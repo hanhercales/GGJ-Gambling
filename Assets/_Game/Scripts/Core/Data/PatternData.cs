@@ -6,18 +6,27 @@ namespace _Game.Scripts.Core.Data
     [CreateAssetMenu(fileName = "NewPattern", menuName = "GameConfig/Pattern Data")]
     public class PatternData : ScriptableObject
     {
-        [Header("Display Info")]
+        #region Thông tin Pattern
+        [Header("Info")]
         public string patternName;
+        #endregion
 
-        [Header("Calculate Score")]
-        public float multiplier = 1.0f;
-        public int priority = 0;
+        #region Cách tính điểm
+        [Header("Scoring")]
+        public float multiplier = 1.0f; // Hệ số nhân
+        public int priority = 0;        // Độ ưu tiên (Số càng to càng được xét trước)
+        #endregion
 
-        [Header("Matrix Config (Editor Only)")]
+        #region Cấu hình Editor (Không dùng trong game)
+        [Header("Editor Config")]
         [Min(1)] public int editorRows = 3; 
         [Min(1)] public int editorCols = 3;
+        #endregion
 
-        [Header("Coordinate Config (Read Only)")]
+        #region Dữ liệu tọa độ
+        [Header("Coordinate Data")]
+        // Danh sách tọa độ tương đối tạo nên hình dáng pattern
         public List<Vector2Int> relativeCoordinates = new List<Vector2Int>();
+        #endregion
     }
 }
