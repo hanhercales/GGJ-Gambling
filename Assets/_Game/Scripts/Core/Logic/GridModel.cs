@@ -63,34 +63,50 @@ namespace _Game.Scripts.Core.Logic
         {
             SymbolData[,] matrix = new SymbolData[cols, rows];
             
-            // 1. Chọn Lucky Symbol
-            SymbolData luckySymbol = _allSymbols[Random.Range(0, _allSymbols.Count)];
-            
-            // 2. Lấy tất cả tọa độ và tráo trộn
+            // Chọn lucky symbol theo trọng số
+            SymbolData luckySymbol = GetRandomSymbol(); 
+
             List<Vector2Int> allCoords = new List<Vector2Int>();
             for (int x = 0; x < cols; x++)
-                for (int y = 0; y < rows; y++)
-                    allCoords.Add(new Vector2Int(x, y));
+            for (int y = 0; y < rows; y++)
+                allCoords.Add(new Vector2Int(x, y));
 
             allCoords = ShuffleList(allCoords);
-
-            // 3. Gán cứng Lucky Symbol vào N vị trí đầu (N = luckValue)
+            
             int guaranteedCount = Mathf.Clamp(luckValue, 0, allCoords.Count);
+
+            // 1. Gán Lucky Symbol vào các vị trí chỉ định
             for (int i = 0; i < guaranteedCount; i++)
             {
                 Vector2Int c = allCoords[i];
                 matrix[c.x, c.y] = luckySymbol;
             }
 
-            // 4. Random các ô còn lại
+            // 2. Random các ô còn lại theo trọng số
             for (int i = guaranteedCount; i < allCoords.Count; i++)
             {
                 Vector2Int c = allCoords[i];
                 matrix[c.x, c.y] = GetRandomSymbol();
             }
+            
+            // Log
+            if (luckValue > 0)
+            {
+                Debug.Log($"<color=cyan>[LUCK] Symbol: {luckySymbol.idName} | Count: {guaranteedCount}</color>");
+            }
 
-            if (luckValue > 0) Debug.Log($"<color=cyan>[LUCK] Applied: {luckValue} x {luckySymbol.idName}</color>");
             return matrix;
+        }
+        
+        // Tạo ra 1 dải băng chứa N symbol ngẫu nhiên
+        public List<SymbolData> CreateRandomStrip(int length)
+        {
+            List<SymbolData> strip = new List<SymbolData>();
+            for (int i = 0; i < length; i++)
+            {
+                strip.Add(GetRandomSymbol());
+            }
+            return strip;
         }
         #endregion
     }
