@@ -8,7 +8,7 @@ namespace _Game.Scripts.Core.Logic
     public class GridModel
     {
         private List<SymbolData> _allSymbols;
-        private float _totalWeight;
+        private int _totalWeight;
 
         public GridModel(List<SymbolData> symbols)
         {
@@ -27,13 +27,12 @@ namespace _Game.Scripts.Core.Logic
         private SymbolData GetRandomSymbol()
         {
             float randomValue = Random.Range(0, _totalWeight);
-            float currentSum = 0;
             foreach (var sym in _allSymbols)
             {
-                currentSum += sym.baseSpawnWeight;
-                if (randomValue <= currentSum) return sym;
+                if (randomValue < sym.baseSpawnWeight) return sym;
+                randomValue -= sym.baseSpawnWeight;
             }
-            return _allSymbols.Last(); 
+            return _allSymbols[0]; 
         }
 
         // Tráo trộn danh sách (Fisher-Yates Shuffle)

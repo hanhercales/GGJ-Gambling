@@ -17,7 +17,7 @@ namespace _Game.Scripts.Core.Data
         public int baseValue = 1;       // Điểm cơ bản
         
         [Tooltip("Trọng số xuất hiện (Càng cao càng dễ ra).")]
-        public float baseSpawnWeight = 10f; 
+        public int baseSpawnWeight; 
         #endregion
     }
 }
