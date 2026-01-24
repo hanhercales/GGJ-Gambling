@@ -59,22 +59,23 @@ namespace _Game.Scripts.Controllers.Machines
             spinButton.interactable = false;
             scoreText.text = "SPINNING...";
 
-            // 1. VISUAL: Bắt đầu hiệu ứng cuộn (Tráo hình)
-            boardView.StartSpinning(rows, cols, allSymbols);
-
-            // 2. LOGIC: Tính toán kết quả ngầm (Có áp dụng Luck)
-            SymbolData[,] grid = _gridModel.GenerateLuckyMatrix(rows, cols, currentLuck);
-            List<MatchResult> results = _evaluator.Evaluate(grid, cols, rows);
-
-            // 3. WAIT: Chờ cho hồi hộp
-            yield return new WaitForSeconds(1.0f);
-
-            // 4. VISUAL: Dừng từng cột và hiện hình thật
+            // 1. LOGIC: Tính toán kết quả trước
+            SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, currentLuck);
+            List<MatchResult> results = _evaluator.Evaluate(finalGrid, cols, rows);
+            
+            // 2. PASS RESULT: Gửi kết quả cho View
+            // Truyền finalGrid vào, BoardView sẽ tự dựng kịch bản để dừng đúng hình đó
             bool animDone = false;
-            StartCoroutine(boardView.StopSpinningRoutine(grid, rows, cols, () => animDone = true));
-            yield return new WaitUntil(() => animDone);
+            StartCoroutine(boardView.SpinSequenceRoutine(finalGrid, _gridModel, rows, cols, () => 
+            {
+                animDone = true;
+            }));
 
-            // 5. END: Tổng kết điểm
+            // Đợi diễn hoạt xong
+            yield return new WaitUntil(() => animDone);
+            yield return new WaitForSeconds(0.5f); // Delay nhỏ cho mượt
+            
+            // 3. VIEW: Show kết quả
             float totalWin = 0;
             foreach (var r in results)
             {
