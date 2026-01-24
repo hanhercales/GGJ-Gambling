@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace _Game.Scripts.Core.Logic
 {
+    // Class chứa kết quả match
     [System.Serializable]
     public class MatchResult
     {
@@ -12,26 +13,15 @@ namespace _Game.Scripts.Core.Logic
         public SymbolData symbol;
         public List<Vector2Int> matchedCoordinates;
 
-        public float GetScore()
-        {
-            return symbol.baseValue * pattern.multiplier;
-        }
+        public float GetScore() => symbol.baseValue * pattern.multiplier;
 
-        // HÀM MỚI: Kiểm tra xem match này có chứa hoàn toàn match kia không
+        // Kiểm tra xem match này có chứa trọn vẹn match kia không
         public bool Contains(MatchResult other)
         {
-            // Nếu khác loại Symbol thì chắc chắn không chứa nhau
             if (this.symbol != other.symbol) return false;
-
-            // Kiểm tra từng tọa độ của 'other' xem có nằm trong 'this' không
-            foreach (var otherCoord in other.matchedCoordinates)
-            {
-                if (!this.matchedCoordinates.Contains(otherCoord))
-                {
-                    return false; // Có 1 ô lòi ra ngoài -> Không phải tập con
-                }
-            }
-            return true; // Tất cả ô của other đều nằm trong this
+            foreach (var c in other.matchedCoordinates)
+                if (!this.matchedCoordinates.Contains(c)) return false;
+            return true;
         }
     }
 
@@ -41,47 +31,44 @@ namespace _Game.Scripts.Core.Logic
 
         public PatternEvaluator(List<PatternData> patterns)
         {
-            // Sắp xếp: Ưu tiên Priority cao, sau đó đến Kích thước lớn
+            // Sort: Priority cao & To hơn xếp trước
             _allPatterns = patterns
                 .OrderByDescending(p => p.priority)
                 .ThenByDescending(p => p.relativeCoordinates.Count)
                 .ToList();
         }
 
+        #region API Chính
         public List<MatchResult> Evaluate(SymbolData[,] grid, int cols, int rows)
         {
-            // BƯỚC 1: TÌM TẤT CẢ CÁC MATCH CÓ THỂ (Không quan tâm chồng lấn)
+            // B1: Tìm tất cả match có thể (Vét cạn)
             List<MatchResult> rawMatches = FindAllMatches(grid, cols, rows);
 
-            // BƯỚC 2: LỌC CÁC MATCH LÀ TẬP CON (Subset Filtering)
-            List<MatchResult> finalMatches = FilterSubsetMatches(rawMatches);
-
-            return finalMatches;
+            // B2: Lọc bỏ các match là tập con của match lớn hơn
+            return FilterSubsetMatches(rawMatches);
         }
+        #endregion
 
+        #region Logic xử lý
         private List<MatchResult> FindAllMatches(SymbolData[,] grid, int cols, int rows)
         {
             List<MatchResult> matches = new List<MatchResult>();
-
             foreach (var pattern in _allPatterns)
             {
                 for (int x = 0; x < cols; x++)
                 {
                     for (int y = 0; y < rows; y++)
                     {
-                        // Ở bước này KHÔNG DÙNG mảng isUsed nữa
-                        // Cho phép quét trùng lặp thoải mái
                         if (CheckMatchAt(grid, pattern, x, y, cols, rows, out SymbolData matchedSymbol))
                         {
-                            MatchResult match = new MatchResult();
-                            match.pattern = pattern;
-                            match.symbol = matchedSymbol;
-                            match.matchedCoordinates = new List<Vector2Int>();
-
+                            MatchResult match = new MatchResult {
+                                pattern = pattern,
+                                symbol = matchedSymbol,
+                                matchedCoordinates = new List<Vector2Int>()
+                            };
                             foreach (var offset in pattern.relativeCoordinates)
-                            {
                                 match.matchedCoordinates.Add(new Vector2Int(x + offset.x, y + offset.y));
-                            }
+                            
                             matches.Add(match);
                         }
                     }
@@ -93,9 +80,8 @@ namespace _Game.Scripts.Core.Logic
         private List<MatchResult> FilterSubsetMatches(List<MatchResult> rawMatches)
         {
             List<MatchResult> validMatches = new List<MatchResult>();
-
-            // Sắp xếp danh sách tìm được theo độ to/ưu tiên giảm dần
-            // Để đảm bảo Pattern to luôn được check trước
+            
+            // Sắp xếp danh sách thô để ưu tiên thằng to
             var sortedRaw = rawMatches
                 .OrderByDescending(m => m.pattern.priority)
                 .ThenByDescending(m => m.matchedCoordinates.Count)
@@ -104,40 +90,29 @@ namespace _Game.Scripts.Core.Logic
             foreach (var candidate in sortedRaw)
             {
                 bool isConsumed = false;
-
-                // So sánh candidate với tất cả các match ĐÃ ĐƯỢC CHẤP NHẬN trước đó
-                // Hoặc so sánh với chính danh sách sortedRaw cũng được, nhưng tối ưu hơn là so với list to hơn
                 foreach (var existing in sortedRaw)
                 {
-                    if (candidate == existing) continue; // Bỏ qua chính nó
+                    if (candidate == existing) continue;
 
-                    // Quy tắc: Chỉ xét Pattern LỚN HƠN (Về Priority hoặc Size)
-                    // Nếu 'existing' to hơn và chứa hoàn toàn 'candidate' -> Loại 'candidate'
-                    bool isExistingLarger = (existing.pattern.priority > candidate.pattern.priority) || 
-                                            (existing.matchedCoordinates.Count > candidate.matchedCoordinates.Count);
-
-                    if (isExistingLarger && existing.Contains(candidate))
+                    // Nếu 'existing' to hơn VÀ chứa trọn vẹn 'candidate' -> 'candidate' bị nuốt
+                    bool isLarger = (existing.pattern.priority > candidate.pattern.priority) || 
+                                    (existing.matchedCoordinates.Count > candidate.matchedCoordinates.Count);
+                    
+                    if (isLarger && existing.Contains(candidate))
                     {
-                        // Trừ trường hợp ngoại lệ: JACKPOT (Theo yêu cầu của bạn, Jackpot là ngoại lệ)
-                        // Nếu existing là Jackpot thì tùy luật, nhưng ở đây ta cứ theo luật chung trước.
-                        if (existing.pattern.patternName != "JACKPOT") 
+                        if (existing.pattern.patternName != "JACKPOT") // Jackpot không nuốt (tuỳ luật)
                         {
                             isConsumed = true;
                             break;
                         }
                     }
                 }
-
-                // Nếu không bị thằng to nào nuốt -> Thêm vào danh sách hợp lệ
-                if (!isConsumed)
-                {
-                    validMatches.Add(candidate);
-                }
+                if (!isConsumed) validMatches.Add(candidate);
             }
-
             return validMatches;
         }
 
+        // Kiểm tra khớp hình tại (startX, startY)
         private bool CheckMatchAt(SymbolData[,] grid, PatternData pattern, int startX, int startY, int cols, int rows, out SymbolData foundSymbol)
         {
             foundSymbol = null;
@@ -145,28 +120,18 @@ namespace _Game.Scripts.Core.Logic
 
             foreach (var offset in pattern.relativeCoordinates)
             {
-                int targetX = startX + offset.x;
-                int targetY = startY + offset.y;
+                int tx = startX + offset.x;
+                int ty = startY + offset.y;
 
-                if (targetX < 0 || targetX >= cols || targetY < 0 || targetY >= rows)
-                    return false;
+                if (tx < 0 || tx >= cols || ty < 0 || ty >= rows) return false; // Out bounds
 
-                // Bỏ đoạn check isUsed ở đây
-
-                SymbolData currentSym = grid[targetX, targetY];
-
-                if (firstSymbol == null)
-                {
-                    firstSymbol = currentSym;
-                }
-                else if (currentSym != firstSymbol)
-                {
-                    return false;
-                }
+                SymbolData current = grid[tx, ty];
+                if (firstSymbol == null) firstSymbol = current;
+                else if (current != firstSymbol) return false; // Khác loại
             }
-
             foundSymbol = firstSymbol;
             return true;
         }
+        #endregion
     }
 }

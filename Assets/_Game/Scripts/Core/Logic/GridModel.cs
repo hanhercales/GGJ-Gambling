@@ -16,63 +16,27 @@ namespace _Game.Scripts.Core.Logic
             CalculateTotalWeight();
         }
 
+        #region Logic Random
         private void CalculateTotalWeight()
         {
             _totalWeight = 0;
+            foreach (var sym in _allSymbols) _totalWeight += sym.baseSpawnWeight;
+        }
+
+        // Chọn symbol dựa trên trọng số (Weighted Random)
+        private SymbolData GetRandomSymbol()
+        {
+            float randomValue = Random.Range(0, _totalWeight);
+            float currentSum = 0;
             foreach (var sym in _allSymbols)
             {
-                _totalWeight += sym.baseSpawnWeight;
+                currentSum += sym.baseSpawnWeight;
+                if (randomValue <= currentSum) return sym;
             }
+            return _allSymbols.Last(); 
         }
 
-        // --- LOGIC MỚI: Sinh Grid có can thiệp bởi Luck ---
-        public SymbolData[,] GenerateLuckyMatrix(int rows, int cols, int luckValue)
-        {
-            SymbolData[,] matrix = new SymbolData[cols, rows];
-            
-            // 1. Chọn ngẫu nhiên 1 Symbol làm "Lucky Symbol"
-            SymbolData luckySymbol = _allSymbols[Random.Range(0, _allSymbols.Count)];
-            
-            // 2. Tạo danh sách tọa độ của toàn bộ bàn cờ
-            List<Vector2Int> allCoords = new List<Vector2Int>();
-            for (int x = 0; x < cols; x++)
-            {
-                for (int y = 0; y < rows; y++)
-                {
-                    allCoords.Add(new Vector2Int(x, y));
-                }
-            }
-
-            // 3. Tráo trộn danh sách tọa độ (Shuffle) để Luck nằm rải rác
-            allCoords = ShuffleList(allCoords);
-
-            // 4. Gán Lucky Symbol vào N vị trí đầu tiên (N = luckValue)
-            // Clamp để đảm bảo không crash nếu luck > tổng số ô
-            int guaranteedCount = Mathf.Clamp(luckValue, 0, allCoords.Count);
-
-            for (int i = 0; i < guaranteedCount; i++)
-            {
-                Vector2Int coord = allCoords[i];
-                matrix[coord.x, coord.y] = luckySymbol;
-            }
-
-            // 5. Random các ô còn lại theo tỷ lệ trọng số bình thường
-            for (int i = guaranteedCount; i < allCoords.Count; i++)
-            {
-                Vector2Int coord = allCoords[i];
-                matrix[coord.x, coord.y] = GetRandomSymbol();
-            }
-
-            // Log ra console để bạn dễ kiểm tra
-            if (luckValue > 0)
-            {
-                Debug.Log($"<color=cyan>[LUCK SYSTEM] Applied: {luckValue} x {luckySymbol.idName}</color>");
-            }
-            
-            return matrix;
-        }
-
-        // Hàm trộn ngẫu nhiên (Fisher-Yates Shuffle)
+        // Tráo trộn danh sách (Fisher-Yates Shuffle)
         private List<T> ShuffleList<T>(List<T> inputList)
         {
             List<T> list = new List<T>(inputList);
@@ -81,32 +45,53 @@ namespace _Game.Scripts.Core.Logic
             {
                 n--;
                 int k = Random.Range(0, n + 1);
-                (list[k], list[n]) = (list[n], list[k]); // Swap cú pháp mới C#
+                (list[k], list[n]) = (list[n], list[k]);
             }
             return list;
         }
+        #endregion
 
-        // Hàm random theo trọng số (Giữ nguyên)
-        private SymbolData GetRandomSymbol()
-        {
-            float randomValue = Random.Range(0, _totalWeight);
-            float currentSum = 0;
-
-            foreach (var sym in _allSymbols)
-            {
-                currentSum += sym.baseSpawnWeight;
-                if (randomValue <= currentSum)
-                {
-                    return sym;
-                }
-            }
-            return _allSymbols.Last(); 
-        }
-
-        // Wrapper cho trường hợp không dùng Luck (Luck = 0)
+        #region API chính
+        // Sinh Grid thường (Luck = 0)
         public SymbolData[,] GenerateMatrix(int rows, int cols)
         {
             return GenerateLuckyMatrix(rows, cols, 0); 
         }
+
+        // Sinh Grid có can thiệp bởi Luck System
+        public SymbolData[,] GenerateLuckyMatrix(int rows, int cols, int luckValue)
+        {
+            SymbolData[,] matrix = new SymbolData[cols, rows];
+            
+            // 1. Chọn Lucky Symbol
+            SymbolData luckySymbol = _allSymbols[Random.Range(0, _allSymbols.Count)];
+            
+            // 2. Lấy tất cả tọa độ và tráo trộn
+            List<Vector2Int> allCoords = new List<Vector2Int>();
+            for (int x = 0; x < cols; x++)
+                for (int y = 0; y < rows; y++)
+                    allCoords.Add(new Vector2Int(x, y));
+
+            allCoords = ShuffleList(allCoords);
+
+            // 3. Gán cứng Lucky Symbol vào N vị trí đầu (N = luckValue)
+            int guaranteedCount = Mathf.Clamp(luckValue, 0, allCoords.Count);
+            for (int i = 0; i < guaranteedCount; i++)
+            {
+                Vector2Int c = allCoords[i];
+                matrix[c.x, c.y] = luckySymbol;
+            }
+
+            // 4. Random các ô còn lại
+            for (int i = guaranteedCount; i < allCoords.Count; i++)
+            {
+                Vector2Int c = allCoords[i];
+                matrix[c.x, c.y] = GetRandomSymbol();
+            }
+
+            if (luckValue > 0) Debug.Log($"<color=cyan>[LUCK] Applied: {luckValue} x {luckySymbol.idName}</color>");
+            return matrix;
+        }
+        #endregion
     }
 }
