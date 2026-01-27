@@ -13,7 +13,8 @@ namespace _Game.Scripts.Core.Data
     
     public class CharmData : RandomSOData
     {
-        CharmTier tier;
+        public CharmTier tier;
+        public bool isEquipped;
     }
 }
 
