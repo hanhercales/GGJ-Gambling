@@ -15,6 +15,16 @@ namespace _Game.Scripts.Core.Data
     {
         public CharmTier tier;
         public bool isEquipped;
+
+        public bool OnEquip()
+        {
+            return true;
+        }
+
+        public bool OnUnequip()
+        {
+            return true;
+        }
     }
 }
 
