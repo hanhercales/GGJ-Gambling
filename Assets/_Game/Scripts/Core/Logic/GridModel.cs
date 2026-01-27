@@ -20,7 +20,7 @@ namespace _Game.Scripts.Core.Logic
         private void CalculateTotalWeight()
         {
             _totalWeight = 0;
-            foreach (var sym in _allSymbols) _totalWeight += sym.baseSpawnWeight;
+            foreach (var sym in _allSymbols) _totalWeight += sym.currentWeight;
         }
 
         // Chọn symbol dựa trên trọng số (Weighted Random)
@@ -29,8 +29,8 @@ namespace _Game.Scripts.Core.Logic
             float randomValue = Random.Range(0, _totalWeight);
             foreach (var sym in _allSymbols)
             {
-                if (randomValue < sym.baseSpawnWeight) return sym;
-                randomValue -= sym.baseSpawnWeight;
+                if (randomValue < sym.currentWeight) return sym;
+                randomValue -= sym.currentWeight;
             }
             return _allSymbols[0]; 
         }
