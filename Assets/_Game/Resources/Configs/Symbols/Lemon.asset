@@ -16,4 +16,4 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 9a3fa5f00e250354295dcd9ba3524d74, type: 3}
   description: 
   baseValue: 2
-  baseSpawnWeight: 19.4
+  baseSpawnWeight: 194
