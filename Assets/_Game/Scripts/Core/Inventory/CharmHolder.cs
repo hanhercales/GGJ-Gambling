@@ -11,6 +11,14 @@ namespace _Game.Scripts.Core.Inventory
         
         public event System.Action OnHolderChanged;
 
+        public void ModifyCapacity(int amount)
+        {
+            size += amount;
+            // Prevent negative size bugs
+            if (size < 0) size = 0; 
+            OnHolderChanged?.Invoke();
+        }
+        
         public bool AddCharm(CharmData charm)
         {
             if(content.Count >= size) return false;

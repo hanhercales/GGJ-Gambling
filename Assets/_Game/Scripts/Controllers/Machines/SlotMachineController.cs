@@ -7,6 +7,7 @@ using TMPro;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Core.Logic;
 using _Game.Scripts.View.UI;
+using _Game.Scripts.Core.Inventory;
 
 namespace _Game.Scripts.Controllers.Machines
 {
@@ -32,6 +33,7 @@ namespace _Game.Scripts.Controllers.Machines
         private GridModel _gridModel;
         private PatternEvaluator _evaluator;
         private bool _isSpinning = false;
+        public CharmHolder charmHolder;
 
         #region Initialization
         private void Start()
@@ -65,12 +67,22 @@ namespace _Game.Scripts.Controllers.Machines
         {
             _isSpinning = true;
             scoreText.text = "SPINNING...";
-
-            // 1. LOGIC: Tính toán kết quả
+    
+            // Check buff đầu game
+            if (charmHolder != null)
+            {
+                var charms = charmHolder.GetContent(); 
+                for (int i = 0; i < charms.Count; i++)
+                {
+                    charms[i].OnSpinStart(this);
+                }
+            }
+    
+            // Core tính toán
             SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, currentLuck);
             List<MatchResult> results = _evaluator.Evaluate(finalGrid, cols, rows);
-            
-            // 2. VIEW: Diễn hoạt
+    
+            // Hoạt ảnh
             bool animDone = false;
             StartCoroutine(boardView.SpinSequenceRoutine(finalGrid, _gridModel, rows, cols, () => 
             {
@@ -79,8 +91,8 @@ namespace _Game.Scripts.Controllers.Machines
 
             yield return new WaitUntil(() => animDone);
             yield return new WaitForSeconds(0.2f); 
-            
-            // 3. SHOW RESULT
+    
+            // Kết quả
             float totalWin = 0;
             foreach (var r in results)
             {
@@ -90,9 +102,22 @@ namespace _Game.Scripts.Controllers.Machines
 
             scoreText.text = totalWin > 0 ? $"WIN: {totalWin}" : "0";
             
+            // Dọn dẹp truớc khi rút
+            if (charmHolder != null)
+            {
+                var charms = charmHolder.GetContent();
+                for (int i = 0; i < charms.Count; i++)
+                {
+                    charms[i].OnSpinResult(this, totalWin);
+                }
+                
+                for (int i = charms.Count - 1; i >= 0; i--)
+                {
+                    charms[i].OnSpinEnd(this);
+                }
+            }
+    
             _isSpinning = false;
-
-            // 4. BÁO CÁO KẾT QUẢ VỀ GAMEMANAGER
             onSpinComplete?.Invoke(totalWin);
         }
         #endregion

@@ -14,13 +14,13 @@ public class ConsumableCharm : CharmData
     public TriggerCondition condition;
     public bool destroyOnUse = true;
 
-    public override void OnSpinEnd()
-    {
-        // if (condition == TriggerCondition.OnDeath && PlayerStats.IsDead)
-        // {
-        //     PlayerStats.Revive();
-        //     if (destroyOnUse) PlayerInventory.RemoveCharm(this);
-        // }
-    }
+    // public override void OnSpinEnd()
+    // {
+    //     // if (condition == TriggerCondition.OnDeath && PlayerStats.IsDead)
+    //     // {
+    //     //     PlayerStats.Revive();
+    //     //     if (destroyOnUse) PlayerInventory.RemoveCharm(this);
+    //     // }
+    // }
 }
 

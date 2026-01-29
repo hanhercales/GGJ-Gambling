@@ -2,6 +2,7 @@
 using UnityEngine;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Controllers.Machines;
+using _Game.Scripts.Core.Inventory;
 
 namespace _Game.Scripts.Core.Managers
 {
@@ -11,6 +12,7 @@ namespace _Game.Scripts.Core.Managers
 
         [Header("References")]
         [SerializeField] private SlotMachineController slotMachine;
+        [SerializeField] private CharmHolder charmHolder;
         
         [Header("Game Config")]
         // Thay thế biến startingDebt cứng bằng Profile mềm dẻo
@@ -58,6 +60,14 @@ namespace _Game.Scripts.Core.Managers
                 ResourceManager.Instance.SetNewDebt(25); // Giá trị chống lỗi (Fallback)
             }
 
+            if (charmHolder != null)
+            {
+                foreach (var charm in charmHolder.GetContent())
+                {
+                    charm.OnRoundStart(this); 
+                }
+            }
+            
             ChangeState(GameState.Preparation);
             
             // Báo cho UI biết đang ở Round 1
@@ -157,6 +167,12 @@ namespace _Game.Scripts.Core.Managers
             currentState = newState;
             OnStateChanged?.Invoke(newState);
             Debug.Log($"Game State Changed: {newState}");
+        }
+
+        public void AddSpins(int amount)
+        {
+            spinsRemaining += amount;
+            OnSpinsChanged?.Invoke(spinsRemaining); 
         }
     }
 }
