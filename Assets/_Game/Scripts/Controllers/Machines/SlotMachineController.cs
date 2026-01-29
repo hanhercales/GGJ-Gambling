@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System; // Cần thêm thư viện này cho Action
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +16,7 @@ namespace _Game.Scripts.Controllers.Machines
         [Header("Settings")]
         public int rows = 3;
         public int cols = 5;
-        [Range(0, 15)] public int currentLuck = 3; // Chỉ số may mắn
+        [Range(0, 15)] public int currentLuck = 3;
 
         [Header("Data")]
         public List<SymbolData> allSymbols;
@@ -23,7 +24,8 @@ namespace _Game.Scripts.Controllers.Machines
 
         [Header("UI")]
         public BoardView boardView;
-        public Button spinButton;
+        // Bỏ nút SpinButton ở đây, vì GameManager hoặc UI Manager sẽ quản lý nút bấm
+        // public Button spinButton; 
         public TextMeshProUGUI scoreText;
         #endregion
 
@@ -31,51 +33,54 @@ namespace _Game.Scripts.Controllers.Machines
         private PatternEvaluator _evaluator;
         private bool _isSpinning = false;
 
-        #region Game Loop
+        #region Initialization
         private void Start()
         {
-            // Init
+            // Init Logic & View
             _gridModel = new GridModel(allSymbols);
             _evaluator = new PatternEvaluator(allPatterns);
             boardView.InitializeBoard(rows, cols);
 
-            // Hiển thị bảng khởi đầu (Luck = 0)
+            // Hiển thị bảng khởi đầu
             SymbolData[,] initGrid = _gridModel.GenerateMatrix(rows, cols);
             boardView.SetInitialState(initGrid, rows, cols);
             
-            spinButton.onClick.AddListener(OnSpinClick);
             scoreText.text = "READY";
         }
+        #endregion
 
-        private void OnSpinClick()
+        #region Public API (Gọi từ GameManager)
+        
+        // GameManager sẽ gọi hàm này và truyền vào một hàm callback để nhận kết quả
+        public void PerformSpin(Action<float> onSpinComplete)
         {
             if (_isSpinning) return;
-            StartCoroutine(SpinRoutine());
+            StartCoroutine(SpinRoutine(onSpinComplete));
         }
 
-        private IEnumerator SpinRoutine()
+        #endregion
+
+        #region Internal Logic
+        private IEnumerator SpinRoutine(Action<float> onSpinComplete)
         {
             _isSpinning = true;
-            spinButton.interactable = false;
             scoreText.text = "SPINNING...";
 
-            // 1. LOGIC: Tính toán kết quả trước
+            // 1. LOGIC: Tính toán kết quả
             SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, currentLuck);
             List<MatchResult> results = _evaluator.Evaluate(finalGrid, cols, rows);
             
-            // 2. PASS RESULT: Gửi kết quả cho View
-            // Truyền finalGrid vào, BoardView sẽ tự dựng kịch bản để dừng đúng hình đó
+            // 2. VIEW: Diễn hoạt
             bool animDone = false;
             StartCoroutine(boardView.SpinSequenceRoutine(finalGrid, _gridModel, rows, cols, () => 
             {
                 animDone = true;
             }));
 
-            // Đợi diễn hoạt xong
             yield return new WaitUntil(() => animDone);
-            yield return new WaitForSeconds(0.5f); // Delay nhỏ cho mượt
+            yield return new WaitForSeconds(0.2f); 
             
-            // 3. VIEW: Show kết quả
+            // 3. SHOW RESULT
             float totalWin = 0;
             foreach (var r in results)
             {
@@ -83,10 +88,12 @@ namespace _Game.Scripts.Controllers.Machines
                 boardView.HighlightWinCells(r.matchedCoordinates, rows, cols);
             }
 
-            scoreText.text = totalWin > 0 ? $"WIN: {totalWin}" : "TRY AGAIN";
+            scoreText.text = totalWin > 0 ? $"WIN: {totalWin}" : "0";
             
             _isSpinning = false;
-            spinButton.interactable = true;
+
+            // 4. BÁO CÁO KẾT QUẢ VỀ GAMEMANAGER
+            onSpinComplete?.Invoke(totalWin);
         }
         #endregion
     }
