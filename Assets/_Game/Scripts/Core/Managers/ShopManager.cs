@@ -3,7 +3,7 @@ using UnityEngine;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Core.Inventory;
 using _Game.Scripts.Core.Utilities;
-using System.Linq; // Cần dùng để xử lý Dictionary hoặc List
+using System.Linq;
 
 namespace _Game.Scripts.Core.Managers
 {
@@ -12,24 +12,22 @@ namespace _Game.Scripts.Core.Managers
         public static ShopManager Instance { get; private set; }
 
         [Header("References")]
-        [SerializeField] private CharmHolder playerInventory; // Kéo CharmHolder vào đây
-        [SerializeField] private List<CharmData> allCharmsPool; // Kéo tất cả Charm SO vào đây
+        [SerializeField] private CharmHolder playerInventory;
+        [SerializeField] private List<CharmData> allCharmsPool; // Danh sách gốc
 
         [Header("Config")]
         [SerializeField] private int shopSlots = 6;
         [SerializeField] private int rerollCost = 5;
 
         [Header("Probability Settings")]
-        // Profile tỉ lệ hiện tại (GameManager sẽ thay đổi cái này khi game khó lên)
         [SerializeField] private ShopProbabilitySO currentProbabilityProfile;
 
-        // Data hiện tại của Shop (để hiển thị UI)
+        // Danh sách hiển thị trên UI
         private List<CharmData> _currentShopItems = new List<CharmData>();
+        
+        // Kho hàng khả dụng (những món người chơi CHƯA có)
+        private Dictionary<CharmTier, List<CharmData>> _availablePool = new Dictionary<CharmTier, List<CharmData>>();
 
-        // Cache: Phân loại Charm theo Tier để truy xuất nhanh, không cần duyệt list mỗi lần roll
-        private Dictionary<CharmTier, List<CharmData>> _charmsByTier = new Dictionary<CharmTier, List<CharmData>>();
-
-        // Event báo cho UI vẽ lại
         public event System.Action<List<CharmData>> OnShopRefreshed;
 
         private void Awake()
@@ -37,88 +35,87 @@ namespace _Game.Scripts.Core.Managers
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
 
-            // Phân loại Charm vào các rổ Tier ngay khi khởi chạy
             InitializeCharmPools();
         }
 
         private void Start()
         {
-            // Tự động roll shop lần đầu (Free)
+            // Đăng ký sự kiện từ CharmHolder
+            if (playerInventory != null)
+            {
+                playerInventory.OnCharmAdded += OnPlayerObtainedCharm;
+                playerInventory.OnCharmRemoved += OnPlayerLostCharm;
+                
+                // Đồng bộ ngay lập tức (phòng trường hợp Load Game đã có đồ)
+                SyncPoolWithInventory();
+            }
+
             RerollShop(true);
         }
 
-        // --- KHỞI TẠO DỮ LIỆU ---
+        private void OnDestroy()
+        {
+            if (playerInventory != null)
+            {
+                playerInventory.OnCharmAdded -= OnPlayerObtainedCharm;
+                playerInventory.OnCharmRemoved -= OnPlayerLostCharm;
+            }
+        }
+
+        // --- QUẢN LÝ KHO (POOL SYSTEM) ---
+
         private void InitializeCharmPools()
         {
-            _charmsByTier.Clear();
-
-            // 1. Tạo list rỗng cho từng loại Tier
+            _availablePool.Clear();
             foreach (CharmTier tier in System.Enum.GetValues(typeof(CharmTier)))
             {
-                _charmsByTier[tier] = new List<CharmData>();
+                _availablePool[tier] = new List<CharmData>();
             }
 
-            // 2. Phân loại từng Charm vào rổ tương ứng
+            // Nạp tất cả vào kho
             foreach (var charm in allCharmsPool)
             {
-                if (_charmsByTier.ContainsKey(charm.tier))
+                if (_availablePool.ContainsKey(charm.tier))
                 {
-                    _charmsByTier[charm.tier].Add(charm);
+                    _availablePool[charm.tier].Add(charm);
                 }
             }
-            
-            Debug.Log($"ShopManager: Đã phân loại {allCharmsPool.Count} charms vào các Tier.");
         }
 
-        // Hàm để GameManager gọi khi muốn đổi tỉ lệ (VD: Qua màn 5 thì đổi profile tỉ lệ mới)
-        public void SetProbabilityProfile(ShopProbabilitySO newProfile)
+        private void SyncPoolWithInventory()
         {
-            currentProbabilityProfile = newProfile;
-            Debug.Log($"Shop Probability Updated: {newProfile.name}");
+            // Loại bỏ những món đang nằm trong túi người chơi
+            foreach (var charm in playerInventory.GetContent())
+            {
+                RemoveFromPool(charm);
+            }
         }
 
-        // --- CORE LOGIC: RANDOM 2 BƯỚC ---
-        private CharmData RollSingleCharm()
+        private void OnPlayerObtainedCharm(CharmData charm) => RemoveFromPool(charm);
+        private void OnPlayerLostCharm(CharmData charm) => AddToPool(charm);
+
+        private void RemoveFromPool(CharmData charm)
         {
-            if (currentProbabilityProfile == null)
+            if (_availablePool.TryGetValue(charm.tier, out var list))
             {
-                Debug.LogError("LỖI: Chưa gán ShopProbabilitySO vào ShopManager!");
-                return null;
+                if (list.Contains(charm)) list.Remove(charm);
             }
-
-            // BƯỚC 1: Chọn Tier dựa trên trọng số của Profile hiện tại
-            // VD: Profile Level 1 có (Common: 100, Rare: 0) -> Chắc chắn ra Common
-            TierWeight selectedTierInfo = WeightedRandomSelector.Select(
-                currentProbabilityProfile.tierWeights, 
-                t => t.weight
-            );
-            
-            CharmTier targetTier = selectedTierInfo.tier;
-
-            // BƯỚC 2: Chọn Charm cụ thể trong Tier đó
-            if (_charmsByTier.TryGetValue(targetTier, out List<CharmData> pool) && pool.Count > 0)
-            {
-                // Dùng tiếp WeightedRandomSelector chọn item dựa trên baseSpawnWeight của chính item đó
-                // (Giúp phân biệt item xịn/dởm trong cùng 1 tier nếu cần)
-                return WeightedRandomSelector.Select(pool, c => c.baseSpawnWeight);
-            }
-
-            // Fallback (Phòng hờ): Nếu quay vào Tier Rare mà chưa tạo charm Rare nào -> Lấy Common bù vào
-            if (_charmsByTier[CharmTier.Common].Count > 0)
-            {
-                return _charmsByTier[CharmTier.Common][0];
-            }
-
-            return null; // Trường hợp xấu nhất (không có data)
         }
 
-        // --- API: REROLL ---
+        private void AddToPool(CharmData charm)
+        {
+            if (_availablePool.TryGetValue(charm.tier, out var list))
+            {
+                if (!list.Contains(charm)) list.Add(charm);
+            }
+        }
+
+        // --- LOGIC REROLL (KHÔNG TRÙNG LẶP) ---
+
         public void RerollShop(bool isFree = false)
         {
-            // 1. Check tiền
             if (!isFree)
             {
-                // TrySpendResource xử lý được cả BigInteger
                 if (!ResourceManager.Instance.TrySpendResource(ResourceType.Coin, rerollCost))
                 {
                     Debug.Log("Không đủ tiền Reroll!");
@@ -126,57 +123,90 @@ namespace _Game.Scripts.Core.Managers
                 }
             }
 
-            // 2. Xóa shop cũ
             _currentShopItems.Clear();
             
-            // 3. Roll từng ô một theo logic mới
+            // Danh sách tạm để kiểm tra trùng lặp TRONG MẺ QUAY NÀY
+            List<CharmData> sessionPicks = new List<CharmData>();
+
             for (int i = 0; i < shopSlots; i++)
             {
-                CharmData newItem = RollSingleCharm();
+                CharmData picked = RollUniqueCharm(sessionPicks);
                 
-                // Lưu ý: newItem có thể null nếu setup data lỗi, ta add null để UI xử lý ô trống
-                _currentShopItems.Add(newItem);
+                // Nếu pick được thì thêm vào danh sách tạm để ô sau không pick trúng nữa
+                if (picked != null)
+                {
+                    sessionPicks.Add(picked);
+                }
+                
+                _currentShopItems.Add(picked);
             }
 
-            // 4. Báo UI cập nhật
             OnShopRefreshed?.Invoke(_currentShopItems);
         }
 
-        // --- API: BUY ---
+        // Hàm roll đảm bảo không trùng với những gì đã roll trước đó trong cùng mẻ
+        private CharmData RollUniqueCharm(List<CharmData> excludeList)
+        {
+            if (currentProbabilityProfile == null) return null;
+
+            int maxAttempts = 10; // Giới hạn số lần thử để tránh treo máy nếu hết sạch đồ
+            
+            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            {
+                // 1. Chọn Tier
+                TierWeight selectedTierInfo = WeightedRandomSelector.Select(
+                    currentProbabilityProfile.tierWeights, 
+                    t => t.weight
+                );
+                CharmTier targetTier = selectedTierInfo.tier;
+
+                // 2. Lấy danh sách khả dụng của Tier đó
+                if (_availablePool.TryGetValue(targetTier, out var pool) && pool.Count > 0)
+                {
+                    // Lọc ra những cái chưa bị chọn trong mẻ này
+                    // (Cách này hơi tốn hiệu năng nhưng đảm bảo an toàn với list nhỏ)
+                    var candidates = pool.Where(c => !excludeList.Contains(c)).ToList();
+
+                    if (candidates.Count > 0)
+                    {
+                        // Chọn 1 cái từ danh sách đã lọc
+                        return WeightedRandomSelector.Select(candidates, c => c.baseSpawnWeight);
+                    }
+                }
+                
+                // Nếu Tier này hết đồ, vòng lặp sẽ tự thử lại (có thể ra Tier khác)
+            }
+
+            // Nếu quay mãi không ra (do hết sạch đồ ở mọi Tier khả thi) -> Trả về null
+            return null;
+        }
+
+        public void SetProbabilityProfile(ShopProbabilitySO newProfile)
+        {
+            currentProbabilityProfile = newProfile;
+        }
+
         public bool TryBuyItem(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= _currentShopItems.Count) return false;
-            
             CharmData item = _currentShopItems[slotIndex];
-            if (item == null) return false; // Ô này trống hoặc đã mua
+            if (item == null) return false;
 
-            // 1. Check tiền (CharmData.price là int, ResourceManager dùng BigInt -> So sánh OK)
-            if (ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin) < item.price)
-            {
-                Debug.Log("Không đủ tiền mua Charm này!");
-                return false;
-            }
+            if (ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin) < item.price) return false;
+            
+            // Check full túi
+            if (playerInventory.GetContent().Count >= playerInventory.GetSize()) return false;
 
-            // 2. Check túi (CharmHolder)
-            if (playerInventory.GetContent().Count >= playerInventory.GetSize())
-            {
-                Debug.Log("Túi đồ đã đầy!");
-                return false;
-            }
-
-            // 3. Thực hiện giao dịch
             ResourceManager.Instance.TrySpendResource(ResourceType.Coin, item.price);
+            
+            // AddCharm sẽ kích hoạt Event -> Gọi RemoveFromPool tự động
             playerInventory.AddCharm(item);
 
-            // 4. Xóa item khỏi shop (để trống ô đó, tránh mua lại)
             _currentShopItems[slotIndex] = null;
-            
-            // 5. Update UI (để ô đó biến mất hoặc hiện chữ SOLD)
             OnShopRefreshed?.Invoke(_currentShopItems);
-            
             return true;
         }
-
+        
         public int GetRerollCost() => rerollCost;
         public List<CharmData> GetCurrentItems() => _currentShopItems;
     }
