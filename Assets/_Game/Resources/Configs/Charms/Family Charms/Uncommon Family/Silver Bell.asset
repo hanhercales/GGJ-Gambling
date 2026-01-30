@@ -22,5 +22,5 @@ MonoBehaviour:
   description: 
   requiredCharmToUnlock:
   - {fileID: 11400000, guid: 99f17ff89c305b941ada4200463d12b8, type: 2}
-  targetedSymbol: {fileID: 0}
+  targetedSymbol: {fileID: 11400000, guid: cee35f6c399c3f74eafab04910b921d6, type: 2}
   bonusLevels: 2

@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f32ff4fa50da41cd9a9c9722018bdd84, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.ShopProbabilitySO
-  tierWeights: []
+  tierWeights:
+  - tier: 0
+    weight: 25
+  - tier: 1
+    weight: 24
+  - tier: 2
+    weight: 23
+  - tier: 3
+    weight: 25
