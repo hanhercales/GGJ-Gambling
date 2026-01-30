@@ -8,12 +8,23 @@ namespace _Game.Scripts.Core.Data
         #region Thông số Gameplay
         [Header("Base Stats")]
         public int baseValue = 1;       // Điểm cơ bản
-        public int currentWeight; 
+        // Trọng số hiện tại (Sau khi đã cộng trừ buff)
+        // Biến này sẽ được GridModel dùng để tính toán
+        [Header("Runtime Info (Read Only)")]
+        public int currentWeight;
         #endregion
 
         public void ResetWeight()
         {
             currentWeight = baseSpawnWeight;
+        }
+        
+        public void ModifyWeight(int amount)
+        {
+            currentWeight += amount;
+            
+            // Đảm bảo trọng số không bao giờ âm
+            if (currentWeight < 0) currentWeight = 0;
         }
     }
 }
