@@ -127,6 +127,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 469722459}
     m_Modifications:
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: soldOutOverlay
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: selectionHighlight
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4035061263302738296, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -1414,7 +1422,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75fa92f8b0e946eb875f71dc7bd9c4fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.ShopManager
-  playerInventory: {fileID: 1908492100}
+  playerInventory: {fileID: 1661107992}
   allCharmsPool:
   - {fileID: 11400000, guid: c2f13510321abd046a155e99dec3211d, type: 2}
   - {fileID: 11400000, guid: 27323963a8f4970489d7c6f29b94c40c, type: 2}
@@ -2599,6 +2607,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 469722459}
     m_Modifications:
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: soldOutOverlay
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: selectionHighlight
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4035061263302738296, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -2784,6 +2800,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 469722459}
     m_Modifications:
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: soldOutOverlay
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: selectionHighlight
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4035061263302738296, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -4109,6 +4133,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 469722459}
     m_Modifications:
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: soldOutOverlay
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: selectionHighlight
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4035061263302738296, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -4299,6 +4331,7 @@ GameObject:
   - component: {fileID: 1661107989}
   - component: {fileID: 1661107988}
   - component: {fileID: 1661107987}
+  - component: {fileID: 1661107992}
   - component: {fileID: 1661107991}
   m_Layer: 5
   m_Name: Panel_Right
@@ -4338,7 +4371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a5c122882c88264aaf27e7a7cac29cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.View.UI.HolderDisplay
-  charmHolder: {fileID: 1908492100}
+  charmHolder: {fileID: 1661107992}
   holderSlotPrefab: {fileID: 5182998091355254636, guid: b5eeac17795c7c243a9900a1c2526d93, type: 3}
   slotParent: {fileID: 1661107986}
 --- !u!114 &1661107988
@@ -4423,6 +4456,20 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: 1
   m_LayoutPriority: 1
+--- !u!114 &1661107992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1661107985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba71079f1781f2b49aefeb367d83a944, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Inventory.CharmHolder
+  content: []
+  size: 7
 --- !u!1 &1680492848
 GameObject:
   m_ObjectHideFlags: 0
@@ -4527,6 +4574,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 469722459}
     m_Modifications:
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: soldOutOverlay
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 372057379930310029, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: selectionHighlight
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4035061263302738296, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -5064,52 +5119,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8295252733802010289, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
   m_PrefabInstance: {fileID: 4381221160907126437}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1908492099
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1908492101}
-  - component: {fileID: 1908492100}
-  m_Layer: 0
-  m_Name: CharmHolder
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1908492100
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1908492099}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba71079f1781f2b49aefeb367d83a944, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Inventory.CharmHolder
-  content: []
-  size: 7
---- !u!4 &1908492101
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1908492099}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1916981136}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1916981133
 GameObject:
   m_ObjectHideFlags: 0
@@ -5185,7 +5194,7 @@ MonoBehaviour:
   boardView: {fileID: 1916981134}
   spinButton: {fileID: 1560163310}
   scoreText: {fileID: 1565976741}
-  charmHolder: {fileID: 1908492100}
+  charmHolder: {fileID: 1661107992}
   luckManager: {fileID: 2090457733}
 --- !u!4 &1916981136
 Transform:
@@ -5199,8 +5208,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1908492101}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1964265815
@@ -5405,11 +5413,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.GameManager
   slotMachine: {fileID: 1916981135}
   luckManager: {fileID: 2090457733}
-  charmHolder: {fileID: 1908492100}
+  charmHolder: {fileID: 1661107992}
   difficultyProfile: {fileID: 11400000, guid: 58720afc786cd7d4588a70d64451dfdc, type: 2}
   startingCoin: 20
   stagesPerDebtRound: 4
-  shopProfiles: []
+  shopProfiles:
+  - {fileID: 11400000, guid: ebc113ab7fb2b65479f873f92f3c7b04, type: 2}
   currentState: 0
   currentDebtRound: 1
   currentStage: 1
@@ -5428,6 +5437,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.LuckManager
   baseLuckFromCharms: 0
+  lastCalculatedTotalLuck: 0
   spinCount: 0
   loseStreak: 0
   debtCompleted: 0

@@ -167,15 +167,18 @@ namespace _Game.Scripts.Core.Managers
             
             if (charmHolder != null)
             {
+                // Tạo bản sao list (ToList) để tránh lỗi khi Charm tự xóa mình (NumberCharm, Lightbulb)
                 var charms = new List<CharmData>(charmHolder.GetContent());
+        
                 foreach (var charm in charms)
                 {
-                    // Logic xử lý thắng thua (ConsoPrizeCharm reset streak)
+                    // 1. Xử lý kết quả thắng thua (ConsoPrizeCharm)
                     charm.OnSpinResult(slotMachine, luckManager, winAmount);
-                    
+            
+                    // 2. Xử lý Buff Symbol vĩnh viễn (CSymbolCharm) - QUAN TRỌNG
                     charm.OnSpinResultBuff(slotMachine, results);
-                    
-                    // Logic dọn dẹp buff / Trừ độ bền (NumberCharm, Lightbulb)
+            
+                    // 3. Dọn dẹp cuối turn & Tự hủy (NumberCharm, Lightbulb)
                     charm.OnSpinEnd(slotMachine, luckManager);
                 }
             }

@@ -10,6 +10,8 @@ namespace _Game.Scripts.Core.Inventory
         [SerializeField] private int size = 7;
         
         public event System.Action OnHolderChanged;
+        public event System.Action<CharmData> OnCharmAdded;
+        public event System.Action<CharmData> OnCharmRemoved;
 
         public void ModifyCapacity(int amount)
         {
@@ -27,6 +29,9 @@ namespace _Game.Scripts.Core.Inventory
             charm.OnEquip(this);
             
             OnHolderChanged?.Invoke();
+            
+            OnCharmAdded?.Invoke(charm);
+            
             return true;
         }
 
@@ -38,6 +43,8 @@ namespace _Game.Scripts.Core.Inventory
                 
                 content.Remove(charm);
                 OnHolderChanged?.Invoke();
+                
+                OnCharmRemoved?.Invoke(charm);
                 return true;
             }
             return false;
@@ -45,9 +52,13 @@ namespace _Game.Scripts.Core.Inventory
 
         public bool ClearCharms()
         {
-            foreach(var c in content) c.OnUnequip(this);
-            content.Clear();
-            OnHolderChanged?.Invoke();
+            // Cần loop để bắn event cho từng cái, đảm bảo trả hết về kho
+            // Tạo bản sao list để tránh lỗi khi xóa
+            var tempContent = new List<CharmData>(content);
+            foreach(var c in tempContent)
+            {
+                RemoveCharm(c);
+            }
             return true;
         }
         

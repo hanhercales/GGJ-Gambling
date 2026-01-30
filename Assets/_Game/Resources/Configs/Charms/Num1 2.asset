@@ -21,6 +21,6 @@ MonoBehaviour:
   isEquipped: 0
   description: 
   requiredCharmToUnlock: []
-  triggerChance: 10
+  triggerChance: 50
   luckBonus: 6
-  maxUses: 9
+  maxUses: 2
