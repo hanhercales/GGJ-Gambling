@@ -49,7 +49,9 @@ namespace _Game.Scripts.Core.Managers
             
             // Reset toàn bộ dữ liệu về ban đầu
             ResourceManager.Instance.ResetAllData(startingCoin);
-
+                
+            WeightManager.Instance.ResetAllWeights();
+            
             if (difficultyProfile != null)
             {
                 // Lấy nợ của vòng 1
