@@ -5,6 +5,7 @@ using UnityEngine;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Inventory;
+using _Game.Scripts.Core.Logic;
 
 namespace _Game.Scripts.Core.Managers
 {
@@ -133,7 +134,17 @@ namespace _Game.Scripts.Core.Managers
         {
             if (currentState != GameState.Spinning) return;
             if (spinsRemaining <= 0) return;
-
+            
+            if (charmHolder != null)
+            {
+                // Tạo bản sao list để tránh lỗi nếu charm tự hủy trong quá trình duyệt
+                var charms = new List<CharmData>(charmHolder.GetContent());
+                foreach (var charm in charms)
+                {
+                    charm.OnSpinStart(slotMachine, luckManager);
+                }
+            }
+            
             // Lấy Luck từ manager
             int calculatedLuck = LuckManager.Instance.CalculateLuckForSpin();
             Debug.Log($"Spin {LuckManager.Instance.SpinCount + 1} - Luck Applied: {calculatedLuck}");
@@ -142,7 +153,7 @@ namespace _Game.Scripts.Core.Managers
             slotMachine.PerformSpin(calculatedLuck, OnSpinCompleted);
         }
         
-        private void OnSpinCompleted(float winAmount)
+        private void OnSpinCompleted(float winAmount, List<MatchResult> results)
         {
             // Báo cáo kết quả để tính Pity
             bool isWin = winAmount > 0;
@@ -152,6 +163,21 @@ namespace _Game.Scripts.Core.Managers
             if (winAmount > 0)
             {
                 ResourceManager.Instance.AddResource(ResourceType.Coin, (int)winAmount);
+            }
+            
+            if (charmHolder != null)
+            {
+                var charms = new List<CharmData>(charmHolder.GetContent());
+                foreach (var charm in charms)
+                {
+                    // Logic xử lý thắng thua (ConsoPrizeCharm reset streak)
+                    charm.OnSpinResult(slotMachine, luckManager, winAmount);
+                    
+                    charm.OnSpinResultBuff(slotMachine, results);
+                    
+                    // Logic dọn dẹp buff / Trừ độ bền (NumberCharm, Lightbulb)
+                    charm.OnSpinEnd(slotMachine, luckManager);
+                }
             }
 
             // Trừ lượt quay
@@ -196,45 +222,85 @@ namespace _Game.Scripts.Core.Managers
         {
             ChangeState(GameState.RoundEnd);
 
-            // Logic kiểm tra trả nợ
+            // Bước 1: Thử trả nợ
             if (ResourceManager.Instance.TryPayDebt())
             {
-                Debug.Log($"DEBT ROUND {currentDebtRound} CLEARED!");
+                OnDebtPaidSuccess();
+                return;
+            }
 
-                // Tăng vòng Nợ lên
-                currentDebtRound++;
-                
-                // Reset Stage về 1
-                currentStage = 1;
-                
-                if (charmHolder != null)
+            // Bước 2: Nếu không đủ tiền -> Hỏi Charm xem có ai cứu không? (AnkhCharm)
+            bool isSaved = false;
+            if (charmHolder != null)
+            {
+                // Duyệt qua từng charm để tìm phao cứu sinh
+                var charms = new List<CharmData>(charmHolder.GetContent());
+                foreach (var charm in charms)
                 {
-                    foreach (var charm in charmHolder.GetContent())
+                    int currentCoin = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
+                    int currentDebt = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Debt);
+
+                    // Nếu Charm trả về true nghĩa là nó đã cứu
+                    if (charm.OnPaymentCheck(currentCoin, currentDebt))
                     {
-                        charm.OnRoundStart(this); // Trigger +2 Spins for the new round
+                        isSaved = true;
+                        Debug.Log($"<color=green>SAVED BY CHARM: {charm.charmName}</color>");
+                        
+                        // Xử lý tiêu thụ charm Ankh (trong script AnkhCharm cần gọi holder.RemoveCharm)
+                        // Trong AnkhCharm của bạn, bạn cần bỏ comment dòng Consume() hoặc xử lý logic đó.
+                        if (charm is ConsumableCharm consumable && consumable.destroyOnUse)
+                        {
+                             charmHolder.RemoveCharm(charm);
+                        }
+                        
+                        break; // Chỉ cần 1 cái cứu là đủ
                     }
                 }
-                
-                // Báo cho Luck Manager biết đã qua 1 deadline
-                LuckManager.Instance.IncrementDebtCompleted();
+            }
 
-                // Setup Nợ mới
-                if (difficultyProfile != null)
-                {
-                    BigInteger nextDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
-                    ResourceManager.Instance.SetNewDebt(nextDebt);
-                }
-                
-                UpdateShopDifficulty();
-                
-                ChangeState(GameState.Preparation);
-                NotifyRoundInfo();
+            if (isSaved)
+            {
+                // Nếu được cứu -> Coi như thành công qua màn
+                OnDebtPaidSuccess();
             }
             else
             {
+                // Bước 3: Chết thật
                 Debug.Log("Phá sản! Game Over.");
                 ChangeState(GameState.GameOver);
+                if (UIManager.Instance != null) UIManager.Instance.CloseAllDialogs();
             }
+        }
+        
+        private void OnDebtPaidSuccess()
+        {
+            Debug.Log($"DEBT ROUND {currentDebtRound} CLEARED!");
+
+            currentDebtRound++;
+            currentStage = 1;
+            
+            // Trigger Charm OnRoundStart (ExtraSpinCharm)
+            if (charmHolder != null)
+            {
+                foreach (var charm in charmHolder.GetContent())
+                {
+                    charm.OnRoundStart(this); 
+                }
+            }
+            
+            luckManager.IncrementDebtCompleted();
+
+            if (difficultyProfile != null)
+            {
+                BigInteger nextDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
+                ResourceManager.Instance.SetNewDebt(nextDebt);
+            }
+            
+            // Update Shop Probability (Logic bạn đã thêm trước đó)
+            UpdateShopDifficulty();
+
+            ChangeState(GameState.Preparation);
+            NotifyRoundInfo();
         }
 
         private void ChangeState(GameState newState)
