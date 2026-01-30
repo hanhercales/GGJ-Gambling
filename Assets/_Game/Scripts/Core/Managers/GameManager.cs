@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using _Game.Scripts.Core.Data;
@@ -21,6 +22,10 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private int startingCoin = 10; 
         [SerializeField] private int stagesPerDebtRound = 4;
 
+        [Header("Shop Progression")]
+        [Tooltip("Danh sách tỉ lệ Shop theo độ khó. VD: Element 0 = Early, Element 1 = Mid...")]
+        [SerializeField] private List<ShopProbabilitySO> shopProfiles;
+        
         [Header("Current State (Read Only)")]
         [SerializeField] private GameState currentState;
         [SerializeField] private int currentDebtRound = 1;
@@ -65,6 +70,13 @@ namespace _Game.Scripts.Core.Managers
             // Gọi thông qua SlotMachineController vì nó giữ list Pattern
             if (slotMachine != null)
                 slotMachine.ResetPatternStats();
+            
+            // Cập nhật tỉ lệ Shop về Early Game
+            UpdateShopDifficulty();
+            
+            // Reroll Shop miễn phí cho khởi đầu mới
+            if (ShopManager.Instance != null)
+                ShopManager.Instance.RerollShop(true);
 
             // Setup Nợ ban đầu
             if (difficultyProfile != null)
@@ -78,8 +90,11 @@ namespace _Game.Scripts.Core.Managers
                 ResourceManager.Instance.SetNewDebt(25);
             }
 
+            // Trigger Charm OnRoundStart (nếu có giữ lại charm từ game trước - tùy logic)
             if (charmHolder != null)
             {
+                // Lưu ý: Thường StartNewGame sẽ clear charm, nhưng nếu game cho giữ thì gọi dòng này
+                // charmHolder.ClearCharms(); // Nếu muốn xóa sạch túi
                 foreach (var charm in charmHolder.GetContent())
                 {
                     charm.OnRoundStart(this); 
@@ -210,6 +225,8 @@ namespace _Game.Scripts.Core.Managers
                     ResourceManager.Instance.SetNewDebt(nextDebt);
                 }
                 
+                UpdateShopDifficulty();
+                
                 ChangeState(GameState.Preparation);
                 NotifyRoundInfo();
             }
@@ -223,8 +240,32 @@ namespace _Game.Scripts.Core.Managers
         private void ChangeState(GameState newState)
         {
             currentState = newState;
+            
+            // Khi bắt đầu quay, đóng tất cả Shop/Dialog để người chơi tập trung
+            if (newState == GameState.Spinning || newState == GameState.GameOver)
+            {
+                if (UIManager.Instance != null)
+                    UIManager.Instance.CloseAllDialogs();
+            }
+            
             OnStateChanged?.Invoke(newState);
             Debug.Log($"Game State Changed: {newState}");
+        }
+        
+        private void UpdateShopDifficulty()
+        {
+            if (shopProfiles == null || shopProfiles.Count == 0) return;
+
+            // Logic ví dụ: Cứ mỗi 3 Round thì tăng độ khó shop lên 1 bậc
+            // Round 1-3: Index 0
+            // Round 4-6: Index 1
+            // ...
+            int profileIndex = Mathf.Clamp((currentDebtRound - 1) / 3, 0, shopProfiles.Count - 1);
+            
+            if (ShopManager.Instance != null)
+            {
+                ShopManager.Instance.SetProbabilityProfile(shopProfiles[profileIndex]);
+            }
         }
 
         public void AddSpins(int amount)
