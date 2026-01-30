@@ -49,6 +49,19 @@ namespace _Game.Scripts.Core.Inventory
             }
             return false;
         }
+        
+        public bool HasCharm(CharmData charm)
+        {
+            // Check by Reference (Exact Asset)
+            if (content.Contains(charm)) return true;
+            
+            foreach(var c in content)
+            {
+                if (c.idName == charm.idName) return true;
+            }
+    
+            return false;
+        }
 
         public bool ClearCharms()
         {

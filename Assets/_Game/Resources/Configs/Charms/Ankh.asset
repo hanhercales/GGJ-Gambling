@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8491eb4f30431334891c91f1592323e7, type: 3}
+  m_Name: Ankh
+  m_EditorClassIdentifier: Assembly-CSharp::AnkhCharm
+  idName: Ankh
+  icon: {fileID: 0}
+  baseSpawnWeight: 0
+  tier: 1
+  charmName: Ankh
+  price: 1
+  isEquipped: 0
+  description: 
+  requiredCharmToUnlock: []
+  condition: 0
+  destroyOnUse: 1
