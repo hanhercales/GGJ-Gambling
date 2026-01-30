@@ -14,7 +14,7 @@ namespace _Game.Scripts.Core.Editor
             
             #region Vẽ UI mặc định
             EditorGUILayout.PropertyField(serializedObject.FindProperty("patternName"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("multiplier"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("baseMultiplier"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("priority"));
             #endregion
 
