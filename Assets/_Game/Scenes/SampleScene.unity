@@ -1786,7 +1786,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Controllers.Machines.SlotMachineController
   rows: 3
   cols: 5
-  currentLuck: 3
   allSymbols:
   - {fileID: 11400000, guid: cee35f6c399c3f74eafab04910b921d6, type: 2}
   - {fileID: 11400000, guid: a1186c9672f10e4479d888e58ce6d2bf, type: 2}
@@ -1837,6 +1836,8 @@ GameObject:
   - component: {fileID: 2090457731}
   - component: {fileID: 2090457732}
   - component: {fileID: 2090457730}
+  - component: {fileID: 2090457733}
+  - component: {fileID: 2090457734}
   m_Layer: 0
   m_Name: '[MANAGER]'
   m_TagString: Untagged
@@ -1887,12 +1888,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.GameManager
   slotMachine: {fileID: 1916981135}
+  luckManager: {fileID: 2090457733}
   difficultyProfile: {fileID: 11400000, guid: 58720afc786cd7d4588a70d64451dfdc, type: 2}
   startingCoin: 20
+  stagesPerDebtRound: 4
   currentState: 0
-  currentRound: 1
+  currentDebtRound: 1
+  currentStage: 1
   spinsRemaining: 0
   currentPack: {fileID: 11400000, guid: 1e35fcda5c39f8042a510c6d88047ec1, type: 2}
+--- !u!114 &2090457733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090457729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4fac1287eb24ee28db86545653e5b0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.LuckManager
+  baseLuckFromCharms: 0
+  spinCount: 0
+  loseStreak: 0
+  debtCompleted: 0
+--- !u!114 &2090457734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090457729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71051c167be44a9c85620ab9aca39b51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.WeightManager
+  allSymbols:
+  - {fileID: 11400000, guid: cee35f6c399c3f74eafab04910b921d6, type: 2}
+  - {fileID: 11400000, guid: a1186c9672f10e4479d888e58ce6d2bf, type: 2}
+  - {fileID: 11400000, guid: e9020101daf34ef49a73cf74151aaa7f, type: 2}
+  - {fileID: 11400000, guid: ef852a7348f60e24db069d7e1b42dbb5, type: 2}
+  - {fileID: 11400000, guid: 345c52dbb02010b48a7ea8e2a58780fa, type: 2}
+  - {fileID: 11400000, guid: 88c0899ff2813184a97a75f51ea04950, type: 2}
+  - {fileID: 11400000, guid: 4d7f4d5cb006b5a4db0e87d7fd5d2016, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
