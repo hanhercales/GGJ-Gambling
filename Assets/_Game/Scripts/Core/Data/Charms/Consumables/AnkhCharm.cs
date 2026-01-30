@@ -1,23 +1,36 @@
 using UnityEngine;
 using _Game.Scripts.Core.Data;
+using _Game.Scripts.Core.Inventory; // <--- Add this namespace
 
 [CreateAssetMenu(menuName = "Charms/Consumables/Ankh")]
+public class AnkhCharm : ConsumableCharm
+{
+    [System.NonSerialized] private CharmHolder _myHolder;
 
-    public class AnkhCharm : ConsumableCharm
+    public override void OnEquip(CharmHolder holder)
     {
-        public override bool OnPaymentCheck(int currentCoin, int currentDebt)
+        _myHolder = holder;
+    }
+
+    public override bool OnPaymentCheck(int currentCoin, int currentDebt)
+    {
+        if (currentCoin < currentDebt)
         {
-            // Only trigger if the player is actually broke
-            if (currentCoin < currentDebt)
+            Debug.Log($"[Ankh] Activated! Debt {currentDebt} not met. Granting extra rounds.");
+
+            // 1. Discard the charm (It's a one-time use)
+            if (_myHolder != null)
             {
-                Debug.Log($"[Ankh] Player saved! Debt remaining: {currentDebt}");
-                
-                // Destroy the Ankh
-                // Consume(); 
-                
-                // Return TRUE to tell GameManager to stop the Game Over process
-                return true;
+                _myHolder.RemoveCharm(this);
             }
-            return false; 
+            else
+            {
+                Debug.LogWarning("[Ankh] No Holder found, cannot discard!");
+            }
+
+            // 2. Return TRUE to tell GameManager "Don't Game Over, I handled it."
+            return true; 
         }
+        return false; 
+    }
 }

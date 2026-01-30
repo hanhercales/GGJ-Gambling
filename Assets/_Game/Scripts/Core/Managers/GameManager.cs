@@ -181,43 +181,64 @@ namespace _Game.Scripts.Core.Managers
         {
             ChangeState(GameState.RoundEnd);
 
-            // Logic kiểm tra trả nợ
+            // Case A: Player has enough money
             if (ResourceManager.Instance.TryPayDebt())
             {
                 Debug.Log($"DEBT ROUND {currentDebtRound} CLEARED!");
-
-                // Tăng vòng Nợ lên
+        
                 currentDebtRound++;
-                
-                // Reset Stage về 1
                 currentStage = 1;
-                
-                if (charmHolder != null)
-                {
-                    foreach (var charm in charmHolder.GetContent())
-                    {
-                        charm.OnRoundStart(this); // Trigger +2 Spins for the new round
-                    }
-                }
-                
-                // Báo cho Luck Manager biết đã qua 1 deadline
                 LuckManager.Instance.IncrementDebtCompleted();
 
-                // Setup Nợ mới
                 if (difficultyProfile != null)
                 {
                     BigInteger nextDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
                     ResourceManager.Instance.SetNewDebt(nextDebt);
                 }
-                
+        
+                // Loop for new round buffs (+2 spins, etc.)
+                if (charmHolder != null)
+                {
+                    foreach (var charm in charmHolder.GetContent()) charm.OnRoundStart(this);
+                }
+
                 ChangeState(GameState.Preparation);
                 NotifyRoundInfo();
             }
+            // Case B: Player is broke, BUT has Ankh
+            else if (CheckCharmsForRescue())
+            {
+                Debug.Log("SAVED BY CHARM! Extending deadline by 2 stages.");
+                currentStage = Mathf.Max(1, stagesPerDebtRound - 2); 
+        
+                ChangeState(GameState.Preparation);
+                NotifyRoundInfo();
+            }
+            // Case C: Game Over
             else
             {
                 Debug.Log("Phá sản! Game Over.");
                 ChangeState(GameState.GameOver);
             }
+        }
+        
+        private bool CheckCharmsForRescue()
+        {
+            if (charmHolder == null) return false;
+            
+            int coin = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
+            int debt = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Debt);
+
+            var charms = charmHolder.GetContent();
+            
+            for (int i = charms.Count - 1; i >= 0; i--)
+            {
+                if (charms[i].OnPaymentCheck(coin, debt))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void ChangeState(GameState newState)
