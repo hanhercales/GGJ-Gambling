@@ -10,6 +10,10 @@ namespace _Game.Scripts.Core.Managers
 
         [Header("State Info (Read Only)")]
         [SerializeField] public int baseLuckFromCharms = 0;
+        
+        [Tooltip("Tổng Luck thực tế (Base + Bonus) được áp dụng ở lần quay gần nhất.")]
+        [SerializeField] private int lastCalculatedTotalLuck = 0;
+        
         [SerializeField] private int spinCount = 0;     // Tổng số lượt đã quay
         [SerializeField] private int loseStreak = 0;    // Chuỗi thua liên tiếp (Pity)
         [SerializeField] private int debtCompleted = 0; // Số vòng nợ đã hoàn thành (để tính OLS)
@@ -96,6 +100,8 @@ namespace _Game.Scripts.Core.Managers
             // Trigger Visual Effect nếu có
             if (sparkTriggered) OnSparkTriggered?.Invoke();
 
+            lastCalculatedTotalLuck = finalLuck;
+            
             return finalLuck;
         }
 

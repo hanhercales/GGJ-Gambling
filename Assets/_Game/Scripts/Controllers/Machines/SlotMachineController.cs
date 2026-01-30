@@ -52,7 +52,7 @@ namespace _Game.Scripts.Controllers.Machines
         #endregion
 
         #region Public API (Gọi từ GameManager)
-        public void PerformSpin(int luckValue, Action<float> onSpinComplete)
+        public void PerformSpin(int luckValue, System.Action<float, List<MatchResult>> onSpinComplete)
         {
             if (_isSpinning) return;
             StartCoroutine(SpinRoutine(luckValue, onSpinComplete));
@@ -68,7 +68,7 @@ namespace _Game.Scripts.Controllers.Machines
         #endregion
 
         #region Internal Logic
-        private IEnumerator SpinRoutine(int luckValue, Action<float> onSpinComplete)
+        private IEnumerator SpinRoutine(int luckValue, System.Action<float, List<MatchResult>> onSpinComplete)
         {
             _isSpinning = true;
             spinButton.interactable = false;
@@ -133,7 +133,7 @@ namespace _Game.Scripts.Controllers.Machines
             spinButton.interactable = true;
 
             // 4. BÁO CÁO KẾT QUẢ VỀ GAMEMANAGER
-            onSpinComplete?.Invoke(totalWin);
+            onSpinComplete?.Invoke(totalWin, results);
         }
         #endregion
     }

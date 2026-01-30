@@ -11,7 +11,6 @@ public class LightbulbCharm : CharmData
     public int luckAmount = 15;
     public int duration = 2;
 
-    // Runtime state
     [System.NonSerialized] private int _roundsRemaining = 0;
     [System.NonSerialized] private CharmHolder _myHolder;
 
@@ -20,34 +19,34 @@ public class LightbulbCharm : CharmData
     public override void OnEquip(CharmHolder holder)
     {
         _myHolder = holder;
-        _roundsRemaining = duration; // Set to 2
-        Debug.Log($"[Lightbulb] Equipped! Active for next {duration} spins.");
+        _roundsRemaining = duration; 
+        Debug.Log($"[Lightbulb] Equipped! Active for {duration} spins.");
     }
 
     public override void OnSpinStart(SlotMachineController machine, LuckManager luckManager)
     {
+        // Chỉ buff nếu còn lượt
         if (_roundsRemaining > 0)
         {
             luckManager.baseLuckFromCharms += luckAmount;
-            Debug.Log($"[Lightbulb] Active! +{luckAmount} Luck ({_roundsRemaining} spins left).");
+            Debug.Log($"[Lightbulb] Active! +{luckAmount} Luck ({_roundsRemaining} left).");
         }
     }
     
     public override void OnSpinEnd(SlotMachineController machine, LuckManager luckManager)
     {
-        // Cleanup Logic
         if (_roundsRemaining > 0)
         {
-            // Remove the temporary luck
+            // 1. Trả lại Luck
             luckManager.baseLuckFromCharms -= luckAmount;
             
-            // Tick down
+            // 2. Trừ lượt tồn tại
             _roundsRemaining--;
 
-            // Discard Check
+            // 3. Kiểm tra hủy
             if (_roundsRemaining <= 0)
             {
-                Debug.Log("[Lightbulb] Burnt out! Discarding charm.");
+                Debug.Log("[Lightbulb] Burnt out! Removing...");
                 if (_myHolder != null)
                 {
                     _myHolder.RemoveCharm(this);
