@@ -10,6 +10,8 @@ namespace _Game.Scripts.Core.Managers
 
         [Header("Data References")]
         [SerializeField] private List<SymbolData> allSymbols;
+        
+        private int _cachedTotalWeight = 0;
 
         private void Awake()
         {
@@ -24,6 +26,7 @@ namespace _Game.Scripts.Core.Managers
             {
                 symbol.ResetStats();
             }
+            RecalculateTotalWeight();
             Debug.Log("WeightManager: Đã reset trọng số về gốc.");
         }
 
@@ -34,17 +37,41 @@ namespace _Game.Scripts.Core.Managers
             if (targetSymbol != null)
             {
                 targetSymbol.ModifyWeight(amount);
-                Debug.Log($"Weight Buff: {targetSymbol.idName} += {amount} (New: {targetSymbol.currentWeight})");
+                RecalculateTotalWeight();
             }
         }
         
-        // 3. API Buff toàn bộ (Ví dụ Charm buff tất cả trái cây)
-        public void ApplyGlobalBuff(int amount)
+        // HÀM MỚI: Dùng cho logic Buff (+1) = +0.8
+        public void ApplyBuffLevel(SymbolData targetSymbol, int levels)
         {
+            if (targetSymbol != null)
+            {
+                targetSymbol.AddWeightLevel(levels);
+                RecalculateTotalWeight();
+                Debug.Log($"Buff Level {targetSymbol.idName} +{levels} (Weight +{levels*8})");
+            }
+        }
+        
+        private void RecalculateTotalWeight()
+        {
+            _cachedTotalWeight = 0;
             foreach (var symbol in allSymbols)
             {
-                symbol.ModifyWeight(amount);
+                _cachedTotalWeight += symbol.currentWeight;
             }
+        }
+
+        // Hàm này trả về chuỗi % để hiển thị UI (VD: "19.4%")
+        public string GetChanceDisplay(SymbolData symbol)
+        {
+            if (_cachedTotalWeight <= 0) return "0%";
+            
+            // Công thức: (Weight / Total) * 100
+            // Ép kiểu float để chia có số thập phân
+            float percent = ((float)symbol.currentWeight / _cachedTotalWeight) * 100f;
+            
+            // Format lấy 1 số sau dấu phẩy (VD: 19.4)
+            return percent.ToString("F1") + "%";
         }
     }
 }
