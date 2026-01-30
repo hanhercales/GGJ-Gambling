@@ -1,5 +1,6 @@
 using UnityEngine;
 using _Game.Scripts.Core.Data;
+using _Game.Scripts.Core.Managers;
 
 public class ChanceCharm : CharmData
 {
@@ -11,19 +12,19 @@ public class ChanceCharm : CharmData
     
     protected bool TryTrigger()
     {
-        // 1. Roll the dice
+        float mult = 1f;
+        if (LuckManager.Instance != null) 
+        {
+            mult = LuckManager.Instance.GetChanceMultiplier();
+        }
+        float finalChance = triggerChance * mult;
+        
         float roll = Random.Range(0f, 100f);
             
-        // 2. Check success
-        if (roll <= triggerChance)
+        if (roll <= finalChance)
         {
-            // if (_playSfxOnTrigger)
-            // {
-            //     // TODO: Call your Audio Manager here
-            // }
             return true;
         }
-
         return false;
     }
 }

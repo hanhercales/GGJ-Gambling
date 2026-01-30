@@ -14,6 +14,9 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private int loseStreak = 0;    // Chuỗi thua liên tiếp (Pity)
         [SerializeField] private int debtCompleted = 0; // Số vòng nợ đã hoàn thành (để tính OLS)
         
+        [Header("Charm Counters")]
+        [SerializeField] private int _horseshoeCount = 0;
+        
         public int SpinCount => spinCount;      
         public int LoseStreak => loseStreak;   
         public int DebtCompleted => debtCompleted;
@@ -124,6 +127,18 @@ namespace _Game.Scripts.Core.Managers
         public void UpdateBaseLuck(int amount)
         {
             baseLuckFromCharms = amount;
+        }
+        
+        public void UpdateHorseshoeCount(int amount)
+        {
+            _horseshoeCount += amount;
+            // Safety clamp: never let it go below 0
+            if (_horseshoeCount < 0) _horseshoeCount = 0;
+        }
+        
+        public float GetChanceMultiplier()
+        {
+            return _horseshoeCount > 0 ? 2.0f : 1.0f;
         }
 
         #region Internal Algorithms (Theo tài liệu Clover Pit)
