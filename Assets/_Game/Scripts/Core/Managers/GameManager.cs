@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using UnityEngine;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Controllers.Machines;
@@ -66,7 +67,7 @@ namespace _Game.Scripts.Core.Managers
             // Setup Nợ ban đầu
             if (difficultyProfile != null)
             {
-                int firstDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
+                BigInteger firstDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
                 ResourceManager.Instance.SetNewDebt(firstDebt);
             }
             else
@@ -187,7 +188,7 @@ namespace _Game.Scripts.Core.Managers
                 // Setup Nợ mới
                 if (difficultyProfile != null)
                 {
-                    int nextDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
+                    BigInteger nextDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
                     ResourceManager.Instance.SetNewDebt(nextDebt);
                 }
                 
