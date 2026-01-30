@@ -12,19 +12,26 @@ namespace _Game.Scripts.Core.Data
         // Biến này sẽ được GridModel dùng để tính toán
         [Header("Runtime Info (Read Only)")]
         public int currentWeight;
+        public int currentValue;
         #endregion
 
-        public void ResetWeight()
+        public void ResetStats()
         {
             currentWeight = baseSpawnWeight;
+            currentValue = baseValue;
         }
         
         public void ModifyWeight(int amount)
         {
             currentWeight += amount;
-            
-            // Đảm bảo trọng số không bao giờ âm
             if (currentWeight < 0) currentWeight = 0;
+        }
+        
+        public void ModifyValue(int amount)
+        {
+            currentValue += amount;
+            // Tiền có thể âm (nếu có debuff), nhưng thường thì chặn ở 0
+            // if (currentValue < 0) currentValue = 0; 
         }
     }
 }
