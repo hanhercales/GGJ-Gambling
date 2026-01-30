@@ -18,15 +18,16 @@ namespace _Game.Scripts.Core.Data
     public class CharmData : RandomSOData
     {
         public CharmTier tier;
+        [TextArea] public string charmName;
         public int price;
         public bool isEquipped;
         
         [TextArea] public string description;
         public CharmData[] requiredCharmToUnlock;
 
-        public virtual void OnSpinStart(SlotMachineController machine) { }
+        public virtual void OnSpinStart(SlotMachineController machine, LuckManager luckManager) { }
         
-        public virtual void OnSpinEnd(SlotMachineController machine) { }
+        public virtual void OnSpinEnd(SlotMachineController machine, LuckManager luckManager) { }
         
         public virtual bool OnBoardGenerated(string[,] boardIds)
         {
@@ -47,7 +48,7 @@ namespace _Game.Scripts.Core.Data
         public virtual void OnEquip(CharmHolder holder) { }
         public virtual void OnUnequip(CharmHolder holder) { }
 
-        public virtual void OnSpinResult(SlotMachineController machine, float winAmount) { }
+        public virtual void OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount) { }
         
     }
 }

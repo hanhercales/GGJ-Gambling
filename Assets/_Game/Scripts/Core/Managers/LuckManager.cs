@@ -9,7 +9,7 @@ namespace _Game.Scripts.Core.Managers
         public static LuckManager Instance { get; private set; }
 
         [Header("State Info (Read Only)")]
-        [SerializeField] private int baseLuckFromCharms = 0;
+        [SerializeField] public int baseLuckFromCharms = 0;
         [SerializeField] private int spinCount = 0;     // Tổng số lượt đã quay
         [SerializeField] private int loseStreak = 0;    // Chuỗi thua liên tiếp (Pity)
         [SerializeField] private int debtCompleted = 0; // Số vòng nợ đã hoàn thành (để tính OLS)
@@ -19,7 +19,7 @@ namespace _Game.Scripts.Core.Managers
         public int DebtCompleted => debtCompleted;
         
         // ILS Algorithm Variables
-        private int _ilsOffset; 
+        private int _ilsOffset;
         
         // OLS Algorithm Variables
         private int _nextOLSSpinTarget = -1;

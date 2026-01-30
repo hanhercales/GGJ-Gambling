@@ -2,6 +2,7 @@ using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Data;
 using UnityEngine;
 using _Game.Scripts.Core.Inventory;
+using _Game.Scripts.Core.Managers;
 
 
 [CreateAssetMenu(menuName = "Charms/Effects/Clutch (Loss Streak)")]
@@ -20,22 +21,22 @@ public class ConsoPrizeCharm : CharmData
         _bonusActive = false;
     }
 
-    public override void OnSpinStart(SlotMachineController machine)
+    public override void OnSpinStart(SlotMachineController machine, LuckManager luckManager)
     {
         if (_lossStreak >= requiredLosses)
         {
-            machine.currentLuck += luckBonus;
+            luckManager.baseLuckFromCharms += luckBonus;
             _bonusActive = true;
             Debug.Log($"[Clutch] Loss Streak {_lossStreak}! Activating +{luckBonus} Luck.");
         }
     }
     
-    public override void OnSpinResult(SlotMachineController machine, float winAmount)
+    public override void OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount)
     {
         // Clean after eating
         if (_bonusActive)
         {
-            machine.currentLuck -= luckBonus;
+            luckManager.baseLuckFromCharms -= luckBonus;
             _bonusActive = false;
             _lossStreak = 0; 
             return; 

@@ -18,7 +18,6 @@ namespace _Game.Scripts.Controllers.Machines
         [Header("Settings")]
         public int rows = 3;
         public int cols = 5;
-        [Range(0, 15)] public int currentLuck = 3;
 
         [Header("Data")]
         public List<SymbolData> allSymbols;
@@ -34,6 +33,7 @@ namespace _Game.Scripts.Controllers.Machines
         private PatternEvaluator _evaluator;
         private bool _isSpinning = false;
         public CharmHolder charmHolder;
+        [SerializeField] public LuckManager luckManager;
 
         #region Initialization
         private void Start()
@@ -80,13 +80,10 @@ namespace _Game.Scripts.Controllers.Machines
                 var charms = charmHolder.GetContent(); 
                 for (int i = 0; i < charms.Count; i++)
                 {
-                    charms[i].OnSpinStart(this);
+                    charms[i].OnSpinStart(this, luckManager);
                 }
             }
-    
-            // Core tính toán
-            SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, currentLuck);
-
+            
             // 1. LOGIC: Tính toán kết quả
             SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, luckValue);
             List<MatchResult> results = _evaluator.Evaluate(finalGrid, cols, rows);
@@ -121,12 +118,12 @@ namespace _Game.Scripts.Controllers.Machines
                 var charms = charmHolder.GetContent();
                 for (int i = 0; i < charms.Count; i++)
                 {
-                    charms[i].OnSpinResult(this, totalWin);
+                    charms[i].OnSpinResult(this, luckManager, totalWin);
                 }
                 
                 for (int i = charms.Count - 1; i >= 0; i--)
                 {
-                    charms[i].OnSpinEnd(this);
+                    charms[i].OnSpinEnd(this, luckManager);
                 }
             }
     

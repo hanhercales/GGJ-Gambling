@@ -9,7 +9,6 @@ namespace _Game.Scripts.View.UI
     {
         [SerializeField] private Image icon;
         [SerializeField] private Image selectedBorder;
-        [SerializeField] private Image equippedCheckBox;
         [SerializeField] private TextMeshProUGUI nameText;
         
         private CharmData currentCharm;
@@ -23,14 +22,12 @@ namespace _Game.Scripts.View.UI
                 currentCharm = charm;
                 icon.sprite = charm.icon;
                 icon.enabled = true;
-                equippedCheckBox.enabled = charm.isEquipped;
             }
             else
             {
                 nameText.text = "";
                 icon.sprite = null;
                 icon.enabled = false;
-                equippedCheckBox.enabled = false;
             }
             
             selectedBorder.enabled = false;

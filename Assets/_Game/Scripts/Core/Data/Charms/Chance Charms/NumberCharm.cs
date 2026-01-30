@@ -2,6 +2,7 @@ using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Data;
 using UnityEngine;
 using _Game.Scripts.Core.Inventory;
+using _Game.Scripts.Core.Managers;
 
 [CreateAssetMenu(menuName = "Charms/Chance/Funny Number")]
 public class NumberCharm : ChanceCharm
@@ -20,7 +21,7 @@ public class NumberCharm : ChanceCharm
         _currentUses = 0; // Reset counter on purchase
     }
 
-    public override void OnSpinStart(SlotMachineController machine)
+    public override void OnSpinStart(SlotMachineController machine, LuckManager luckManager)
     {
         _isActiveThisTurn = false;
 
@@ -28,7 +29,7 @@ public class NumberCharm : ChanceCharm
         if (TryTrigger())
         {
             // Apply Buff
-            machine.currentLuck += luckBonus;
+            luckManager.baseLuckFromCharms += luckBonus;
                 
             // Mark state
             _isActiveThisTurn = true;
@@ -38,11 +39,11 @@ public class NumberCharm : ChanceCharm
         }
     }
 
-    public override void OnSpinEnd(SlotMachineController machine)
+    public override void OnSpinEnd(SlotMachineController machine, LuckManager luckManager)
     {
         if (_isActiveThisTurn)
         {
-            machine.currentLuck -= luckBonus;
+            luckManager.baseLuckFromCharms -= luckBonus;
             _isActiveThisTurn = false;
             
             if (_currentUses >= maxUses)

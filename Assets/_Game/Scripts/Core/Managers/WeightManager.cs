@@ -38,13 +38,5 @@ namespace _Game.Scripts.Core.Managers
             }
         }
         
-        // 3. API Buff toàn bộ (Ví dụ Charm buff tất cả trái cây)
-        public void ApplyGlobalBuff(int amount)
-        {
-            foreach (var symbol in allSymbols)
-            {
-                symbol.ModifyWeight(amount);
-            }
-        }
     }
 }
