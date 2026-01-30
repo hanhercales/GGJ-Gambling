@@ -11,6 +11,7 @@ namespace _Game.Scripts.Core.Managers
 
         [Header("References")]
         [SerializeField] private SlotMachineController slotMachine;
+        [SerializeField] private LuckManager luckManager;
         
         [Header("Game Config")]
         [SerializeField] private DebtDifficultySO difficultyProfile; 
@@ -98,13 +99,20 @@ namespace _Game.Scripts.Core.Managers
             if (currentState != GameState.Spinning) return;
             if (spinsRemaining <= 0) return;
 
-            // Gọi SlotMachine quay và chờ kết quả trả về
-            slotMachine.PerformSpin(OnSpinCompleted);
-        }
+            // Lấy Luck từ manager
+            int calculatedLuck = LuckManager.Instance.CalculateLuckForSpin();
+            Debug.Log($"Spin {LuckManager.Instance.SpinCount + 1} - Luck Applied: {calculatedLuck}");
 
-        // 3. Callback khi SlotMachine quay xong (Nhận kết quả từ Controller)
+            // Truyền Luck vào slot machine
+            slotMachine.PerformSpin(calculatedLuck, OnSpinCompleted);
+        }
+        
         private void OnSpinCompleted(float winAmount)
         {
+            // Báo cáo kết quả để tính Pity
+            bool isWin = winAmount > 0;
+            LuckManager.Instance.ReportSpinResult(isWin);
+            
             // Cộng tiền thắng
             if (winAmount > 0)
             {
@@ -163,6 +171,9 @@ namespace _Game.Scripts.Core.Managers
                 
                 // Reset Stage về 1
                 currentStage = 1;
+                
+                // Báo cho Luck Manager biết đã qua 1 deadline
+                LuckManager.Instance.IncrementDebtCompleted();
 
                 // Setup Nợ mới
                 if (difficultyProfile != null)
