@@ -16,7 +16,6 @@ namespace _Game.Scripts.Controllers.Machines
         [Header("Settings")]
         public int rows = 3;
         public int cols = 5;
-        [Range(0, 15)] public int currentLuck = 3;
 
         [Header("Data")]
         public List<SymbolData> allSymbols;
@@ -24,8 +23,6 @@ namespace _Game.Scripts.Controllers.Machines
 
         [Header("UI")]
         public BoardView boardView;
-        // Bỏ nút SpinButton ở đây, vì GameManager hoặc UI Manager sẽ quản lý nút bấm
-        // public Button spinButton; 
         public TextMeshProUGUI scoreText;
         #endregion
 
@@ -50,24 +47,21 @@ namespace _Game.Scripts.Controllers.Machines
         #endregion
 
         #region Public API (Gọi từ GameManager)
-        
-        // GameManager sẽ gọi hàm này và truyền vào một hàm callback để nhận kết quả
-        public void PerformSpin(Action<float> onSpinComplete)
+        public void PerformSpin(int luckValue, Action<float> onSpinComplete)
         {
             if (_isSpinning) return;
-            StartCoroutine(SpinRoutine(onSpinComplete));
+            StartCoroutine(SpinRoutine(luckValue, onSpinComplete));
         }
-
         #endregion
 
         #region Internal Logic
-        private IEnumerator SpinRoutine(Action<float> onSpinComplete)
+        private IEnumerator SpinRoutine(int luckValue, Action<float> onSpinComplete)
         {
             _isSpinning = true;
             scoreText.text = "SPINNING...";
 
             // 1. LOGIC: Tính toán kết quả
-            SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, currentLuck);
+            SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, luckValue);
             List<MatchResult> results = _evaluator.Evaluate(finalGrid, cols, rows);
             
             // 2. VIEW: Diễn hoạt
