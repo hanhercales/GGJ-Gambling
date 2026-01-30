@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using _Game.Scripts.Core.Data;
 using System.Linq;
+using _Game.Scripts.Core.Utilities;
 
 namespace _Game.Scripts.Core.Logic
 {
@@ -13,26 +14,14 @@ namespace _Game.Scripts.Core.Logic
         public GridModel(List<SymbolData> symbols)
         {
             _allSymbols = symbols;
-            CalculateTotalWeight();
         }
 
         #region Logic Random
-        private void CalculateTotalWeight()
-        {
-            _totalWeight = 0;
-            foreach (var sym in _allSymbols) _totalWeight += sym.currentWeight;
-        }
-
         // Chọn symbol dựa trên trọng số (Weighted Random)
         private SymbolData GetRandomSymbol()
         {
-            float randomValue = Random.Range(0, _totalWeight);
-            foreach (var sym in _allSymbols)
-            {
-                if (randomValue < sym.currentWeight) return sym;
-                randomValue -= sym.currentWeight;
-            }
-            return _allSymbols[0]; 
+            // Cú pháp: Select(List, Hàm lấy trọng số)
+            return WeightedRandomSelector.Select(_allSymbols, symbol => symbol.currentWeight);
         }
 
         // Tráo trộn danh sách (Fisher-Yates Shuffle)
@@ -100,12 +89,8 @@ namespace _Game.Scripts.Core.Logic
         // Tạo ra 1 dải băng chứa N symbol ngẫu nhiên
         public List<SymbolData> CreateRandomStrip(int length)
         {
-            List<SymbolData> strip = new List<SymbolData>();
-            for (int i = 0; i < length; i++)
-            {
-                strip.Add(GetRandomSymbol());
-            }
-            return strip;
+            // Dùng hàm SelectMultiple có sẵn trong Utility
+            return WeightedRandomSelector.SelectMultiple(_allSymbols, s => s.currentWeight, length);
         }
         #endregion
     }
