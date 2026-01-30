@@ -119,8 +119,10 @@ namespace _Game.Scripts.Controllers.Machines
                 for (int i = 0; i < charms.Count; i++)
                 {
                     charms[i].OnSpinResult(this, luckManager, totalWin);
+                    charms[i].OnSpinResultBuff(this, results); 
                 }
-                
+    
+                // 3. Cleanup (Backwards loop)
                 for (int i = charms.Count - 1; i >= 0; i--)
                 {
                     charms[i].OnSpinEnd(this, luckManager);

@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Core.Inventory;
+using _Game.Scripts.Core.Logic;
 using _Game.Scripts.Core.Managers;
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace _Game.Scripts.Core.Data
 {
@@ -49,6 +52,10 @@ namespace _Game.Scripts.Core.Data
         public virtual void OnUnequip(CharmHolder holder) { }
 
         public virtual void OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount) { }
-        
+
+        public virtual void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
+        {
+            
+        }
     }
 }

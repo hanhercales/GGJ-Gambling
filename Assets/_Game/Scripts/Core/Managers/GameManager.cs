@@ -192,6 +192,14 @@ namespace _Game.Scripts.Core.Managers
                 // Reset Stage về 1
                 currentStage = 1;
                 
+                if (charmHolder != null)
+                {
+                    foreach (var charm in charmHolder.GetContent())
+                    {
+                        charm.OnRoundStart(this); // Trigger +2 Spins for the new round
+                    }
+                }
+                
                 // Báo cho Luck Manager biết đã qua 1 deadline
                 LuckManager.Instance.IncrementDebtCompleted();
 
