@@ -1808,6 +1808,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 735ebf6b442e4c140bf077833403ac86, type: 2}
   - {fileID: 11400000, guid: 7d68aed5681ad5740ac345edcc044973, type: 2}
   boardView: {fileID: 1916981134}
+  spinButton: {fileID: 1560163310}
   scoreText: {fileID: 1565976741}
 --- !u!4 &1916981136
 Transform:
@@ -1838,6 +1839,7 @@ GameObject:
   - component: {fileID: 2090457730}
   - component: {fileID: 2090457733}
   - component: {fileID: 2090457734}
+  - component: {fileID: 2090457735}
   m_Layer: 0
   m_Name: '[MANAGER]'
   m_TagString: Untagged
@@ -1933,6 +1935,20 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 345c52dbb02010b48a7ea8e2a58780fa, type: 2}
   - {fileID: 11400000, guid: 88c0899ff2813184a97a75f51ea04950, type: 2}
   - {fileID: 11400000, guid: 4d7f4d5cb006b5a4db0e87d7fd5d2016, type: 2}
+--- !u!114 &2090457735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090457729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f82870dfa274e9bb770c99435dcd5de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.ScoreManager
+  globalSymbolMultiplier: 1
+  globalPatternMultiplier: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
