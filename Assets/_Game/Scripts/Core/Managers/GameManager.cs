@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Inventory;
+using _Game.Scripts.Core.Logic;
 
 namespace _Game.Scripts.Core.Managers
 {
@@ -21,6 +23,10 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private int startingCoin = 10; 
         [SerializeField] private int stagesPerDebtRound = 4;
 
+        [Header("Shop Progression")]
+        [Tooltip("Danh sách tỉ lệ Shop theo độ khó. VD: Element 0 = Early, Element 1 = Mid...")]
+        [SerializeField] private List<ShopProbabilitySO> shopProfiles;
+        
         [Header("Current State (Read Only)")]
         [SerializeField] private GameState currentState;
         [SerializeField] private int currentDebtRound = 1;
@@ -65,6 +71,13 @@ namespace _Game.Scripts.Core.Managers
             // Gọi thông qua SlotMachineController vì nó giữ list Pattern
             if (slotMachine != null)
                 slotMachine.ResetPatternStats();
+            
+            // Cập nhật tỉ lệ Shop về Early Game
+            UpdateShopDifficulty();
+            
+            // Reroll Shop miễn phí cho khởi đầu mới
+            if (ShopManager.Instance != null)
+                ShopManager.Instance.RerollShop(true);
 
             // Setup Nợ ban đầu
             if (difficultyProfile != null)
@@ -78,8 +91,11 @@ namespace _Game.Scripts.Core.Managers
                 ResourceManager.Instance.SetNewDebt(25);
             }
 
+            // Trigger Charm OnRoundStart (nếu có giữ lại charm từ game trước - tùy logic)
             if (charmHolder != null)
             {
+                // Lưu ý: Thường StartNewGame sẽ clear charm, nhưng nếu game cho giữ thì gọi dòng này
+                // charmHolder.ClearCharms(); // Nếu muốn xóa sạch túi
                 foreach (var charm in charmHolder.GetContent())
                 {
                     charm.OnRoundStart(this); 
@@ -118,7 +134,17 @@ namespace _Game.Scripts.Core.Managers
         {
             if (currentState != GameState.Spinning) return;
             if (spinsRemaining <= 0) return;
-
+            
+            if (charmHolder != null)
+            {
+                // Tạo bản sao list để tránh lỗi nếu charm tự hủy trong quá trình duyệt
+                var charms = new List<CharmData>(charmHolder.GetContent());
+                foreach (var charm in charms)
+                {
+                    charm.OnSpinStart(slotMachine, luckManager);
+                }
+            }
+            
             // Lấy Luck từ manager
             int calculatedLuck = LuckManager.Instance.CalculateLuckForSpin();
             Debug.Log($"Spin {LuckManager.Instance.SpinCount + 1} - Luck Applied: {calculatedLuck}");
@@ -127,7 +153,7 @@ namespace _Game.Scripts.Core.Managers
             slotMachine.PerformSpin(calculatedLuck, OnSpinCompleted);
         }
         
-        private void OnSpinCompleted(float winAmount)
+        private void OnSpinCompleted(float winAmount, List<MatchResult> results)
         {
             // Báo cáo kết quả để tính Pity
             bool isWin = winAmount > 0;
@@ -137,6 +163,21 @@ namespace _Game.Scripts.Core.Managers
             if (winAmount > 0)
             {
                 ResourceManager.Instance.AddResource(ResourceType.Coin, (int)winAmount);
+            }
+            
+            if (charmHolder != null)
+            {
+                var charms = new List<CharmData>(charmHolder.GetContent());
+                foreach (var charm in charms)
+                {
+                    // Logic xử lý thắng thua (ConsoPrizeCharm reset streak)
+                    charm.OnSpinResult(slotMachine, luckManager, winAmount);
+                    
+                    charm.OnSpinResultBuff(slotMachine, results);
+                    
+                    // Logic dọn dẹp buff / Trừ độ bền (NumberCharm, Lightbulb)
+                    charm.OnSpinEnd(slotMachine, luckManager);
+                }
             }
 
             // Trừ lượt quay
@@ -181,71 +222,116 @@ namespace _Game.Scripts.Core.Managers
         {
             ChangeState(GameState.RoundEnd);
 
-            // Case A: Player has enough money
+            // Bước 1: Thử trả nợ
             if (ResourceManager.Instance.TryPayDebt())
             {
-                Debug.Log($"DEBT ROUND {currentDebtRound} CLEARED!");
-        
-                currentDebtRound++;
-                currentStage = 1;
-                LuckManager.Instance.IncrementDebtCompleted();
-
-                if (difficultyProfile != null)
-                {
-                    BigInteger nextDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
-                    ResourceManager.Instance.SetNewDebt(nextDebt);
-                }
-        
-                // Loop for new round buffs (+2 spins, etc.)
-                if (charmHolder != null)
-                {
-                    foreach (var charm in charmHolder.GetContent()) charm.OnRoundStart(this);
-                }
-
-                ChangeState(GameState.Preparation);
-                NotifyRoundInfo();
+                OnDebtPaidSuccess();
+                return;
             }
-            // Case B: Player is broke, BUT has Ankh
-            else if (CheckCharmsForRescue())
+
+            // Bước 2: Nếu không đủ tiền -> Hỏi Charm xem có ai cứu không? (AnkhCharm)
+            bool isSaved = false;
+            if (charmHolder != null)
             {
-                Debug.Log("SAVED BY CHARM! Extending deadline by 2 stages.");
-                currentStage = Mathf.Max(1, stagesPerDebtRound - 2); 
-        
-                ChangeState(GameState.Preparation);
-                NotifyRoundInfo();
+                // Duyệt qua từng charm để tìm phao cứu sinh
+                var charms = new List<CharmData>(charmHolder.GetContent());
+                foreach (var charm in charms)
+                {
+                    int currentCoin = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
+                    int currentDebt = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Debt);
+
+                    // Nếu Charm trả về true nghĩa là nó đã cứu
+                    if (charm.OnPaymentCheck(currentCoin, currentDebt))
+                    {
+                        isSaved = true;
+                        Debug.Log($"<color=green>SAVED BY CHARM: {charm.charmName}</color>");
+                        
+                        // Xử lý tiêu thụ charm Ankh (trong script AnkhCharm cần gọi holder.RemoveCharm)
+                        // Trong AnkhCharm của bạn, bạn cần bỏ comment dòng Consume() hoặc xử lý logic đó.
+                        if (charm is ConsumableCharm consumable && consumable.destroyOnUse)
+                        {
+                             charmHolder.RemoveCharm(charm);
+                        }
+                        
+                        break; // Chỉ cần 1 cái cứu là đủ
+                    }
+                }
             }
-            // Case C: Game Over
+
+            if (isSaved)
+            {
+                // Nếu được cứu -> Coi như thành công qua màn
+                OnDebtPaidSuccess();
+            }
             else
             {
+                // Bước 3: Chết thật
                 Debug.Log("Phá sản! Game Over.");
                 ChangeState(GameState.GameOver);
+                if (UIManager.Instance != null) UIManager.Instance.CloseAllDialogs();
             }
         }
         
-        private bool CheckCharmsForRescue()
+        private void OnDebtPaidSuccess()
         {
-            if (charmHolder == null) return false;
-            
-            int coin = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
-            int debt = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Debt);
+            Debug.Log($"DEBT ROUND {currentDebtRound} CLEARED!");
 
-            var charms = charmHolder.GetContent();
+            currentDebtRound++;
+            currentStage = 1;
             
-            for (int i = charms.Count - 1; i >= 0; i--)
+            // Trigger Charm OnRoundStart (ExtraSpinCharm)
+            if (charmHolder != null)
             {
-                if (charms[i].OnPaymentCheck(coin, debt))
+                foreach (var charm in charmHolder.GetContent())
                 {
-                    return true;
+                    charm.OnRoundStart(this); 
                 }
             }
-            return false;
+            
+            luckManager.IncrementDebtCompleted();
+
+            if (difficultyProfile != null)
+            {
+                BigInteger nextDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
+                ResourceManager.Instance.SetNewDebt(nextDebt);
+            }
+            
+            // Update Shop Probability (Logic bạn đã thêm trước đó)
+            UpdateShopDifficulty();
+
+            ChangeState(GameState.Preparation);
+            NotifyRoundInfo();
         }
 
         private void ChangeState(GameState newState)
         {
             currentState = newState;
+            
+            // Khi bắt đầu quay, đóng tất cả Shop/Dialog để người chơi tập trung
+            if (newState == GameState.Spinning || newState == GameState.GameOver)
+            {
+                if (UIManager.Instance != null)
+                    UIManager.Instance.CloseAllDialogs();
+            }
+            
             OnStateChanged?.Invoke(newState);
             Debug.Log($"Game State Changed: {newState}");
+        }
+        
+        private void UpdateShopDifficulty()
+        {
+            if (shopProfiles == null || shopProfiles.Count == 0) return;
+
+            // Logic ví dụ: Cứ mỗi 3 Round thì tăng độ khó shop lên 1 bậc
+            // Round 1-3: Index 0
+            // Round 4-6: Index 1
+            // ...
+            int profileIndex = Mathf.Clamp((currentDebtRound - 1) / 3, 0, shopProfiles.Count - 1);
+            
+            if (ShopManager.Instance != null)
+            {
+                ShopManager.Instance.SetProbabilityProfile(shopProfiles[profileIndex]);
+            }
         }
 
         public void AddSpins(int amount)

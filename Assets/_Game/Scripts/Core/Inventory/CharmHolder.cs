@@ -14,7 +14,6 @@ namespace _Game.Scripts.Core.Inventory
         public void ModifyCapacity(int amount)
         {
             size += amount;
-            // Prevent negative size bugs
             if (size < 0) size = 0; 
             OnHolderChanged?.Invoke();
         }
@@ -24,19 +23,29 @@ namespace _Game.Scripts.Core.Inventory
             if(content.Count >= size) return false;
             
             content.Add(charm);
+            
+            charm.OnEquip(this);
+            
             OnHolderChanged?.Invoke();
             return true;
         }
 
         public bool RemoveCharm(CharmData charm)
         {
-            content.Remove(charm);
-            OnHolderChanged?.Invoke();
-            return true;
+            if (content.Contains(charm))
+            {
+                charm.OnUnequip(this);
+                
+                content.Remove(charm);
+                OnHolderChanged?.Invoke();
+                return true;
+            }
+            return false;
         }
 
         public bool ClearCharms()
         {
+            foreach(var c in content) c.OnUnequip(this);
             content.Clear();
             OnHolderChanged?.Invoke();
             return true;
