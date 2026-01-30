@@ -8,13 +8,19 @@ namespace _Game.Scripts.Core.Data
         #region Thông số Gameplay
         [Header("Base Stats")]
         public int baseValue = 1;       // Điểm cơ bản
-        // Trọng số hiện tại (Sau khi đã cộng trừ buff)
-        // Biến này sẽ được GridModel dùng để tính toán
+        
+        // QUY ƯỚC: Weight nhập trong Inspector đã nhân 10.
+        // VD: Lemon 1.3 -> Nhập 13.
+        // VD: Seven 0.5 -> Nhập 5.
+        
         [Header("Runtime Info (Read Only)")]
         public int currentWeight;
         public int currentValue;
         #endregion
 
+        // HẰNG SỐ: Mỗi 1 Level buff (+1) tương ứng tăng 0.8 weight -> Int là 8
+        private const int WEIGHT_PER_LEVEL = 8;
+        
         public void ResetStats()
         {
             currentWeight = baseSpawnWeight;
@@ -25,6 +31,13 @@ namespace _Game.Scripts.Core.Data
         {
             currentWeight += amount;
             if (currentWeight < 0) currentWeight = 0;
+        }
+        
+        // Gọi hàm này: symbol.AddWeightLevel(1) -> Nó tự cộng 8
+        public void AddWeightLevel(int levels)
+        {
+            int amountToAdd = levels * WEIGHT_PER_LEVEL;
+            ModifyWeight(amountToAdd);
         }
         
         public void ModifyValue(int amount)
