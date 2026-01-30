@@ -22,7 +22,7 @@ namespace _Game.Scripts.Core.Managers
         {
             foreach (var symbol in allSymbols)
             {
-                symbol.ResetWeight();
+                symbol.ResetStats();
             }
             Debug.Log("WeightManager: Đã reset trọng số về gốc.");
         }

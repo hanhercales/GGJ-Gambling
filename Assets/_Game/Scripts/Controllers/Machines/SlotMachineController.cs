@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Core.Logic;
+using _Game.Scripts.Core.Managers;
 using _Game.Scripts.View.UI;
 
 namespace _Game.Scripts.Controllers.Machines
@@ -23,6 +24,7 @@ namespace _Game.Scripts.Controllers.Machines
 
         [Header("UI")]
         public BoardView boardView;
+        public Button spinButton;
         public TextMeshProUGUI scoreText;
         #endregion
 
@@ -52,12 +54,21 @@ namespace _Game.Scripts.Controllers.Machines
             if (_isSpinning) return;
             StartCoroutine(SpinRoutine(luckValue, onSpinComplete));
         }
+        public void ResetPatternStats()
+        {
+            foreach (var pattern in allPatterns)
+            {
+                pattern.ResetStats();
+            }
+            Debug.Log("Patterns: Đã reset stats về gốc.");
+        }
         #endregion
 
         #region Internal Logic
         private IEnumerator SpinRoutine(int luckValue, Action<float> onSpinComplete)
         {
             _isSpinning = true;
+            spinButton.interactable = false;
             scoreText.text = "SPINNING...";
 
             // 1. LOGIC: Tính toán kết quả
@@ -76,15 +87,20 @@ namespace _Game.Scripts.Controllers.Machines
             
             // 3. SHOW RESULT
             float totalWin = 0;
+            
+            float globalSymMult = ScoreManager.Instance.GetSymbolMult();
+            float globalPatMult = ScoreManager.Instance.GetPatternMult();
+            
             foreach (var r in results)
             {
-                totalWin += r.GetScore();
+                totalWin += r.GetScore(globalSymMult, globalPatMult);
                 boardView.HighlightWinCells(r.matchedCoordinates, rows, cols);
             }
 
             scoreText.text = totalWin > 0 ? $"WIN: {totalWin}" : "0";
             
             _isSpinning = false;
+            spinButton.interactable = true;
 
             // 4. BÁO CÁO KẾT QUẢ VỀ GAMEMANAGER
             onSpinComplete?.Invoke(totalWin);

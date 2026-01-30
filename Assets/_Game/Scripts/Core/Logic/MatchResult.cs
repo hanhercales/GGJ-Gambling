@@ -14,21 +14,27 @@ namespace _Game.Scripts.Core.Logic
         #endregion
 
         #region Logic Phụ trợ
-        // Tính điểm nhanh: Giá trị Symbol * Hệ số Pattern
-        public float GetScore() => symbol.baseValue * pattern.multiplier;
+        // CÔNG THỨC CHUẨN: 4 THÀNH PHẦN
+        public float GetScore(float globalSymMult, float globalPatMult)
+        {
+            // 1. Symbol Value (Dynamic)
+            float valSymbol = symbol.currentValue;
 
-        // Kiểm tra xem Match này có chứa trọn vẹn Match kia không? (Dùng để lọc tập con)
+            // 2. Pattern Value (Dynamic)
+            float valPattern = pattern.currentMultiplier;
+
+            // 3 & 4. Global Multipliers (truyền vào từ ScoreManager)
+            
+            // Tính toán: (SymVal * GlobalSymMult) * (PatVal * GlobalPatMult)
+            return (valSymbol * globalSymMult) * (valPattern * globalPatMult);
+        }
+
         public bool Contains(MatchResult other)
         {
-            // Khác loại trái cây -> Chắc chắn không chứa
             if (this.symbol != other.symbol) return false;
-
-            // Kiểm tra từng tọa độ: Nếu có 1 ô lòi ra ngoài -> Không chứa
             foreach (var c in other.matchedCoordinates)
-            {
                 if (!this.matchedCoordinates.Contains(c)) return false;
-            }
-            return true; // Chứa hoàn toàn
+            return true;
         }
         #endregion
     }

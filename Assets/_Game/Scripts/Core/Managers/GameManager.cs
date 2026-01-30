@@ -48,25 +48,34 @@ namespace _Game.Scripts.Core.Managers
             currentDebtRound = 1;
             currentStage = 1; 
             
-            // Reset toàn bộ dữ liệu về ban đầu
+            // 1. Reset Tiền & Nợ
             ResourceManager.Instance.ResetAllData(startingCoin);
                 
+            // 2. Reset Symbol (Weight & Value)
             WeightManager.Instance.ResetAllWeights();
             
+            // 3. Reset Global Multipliers (MỚI)
+            if (ScoreManager.Instance != null)
+                ScoreManager.Instance.ResetMultipliers();
+            
+            // 4. Reset Patterns (MỚI)
+            // Gọi thông qua SlotMachineController vì nó giữ list Pattern
+            if (slotMachine != null)
+                slotMachine.ResetPatternStats();
+
+            // Setup Nợ ban đầu
             if (difficultyProfile != null)
             {
-                // Lấy nợ của vòng 1
                 int firstDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
                 ResourceManager.Instance.SetNewDebt(firstDebt);
             }
             else
             {
-                Debug.LogError("CẢNH BÁO: Chưa gán DebtDifficultySO vào GameManager!");
+                Debug.LogError("CẢNH BÁO: Chưa gán DebtDifficultySO!");
                 ResourceManager.Instance.SetNewDebt(25);
             }
 
             ChangeState(GameState.Preparation);
-            
             NotifyRoundInfo();
         }
 
