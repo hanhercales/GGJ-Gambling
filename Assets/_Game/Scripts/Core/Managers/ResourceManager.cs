@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 using _Game.Scripts.Core.Data;
 
@@ -10,14 +11,17 @@ namespace _Game.Scripts.Core.Managers
         // Singleton Pattern để dễ truy cập từ bất cứ đâu
         public static ResourceManager Instance { get; private set; }
 
+        private BigInteger coin = 0;
+        private BigInteger currentDebt = 0;
+            
         [Header("Debug Info (Read Only)")]
-        [SerializeField] private int coin = 0;
+        [SerializeField] private string coinDisplay = "0";
         [SerializeField] private int ticket = 0;
-        [SerializeField] private int currentDebt = 0;
+        [SerializeField] private string debtDisplay = "0";
 
         // Sự kiện để UI tự động cập nhật (Observer Pattern)
         // Tham số 1: Loại tài nguyên, Tham số 2: Giá trị mới
-        public event Action<ResourceType, int> OnResourceChanged;
+        public event Action<ResourceType, string> OnResourceChanged;
 
         private void Awake()
         {
@@ -26,72 +30,84 @@ namespace _Game.Scripts.Core.Managers
         }
 
         #region Getters
-        public int GetResource(ResourceType type)
+        public BigInteger GetResourceBigInt(ResourceType type)
         {
             switch (type)
             {
                 case ResourceType.Coin: return coin;
-                case ResourceType.Ticket: return ticket;
                 case ResourceType.Debt: return currentDebt;
+                case ResourceType.Ticket: return ticket; // Implicit conversion int -> BigInt
                 default: return 0;
             }
         }
+        
+        public int GetTicket() => ticket;
         #endregion
 
         #region Modifiers (Thay đổi số liệu)
 
-        // Hàm tổng quát để cộng/trừ tài nguyên
-        public void AddResource(ResourceType type, int amount)
+        public void AddResource(ResourceType type, BigInteger amount)
         {
             switch (type)
             {
                 case ResourceType.Coin:
                     coin += amount;
-                    if (coin < 0) coin = 0; // Không cho âm tiền
+                    if (coin < 0) coin = 0;
+                    OnResourceChanged?.Invoke(type, FormatBigInt(coin));
                     break;
-                case ResourceType.Ticket:
-                    ticket += amount;
-                    if (ticket < 0) ticket = 0;
-                    break;
+                    
                 case ResourceType.Debt:
-                    currentDebt += amount; 
-                    // Debt có thể tăng lên (khi qua màn) hoặc giảm đi (nếu có item giảm nợ)
+                    currentDebt += amount;
+                    OnResourceChanged?.Invoke(type, FormatBigInt(currentDebt));
+                    break;
+                    
+                case ResourceType.Ticket:
+                    ticket += (int)amount;
+                    if (ticket < 0) ticket = 0;
+                    OnResourceChanged?.Invoke(type, ticket.ToString());
                     break;
             }
-
-            // Báo cho UI biết là số liệu đã thay đổi
-            OnResourceChanged?.Invoke(type, GetResource(type));
+            UpdateInspectorDisplay();
         }
 
-        // Hàm kiểm tra và tiêu tiền (dùng khi mua Pack hoặc Charm)
-        public bool TrySpendResource(ResourceType type, int cost)
+        public void AddResource(ResourceType type, int amount)
         {
-            int currentAmount = GetResource(type);
+            AddResource(type, new BigInteger(amount));
+        }
+
+        public bool TrySpendResource(ResourceType type, BigInteger cost)
+        {
+            BigInteger currentAmount = GetResourceBigInt(type);
             if (currentAmount >= cost)
             {
-                AddResource(type, -cost); // Trừ tiền
-                return true; // Mua thành công
+                AddResource(type, -cost); 
+                return true; 
             }
-            return false; // Không đủ tiền
+            return false; 
         }
 
-        // Setup lại nợ cho vòng mới
-        public void SetNewDebt(int amount)
+        // Overload cho cost int
+        public bool TrySpendResource(ResourceType type, int cost)
+        {
+            return TrySpendResource(type, new BigInteger(cost));
+        }
+
+        public void SetNewDebt(BigInteger amount)
         {
             currentDebt = amount;
-            OnResourceChanged?.Invoke(ResourceType.Debt, currentDebt);
+            OnResourceChanged?.Invoke(ResourceType.Debt, FormatBigInt(currentDebt));
+            
+            UpdateInspectorDisplay();
         }
         
-        // Logic trả nợ cuối vòng
-        // Trả về TRUE nếu đủ tiền trả nợ, FALSE nếu phá sản
         public bool TryPayDebt()
         {
             if (coin >= currentDebt)
             {
                 AddResource(ResourceType.Coin, -currentDebt);
-                return true; // Trả nợ thành công, sống sót qua màn
+                return true; 
             }
-            return false; // Game Over
+            return false;
         }
         
         // Reset game (Cho debug hoặc chơi lại)
@@ -101,11 +117,35 @@ namespace _Game.Scripts.Core.Managers
             ticket = 0;
             currentDebt = 0;
             
-            OnResourceChanged?.Invoke(ResourceType.Coin, coin);
-            OnResourceChanged?.Invoke(ResourceType.Ticket, ticket);
-            OnResourceChanged?.Invoke(ResourceType.Debt, currentDebt);
+            OnResourceChanged?.Invoke(ResourceType.Coin, FormatBigInt(coin));
+            OnResourceChanged?.Invoke(ResourceType.Ticket, ticket.ToString());
+            OnResourceChanged?.Invoke(ResourceType.Debt, FormatBigInt(currentDebt));
+            
+            UpdateInspectorDisplay();
         }
 
+        #endregion
+        
+        #region Helper Format
+        private void UpdateInspectorDisplay()
+        {
+#if UNITY_EDITOR
+            // Format số đầy đủ để dễ debug chính xác
+            coinDisplay = coin.ToString(); 
+            debtDisplay = currentDebt.ToString();
+#endif
+        }
+        
+        private string FormatBigInt(BigInteger number)
+        {
+            if (number < 1000) return number.ToString();
+            if (number < 1000000) return ((double)number / 1000).ToString("0.#") + "K";
+            if (number < 1000000000) return ((double)number / 1000000).ToString("0.##") + "M";
+
+            // Với số siêu lớn, dùng định dạng khoa học
+            double d = (double)number;
+            return d.ToString("0.##E+0"); 
+        }
         #endregion
     }
 }
