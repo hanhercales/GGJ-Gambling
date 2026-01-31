@@ -39,7 +39,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 1560.5623, y: 863.1096}
-  m_SizeDelta: {x: 192, y: 192}
+  m_SizeDelta: {x: 52, y: 52}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3164682863077201540
 CanvasRenderer:
@@ -94,7 +94,7 @@ MonoBehaviour:
   iconImage: {fileID: 8379271718359790896}
   backgroundHighlight: {fileID: 986991561627129946}
   iconRect: {fileID: 2161195925635211061}
-  fixedCellHeight: 192
+  fixedCellHeight: 52
 --- !u!114 &3322800379498219492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,7 +144,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 176, y: 176}
+  m_SizeDelta: {x: 46, y: 46}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2387168095136110558
 CanvasRenderer:
@@ -219,7 +219,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 192, y: 192}
+  m_SizeDelta: {x: 52, y: 52}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6484019474021672981
 CanvasRenderer:
