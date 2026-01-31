@@ -26,7 +26,7 @@ namespace _Game.Scripts.Controllers.Machines
 
         [Header("UI")]
         public BoardView boardView;
-        public Button spinButton;
+        public SpinLeverUI spinLever;
         public TextMeshProUGUI scoreText;
         #endregion
 
@@ -70,8 +70,13 @@ namespace _Game.Scripts.Controllers.Machines
         private IEnumerator SpinRoutine(int luckValue, System.Action<float, List<MatchResult>> onSpinComplete)
         {
             _isSpinning = true;
-            spinButton.interactable = false;
             scoreText.text = "SPINNING...";
+            
+            if (spinLever != null)
+            {
+                spinLever.SetInteractable(false); // Khóa nút
+                spinLever.PlayPullAnimation();    // Chạy hoạt ảnh gạt (1->2->3)
+            }
             
             // 1. LOGIC: Tính toán kết quả
             SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, luckValue);
@@ -104,7 +109,12 @@ namespace _Game.Scripts.Controllers.Machines
             }
             
             _isSpinning = false;
-            spinButton.interactable = true;
+            
+            if (spinLever != null)
+            {
+                spinLever.PlayReleaseAnimation(); // Chạy hoạt ảnh nhả (3->2->1)
+                spinLever.SetInteractable(true);  // Mở lại nút
+            }
 
             // 4. BÁO CÁO KẾT QUẢ VỀ GAMEMANAGER
             onSpinComplete?.Invoke(totalWin, results);
