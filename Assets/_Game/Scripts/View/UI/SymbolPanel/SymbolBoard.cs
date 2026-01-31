@@ -13,7 +13,14 @@ public class SymbolBoard : MonoBehaviour
         for (int i = 0; i < this.transform.childCount; i++)
         {
             GameObject child = this.transform.GetChild(i).gameObject;
-            totalWeight += child.GetComponent<SymbolSlot>().symbolData.currentWeight;
+            
+            // Lấy component ra kiểm tra trước
+            var slot = child.GetComponent<SymbolSlot>();
+            
+            if (slot != null && slot.symbolData != null)
+            {
+                totalWeight += slot.symbolData.currentWeight;
+            }
         }
         
         SetUpUI();
@@ -29,7 +36,12 @@ public class SymbolBoard : MonoBehaviour
         for (int i = 0; i < this.transform.childCount; i++)
         {
             GameObject child = this.transform.GetChild(i).gameObject;
-            child.GetComponent<SymbolSlot>().TakeInformation(totalWeight);
+            var slot = child.GetComponent<SymbolSlot>();
+
+            if (slot != null)
+            {
+                slot.TakeInformation(totalWeight);
+            }
         }
     }
 
@@ -37,8 +49,15 @@ public class SymbolBoard : MonoBehaviour
     {
         for (int i = 0; i < this.transform.childCount; i++)
         {
-            GameObject child = this.transform.GetChild(i).gameObject;
-            child.GetComponent<SymbolSlot>().symbolData.ResetStats();
+            Transform t = this.transform.GetChild(i);
+            if (t == null) continue;
+
+            var slot = t.GetComponent<SymbolSlot>();
+            
+            if (slot != null && slot.symbolData != null)
+            {
+                slot.symbolData.ResetStats();
+            }
         }
     }
 }
