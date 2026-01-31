@@ -9,17 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc667db0c1eb69e4c8fcd2b1cebd0a7c, type: 3}
-  m_Name: Consolation Prize
-  m_EditorClassIdentifier: Assembly-CSharp::ConsoPrizeCharm
+  m_Script: {fileID: 11500000, guid: 4a740d45c1c6cba4ebc5b723e5f00df0, type: 3}
+  m_Name: Scratch Ticket
+  m_EditorClassIdentifier: Assembly-CSharp::ScratchTicket
   idName: 
   icon: {fileID: 0}
   baseSpawnWeight: 0
   tier: 0
-  charmName: Consolation
+  charmName: 
   price: 0
   isEquipped: 0
+  oneTimePurchase: 0
   description: 
   requiredCharmToUnlock: []
-  requiredLosses: 2
-  luckBonus: 7
+  bonusLevels: 1

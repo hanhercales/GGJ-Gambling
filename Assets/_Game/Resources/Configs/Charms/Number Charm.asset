@@ -9,16 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b65597f16dfafb42bb7c9ce81aaab72, type: 3}
-  m_Name: Extra Spin
-  m_EditorClassIdentifier: Assembly-CSharp::ExtraSpinCharm
+  m_Script: {fileID: 11500000, guid: 231fae0714b032944a7311d345e7f1ce, type: 3}
+  m_Name: Number Charm
+  m_EditorClassIdentifier: Assembly-CSharp::NumberCharm
   idName: 
   icon: {fileID: 0}
   baseSpawnWeight: 0
   tier: 0
-  charmName: Cat Food
+  charmName: 
   price: 0
   isEquipped: 0
+  oneTimePurchase: 0
   description: 
   requiredCharmToUnlock: []
-  extraSpins: 2
+  triggerChance: 10
+  luckBonus: 6
+  maxUses: 9
