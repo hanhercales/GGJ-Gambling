@@ -35,6 +35,9 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private SpinOption currentSpinOption; 
         
         public int SpinsRemaining => spinsRemaining;
+        
+        // --- [MỚI] Public Getter để UI có thể truy cập ---
+        public GameState CurrentState => currentState;
 
         // Events
         public event Action<int> OnSpinsChanged;
@@ -54,18 +57,20 @@ namespace _Game.Scripts.Core.Managers
         {
             Debug.Log(">>> GAME STARTED <<<");
 
-            // Lắng nghe sự kiện từ DebtManager
+            // 1. Lắng nghe sự kiện từ DebtManager
             if (DebtManager.Instance != null)
             {
                 DebtManager.Instance.OnDebtPaidSuccess += HandleDebtPaid;
                 DebtManager.Instance.OnGameOver += HandleGameOver;
                 Debug.Log("GameManager: Connected to DebtManager.");
             }
-            else
-            {
-                Debug.LogError("CẢNH BÁO: Không tìm thấy DebtManager trong scene!");
-            }
             
+            // 2. Lắng nghe sự kiện Tiền thay đổi từ ResourceManager
+            if (ResourceManager.Instance != null)
+            {
+                ResourceManager.Instance.OnResourceChanged += OnResourceChanged;
+            }
+
             StartNewGame();
         }
 
@@ -75,6 +80,11 @@ namespace _Game.Scripts.Core.Managers
             {
                 DebtManager.Instance.OnDebtPaidSuccess -= HandleDebtPaid;
                 DebtManager.Instance.OnGameOver -= HandleGameOver;
+            }
+
+            if (ResourceManager.Instance != null)
+            {
+                ResourceManager.Instance.OnResourceChanged -= OnResourceChanged;
             }
         }
 
@@ -97,10 +107,9 @@ namespace _Game.Scripts.Core.Managers
             UpdateShopDifficulty();
             if (ShopManager.Instance != null) ShopManager.Instance.RerollShop(true);
 
-            // 4. Setup Nợ (Giao cho DebtManager)
+            // 4. Setup Nợ
             if (DebtManager.Instance != null)
             {
-                Debug.Log($"Requesting DebtManager to setup debt for Round {currentDebtRound}...");
                 DebtManager.Instance.SetupDebtForRound(currentDebtRound);
             }
 
@@ -112,6 +121,16 @@ namespace _Game.Scripts.Core.Managers
             NotifyRoundInfo();
         }
 
+        // --- XỬ LÝ KHI TÀI NGUYÊN THAY ĐỔI ---
+        private void OnResourceChanged(ResourceType type, string value)
+        {
+            // Chỉ quan tâm nếu TIỀN thay đổi và đang ở giai đoạn chuẩn bị (mua gói)
+            if (type == ResourceType.Coin && currentState == GameState.Preparation)
+            {
+                RequestSpinOptionsUpdate();
+            }
+        }
+
         // --- PUBLIC API: UI GỌI ĐỂ LẤY OPTION ---
         public void RequestSpinOptionsUpdate()
         {
@@ -120,7 +139,6 @@ namespace _Game.Scripts.Core.Managers
                 var coin = ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
                 var options = SpinManager.Instance.GetSpinOptions(currentDebtRound, coin);
                 
-                // Bắn event cập nhật UI
                 OnSpinOptionsUpdated?.Invoke(options.option1, options.option2);
             }
             else
@@ -146,7 +164,6 @@ namespace _Game.Scripts.Core.Managers
 
             Debug.Log($"Player selecting option: {option.type} | Title: {option.title} | Cost: {option.coinCost}");
 
-            // 1. Trừ tiền (Nếu gói tốn tiền)
             if (option.coinCost > 0)
             {
                 if (ResourceManager.Instance.TrySpendResource(ResourceType.Coin, option.coinCost))
@@ -159,7 +176,6 @@ namespace _Game.Scripts.Core.Managers
                     Debug.LogError("FAILED: UI allows click but ResourceManager says Not Enough Coin!");
                 }
             }
-            // 2. Miễn phí (Free Spin / Bankruptcy)
             else
             {
                 Debug.Log("Free Spin / Bankruptcy Option Selected.");
@@ -171,7 +187,6 @@ namespace _Game.Scripts.Core.Managers
         {
             currentSpinOption = option; 
             AddSpins(option.spinCount);
-            
             ChangeState(GameState.Spinning);
         }
 
@@ -219,19 +234,16 @@ namespace _Game.Scripts.Core.Managers
         
         private void OnSpinPackFinished()
         {
-            // 1. Cộng Ticket từ Gói Spin (Nguồn thu 1)
             if (currentSpinOption != null)
             {
                 ResourceManager.Instance.AddResource(ResourceType.Ticket, currentSpinOption.ticketReward);
-                Debug.Log($"Reward: Added {currentSpinOption.ticketReward} Tickets (Source: Spin Pack).");
+                Debug.Log($"Reward: Added {currentSpinOption.ticketReward} Tickets.");
             }
 
-            // 2. Kiểm tra tiến độ Stage
             if (currentStage < stagesPerDebtRound)
             {
                 currentStage++;
                 Debug.Log($">>> ADVANCING TO STAGE {currentStage}/{stagesPerDebtRound} <<<");
-                
                 ChangeState(GameState.Preparation); 
                 NotifyRoundInfo();
             }
@@ -244,32 +256,21 @@ namespace _Game.Scripts.Core.Managers
 
         private void ResolveDebtCycle()
         {
-            // Chuyển sang trạng thái chờ kết quả
             ChangeState(GameState.RoundEnd);
-
-            // Ủy quyền kiểm tra cho DebtManager
             if (DebtManager.Instance != null)
             {
                 Debug.Log("Calling DebtManager.EvaluateRoundEnd()...");
                 DebtManager.Instance.EvaluateRoundEnd();
             }
-            else
-            {
-                Debug.LogError("CRITICAL: DebtManager not found!");
-            }
         }
         
-        // --- CALLBACKS TỪ DEBT MANAGER ---
-
         private void HandleDebtPaid()
         {
             Debug.Log("[Event Received] DebtManager says: Debt Paid / Clear!");
 
-            // 1. Tính toán Ticket thưởng nếu trả sớm (Nguồn thu 2)
             int skippedStages = 0;
             if (currentState != GameState.RoundEnd)
             {
-                // [FIX LOGIC] Cộng thêm 1 để tính cả stage hiện tại
                 skippedStages = (stagesPerDebtRound - currentStage) + 1;
             }
 
@@ -280,13 +281,11 @@ namespace _Game.Scripts.Core.Managers
                 Debug.Log($"[Debt] Early Pay Bonus: +{bonusTickets} Tickets ({skippedStages} stages skipped).");
             }
 
-            // 2. Xử lý chuyển Round
             Debug.Log($"ROUND {currentDebtRound} COMPLETE! Preparing next round...");
-
             currentDebtRound++;
             currentStage = 1;
             
-            // [FIX LOGIC] Reset lượt quay dư thừa để tránh exploit ở Round sau
+            // Reset state
             spinsRemaining = 0;
             currentSpinOption = null;
             OnSpinsChanged?.Invoke(0);
@@ -296,10 +295,8 @@ namespace _Game.Scripts.Core.Managers
             
             luckManager.IncrementDebtCompleted();
 
-            // Setup Nợ mới
             if (DebtManager.Instance != null)
             {
-                Debug.Log($"Setting up new debt target for Round {currentDebtRound}");
                 DebtManager.Instance.SetupDebtForRound(currentDebtRound);
             }
             
@@ -321,12 +318,13 @@ namespace _Game.Scripts.Core.Managers
             currentState = newState;
             Debug.Log($"[GameState] Changed to: {newState}");
             
-            // Khi vào Preparation -> Báo UI cập nhật lại giá tiền & nút bấm
+            // Nếu vào giai đoạn chuẩn bị -> Tính giá tiền gói Spin
             if (newState == GameState.Preparation)
             {
                 RequestSpinOptionsUpdate();
             }
 
+            // Nếu đang quay hoặc Game Over -> Đóng hết Dialog UI
             if (newState == GameState.Spinning || newState == GameState.GameOver)
             {
                 if (UIManager.Instance != null)
@@ -341,7 +339,6 @@ namespace _Game.Scripts.Core.Managers
             if (shopProfiles == null || shopProfiles.Count == 0) return;
             
             int profileIndex = Mathf.Clamp((currentDebtRound - 1) / 3, 0, shopProfiles.Count - 1);
-            Debug.Log($"Updating Shop Difficulty to Profile Index: {profileIndex}");
             
             if (ShopManager.Instance != null)
             {

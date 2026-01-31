@@ -8,33 +8,27 @@ namespace _Game.Scripts.View.UI
 {
     [RequireComponent(typeof(Button))]
     [RequireComponent(typeof(Image))]
-    [RequireComponent(typeof(TooltipTrigger))] // Tích hợp sẵn Tooltip
+    [RequireComponent(typeof(TooltipTrigger))]
     public class SpinButtonView : MonoBehaviour
     {
         [Header("Configuration")]
-        [Tooltip("Nếu tích, nút này sẽ hiển thị Option 2 (Bên phải/Gói ít lượt). Nếu bỏ tích, hiển thị Option 1 (Bên trái).")]
         [SerializeField] private bool isOption2;
 
         [Header("Visual Components")]
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI costText;
-        [SerializeField] private TextMeshProUGUI ticketText; // (Optional) Hiển thị số vé thưởng nếu muốn
-        [SerializeField] private GameObject ticketIcon;      // (Optional) Icon vé
+        [SerializeField] private TextMeshProUGUI ticketText;
+        [SerializeField] private GameObject ticketIcon;
 
         [Header("State Sprites")]
-        [Tooltip("Ảnh khi nút MỞ (Mua được)")]
         [SerializeField] private Sprite normalSprite;
-        [Tooltip("Ảnh khi nút KHÓA (Đang còn lượt quay HOẶC Không đủ tiền)")]
         [SerializeField] private Sprite lockedSprite;
 
-        // Internal References
         private Button _btn;
         private Image _img;
         private TooltipTrigger _tooltip;
         
-        // Data State
         private SpinOption _currentOption;
-        private bool _hasSpinsRemaining; // Đang còn lượt quay hay không?
 
         private void Awake()
         {
@@ -44,7 +38,6 @@ namespace _Game.Scripts.View.UI
             
             _btn.onClick.AddListener(OnClick);
 
-            // Tự động lưu sprite hiện tại làm normal nếu chưa gán
             if (normalSprite == null && _img != null) normalSprite = _img.sprite;
         }
 
@@ -52,14 +45,16 @@ namespace _Game.Scripts.View.UI
         {
             if (GameManager.Instance != null)
             {
-                // Lắng nghe thay đổi về Option (Giá tiền/Gói)
+                // 1. Lắng nghe thay đổi giá/gói
                 GameManager.Instance.OnSpinOptionsUpdated += OnOptionsUpdated;
                 
-                // Lắng nghe thay đổi về số lượt quay (Để khóa nút khi đang chơi)
+                // 2. Lắng nghe thay đổi số lượt quay
                 GameManager.Instance.OnSpinsChanged += OnSpinsChanged;
 
-                // Khởi tạo trạng thái ban đầu
-                _hasSpinsRemaining = GameManager.Instance.SpinsRemaining > 0;
+                // 3. [MỚI - QUAN TRỌNG] Lắng nghe thay đổi Trạng thái Game
+                // Để khi chuyển sang SPINNING thì đổi sprite lock ngay
+                GameManager.Instance.OnStateChanged += OnGameStateChanged;
+
                 GameManager.Instance.RequestSpinOptionsUpdate();
             }
         }
@@ -70,6 +65,7 @@ namespace _Game.Scripts.View.UI
             {
                 GameManager.Instance.OnSpinOptionsUpdated -= OnOptionsUpdated;
                 GameManager.Instance.OnSpinsChanged -= OnSpinsChanged;
+                GameManager.Instance.OnStateChanged -= OnGameStateChanged; // [MỚI]
             }
         }
 
@@ -83,29 +79,24 @@ namespace _Game.Scripts.View.UI
 
         private void OnSpinsChanged(int remaining)
         {
-            bool hasSpins = remaining > 0;
-            
-            // Chỉ refresh nếu trạng thái thực sự thay đổi để tối ưu performance
-            if (_hasSpinsRemaining != hasSpins)
-            {
-                _hasSpinsRemaining = hasSpins;
-                RefreshState();
-            }
+            RefreshState();
         }
 
-        // --- CORE LOGIC: QUYẾT ĐỊNH HIỂN THỊ ---
+        // [MỚI] Xử lý khi Game đổi trạng thái (Spinning <-> Preparation)
+        private void OnGameStateChanged(GameState newState)
+        {
+            RefreshState();
+        }
+
+        // --- CORE LOGIC ---
         private void RefreshState()
         {
             if (_currentOption == null) return;
 
             // 1. Cập nhật Text
             if (titleText != null) titleText.text = _currentOption.title;
-            
-            if (costText != null) 
-                costText.text = _currentOption.coinCost > 0 ? $"{_currentOption.coinCost}" : "FREE";
-            
-            if (ticketText != null) 
-                ticketText.text = $"+{_currentOption.ticketReward}";
+            if (costText != null) costText.text = _currentOption.coinCost > 0 ? $"{_currentOption.coinCost}" : "FREE";
+            if (ticketText != null) ticketText.text = $"+{_currentOption.ticketReward}";
 
             if (_tooltip != null)
             {
@@ -113,34 +104,39 @@ namespace _Game.Scripts.View.UI
                 _tooltip.content = _currentOption.description;
             }
 
-            // 2. Quyết định trạng thái
-            bool isLockedByGameplay = _hasSpinsRemaining;
+            // 2. Kiểm tra điều kiện khóa
+            bool isLockedByGameplay = false;
+            if (GameManager.Instance != null)
+            {
+                // CHỈ KHÓA KHI ĐANG QUAY
+                // (Logic này cho phép cộng dồn spin ở phase Preparation)
+                isLockedByGameplay = (GameManager.Instance.CurrentState == GameState.Spinning);
+            }
+
             bool isAvailable = _currentOption.isAvailable; 
+            
+            // Nút bấm được khi: KHÔNG bị khóa bởi gameplay VÀ Gói này khả dụng
             bool canInteract = !isLockedByGameplay && isAvailable;
 
-            // 3. Cập nhật UI Button & Image
+            // 3. Cập nhật UI
             _btn.interactable = canInteract;
 
             if (_img != null)
             {
+                // Hiển thị ảnh khóa nếu: Bị khóa do đang quay HOẶC Không khả dụng (thiếu tiền/disable)
                 bool showLockSprite = isLockedByGameplay || !isAvailable;
                 
-                // Đổi ảnh
                 _img.sprite = showLockSprite ? lockedSprite : normalSprite;
 
-                // --- [THÊM ĐOẠN NÀY] ---
-                // Báo cho Tooltip biết: "Đây là ảnh gốc mới nhé, đừng nhớ cái cũ nữa!"
                 if (_tooltip != null)
                 {
                     _tooltip.RefreshOriginalSprite();
                 }
-                // -----------------------
             }
         }
 
         private void OnClick()
         {
-            // Bảo vệ 2 lớp: Check lại lần nữa trước khi gửi lệnh
             if (_currentOption != null && _btn.interactable)
             {
                 GameManager.Instance.SelectSpinOption(_currentOption);

@@ -17,7 +17,7 @@ namespace _Game.Scripts.Core.Managers
 
         [Header("Config")]
         [SerializeField] private int shopSlots = 6;
-        [SerializeField] private int rerollCost = 5;
+        [SerializeField] private int rerollCost = 5; // Giá Reroll (vẫn dùng Coin)
 
         [Header("Probability Settings")]
         [SerializeField] private ShopProbabilitySO currentProbabilityProfile;
@@ -116,9 +116,10 @@ namespace _Game.Scripts.Core.Managers
         {
             if (!isFree)
             {
+                // Reroll dùng Coin (để người chơi phải cân nhắc với việc dùng Coin để Spin)
                 if (!ResourceManager.Instance.TrySpendResource(ResourceType.Coin, rerollCost))
                 {
-                    Debug.Log("Không đủ tiền Reroll!");
+                    Debug.Log("Không đủ Coin để Reroll!");
                     return;
                 }
             }
@@ -182,6 +183,7 @@ namespace _Game.Scripts.Core.Managers
             currentProbabilityProfile = newProfile;
         }
 
+        // --- [ĐIỀU CHỈNH QUAN TRỌNG] LOGIC MUA HÀNG DÙNG TICKET ---
         public bool TryBuyItem(int slotIndex)
         {
             // 1. Kiểm tra Slot hợp lệ
@@ -198,30 +200,35 @@ namespace _Game.Scripts.Core.Managers
                 return false;
             }
 
-            // 2. Kiểm tra tiền
-            var currentCoin = ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
-            if (currentCoin < item.price) 
+            // 2. Kiểm tra TICKET (Thay vì Coin)
+            // Lấy số lượng Ticket hiện có
+            var currentTicket = ResourceManager.Instance.GetResourceBigInt(ResourceType.Ticket);
+            
+            // So sánh với giá item (Lúc này item.price được hiểu là giá Ticket)
+            if (currentTicket < item.price) 
             {
-                Debug.Log($"[Shop] Mua thất bại: Không đủ tiền! (Có: {currentCoin}, Cần: {item.price})");
+                Debug.Log($"[Shop] Mua thất bại: Không đủ Ticket! (Có: {currentTicket}, Cần: {item.price})");
                 return false;
             }
             
             // 3. Kiểm tra túi đồ (Inventory Full)
-            // LƯU Ý: Đây là nguyên nhân phổ biến nhất khiến bấm vào không có gì xảy ra
             if (playerInventory.GetContent().Count >= playerInventory.GetSize()) 
             {
                 Debug.Log("[Shop] Mua thất bại: Túi đồ đã đầy (Inventory Full)!");
                 return false;
             }
 
-            // 4. Thực hiện giao dịch
-            ResourceManager.Instance.TrySpendResource(ResourceType.Coin, item.price);
+            // 4. Thực hiện giao dịch (Trừ Ticket)
+            ResourceManager.Instance.TrySpendResource(ResourceType.Ticket, item.price);
+            
+            // Thêm đồ vào túi
             playerInventory.AddCharm(item);
 
+            // Xóa item khỏi shop sau khi mua
             _currentShopItems[slotIndex] = null;
             OnShopRefreshed?.Invoke(_currentShopItems);
             
-            Debug.Log($"[Shop] Mua thành công: {item.name}");
+            Debug.Log($"[Shop] Mua thành công Charm '{item.charmName}' với giá {item.price} Ticket.");
             return true;
         }
         
