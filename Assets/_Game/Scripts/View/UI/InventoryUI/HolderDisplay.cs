@@ -36,24 +36,47 @@ namespace _Game.Scripts.View.UI
 
         public void SetupUI()
         {
-            // Xóa hết slot cũ
-            foreach (Transform slot in slotParent)
-            {
-                Destroy(slot.gameObject);
-            }
             holderSlots.Clear();
-
-            // Sinh slot mới dựa trên Size hiện tại (đã được EstateCharm cộng thêm)
-            for (int i = 0; i < charmHolder.GetSize(); ++i)
+            int targetSize = charmHolder.GetSize();
+            
+            while (slotParent.childCount > targetSize)
             {
-                GameObject slot = Instantiate(holderSlotPrefab, slotParent);
-                HolderSlotUI slotUI = slot.GetComponent<HolderSlotUI>();
+                Transform childToRemove = slotParent.GetChild(slotParent.childCount - 1);
+                DestroyImmediate(childToRemove.gameObject); 
+            }
+            
+            for (int i = 0; i < targetSize; ++i)
+            {
+                GameObject slotObj;
+
+                //Kiểm tra nếu parent đã có con thì dùng lại, không tạo mới
+                if (i < slotParent.childCount)
+                {
+                    slotObj = slotParent.GetChild(i).gameObject;
+                }
+                else
+                {
+                    slotObj = Instantiate(holderSlotPrefab, slotParent);
+                }
+
+                // Setup các thành phần logic cho slot
+                HolderSlotUI slotUI = slotObj.GetComponent<HolderSlotUI>();
                 if (slotUI != null)
                 {
                     holderSlots.Add(slotUI);
-                    Button slotButton = slot.GetComponent<Button>();
-                    if(slotButton == null) slotButton = slot.AddComponent<Button>();
-                    slotButton.onClick.AddListener(() => OnSlotUI_Clicked(slotUI));
+                    
+                    Button slotButton = slotObj.GetComponent<Button>();
+                    if(slotButton == null) slotButton = slotObj.AddComponent<Button>();
+
+                    slotButton.onClick.RemoveAllListeners();
+
+                    slotButton.onClick.AddListener(() => 
+                    {
+                        if (AudioManager.Instance != null) 
+                            AudioManager.Instance.PlayClick();
+                        
+                        OnSlotUI_Clicked(slotUI);
+                    });
                 }
             }
 
