@@ -103,9 +103,9 @@ TextureImporter:
       name: EnvyMask_0
       rect:
         serializedVersion: 2
-        x: 13
+        x: 11
         y: 9
-        width: 38
+        width: 42
         height: 47
       alignment: 0
       pivot: {x: 0, y: 0}
