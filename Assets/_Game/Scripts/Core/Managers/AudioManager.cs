@@ -1,100 +1,103 @@
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour
+namespace _Game.Scripts.Core.Managers
 {
-    public static AudioManager Instance;
-    
-    [SerializeField] private AudioSource musicSource;
-    [SerializeField] private AudioSource sfxSource;
-    [SerializeField] private AudioSource spinSource;
-    
-    public AudioClip backgroundMusic;
-    public AudioClip clickClip;
-    public AudioClip leverPullClip;
-    public AudioClip spinningLoopClip;
-    public AudioClip reelStopClip;
-    
-    public AudioClip winSmallClip;
-    public AudioClip winBigClip;
-    public AudioClip maskUnlockClip;
-    
-    private void Awake()
+    public class AudioManager : MonoBehaviour
     {
-        if (Instance == null)
+        public static AudioManager Instance;
+        
+        [SerializeField] private AudioSource musicSource;
+        [SerializeField] private AudioSource sfxSource;
+        [SerializeField] private AudioSource spinSource;
+        
+        public AudioClip backgroundMusic;
+        public AudioClip clickClip;
+        public AudioClip leverPullClip;
+        public AudioClip spinningLoopClip;
+        public AudioClip patternMatchClip;
+        
+        public AudioClip winSmallClip;
+        public AudioClip winBigClip;
+        public AudioClip maskUnlockClip;
+        
+        private void Awake()
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
-        else
+        
+        private void Start()
         {
-            Destroy(gameObject);
+            if (musicSource.isPlaying) musicSource.Stop();
+            PlayBGM();
         }
-    }
     
-    private void Start()
-    {
-        if (musicSource.isPlaying) musicSource.Stop();
-        PlayBGM();
-    }
-
-    public void PlayBGM()
-    {
-        if (backgroundMusic != null && !musicSource.isPlaying)
+        public void PlayBGM()
         {
-            musicSource.clip = backgroundMusic;
-            musicSource.loop = true;
-            musicSource.Play();
-            Debug.Log("Playing BGM");
+            if (backgroundMusic != null && !musicSource.isPlaying)
+            {
+                musicSource.clip = backgroundMusic;
+                musicSource.loop = true;
+                musicSource.Play();
+            }
         }
-    }
-
-    public void PlayClick()
-    {
-        PlaySFX(clickClip);
-    }
-
-    public void PlayLeverPull()
-    {
-        PlaySFX(leverPullClip, 1.2f);
-    }
-
-    public void PlayReelStop()
-    {
-        sfxSource.pitch = Random.Range(0.9f, 1.1f);
-        PlaySFX(reelStopClip);
-        sfxSource.pitch = 1f;
-    }
-
-    public void PlayWin(bool isBigWin)
-    {
-        PlaySFX(isBigWin ? winBigClip : winSmallClip);
-    }
-
-    public void PlayUnlockMask()
-    {
-        PlaySFX(maskUnlockClip);
-    }
-
-    private void PlaySFX(AudioClip clip, float volumeScale = 1f)
-    {
-        if (clip != null)
-        {
-            sfxSource.PlayOneShot(clip, volumeScale);
-        }
-    }
     
-    public void StartSpinningSound()
-    {
-        if (spinningLoopClip != null)
+        public void PlayClick()
         {
-            spinSource.clip = spinningLoopClip;
-            spinSource.loop = true;
-            spinSource.Play();
+            PlaySFX(clickClip);
         }
-    }
-
-    public void StopSpinningSound()
-    {
-        spinSource.Stop();
+    
+        public void PlayLeverPull()
+        {
+            PlaySFX(leverPullClip, 1.2f);
+        }
+    
+        public void PlayPatternMatch()
+        {
+            sfxSource.pitch = Random.Range(0.9f, 1.1f);
+            PlaySFX(patternMatchClip);
+            sfxSource.pitch = 1f;
+            Debug.Log("Pattern match played");
+        }
+    
+        public void PlayWin(bool isBigWin)
+        {
+            PlaySFX(isBigWin ? winBigClip : winSmallClip);
+        }
+    
+        public void PlayUnlockMask()
+        {
+            PlaySFX(maskUnlockClip);
+        }
+    
+        private void PlaySFX(AudioClip clip, float volumeScale = 1f)
+        {
+            if (clip != null)
+            {
+                sfxSource.PlayOneShot(clip, volumeScale);
+            }
+        }
+        
+        public void StartSpinningSound()
+        {
+            if (spinningLoopClip != null)
+            {
+                spinSource.clip = spinningLoopClip;
+                spinSource.loop = true;
+                spinSource.Play();
+            }
+        }
+    
+        public void StopSpinningSound()
+        {
+            spinSource.Stop();
+        }
     }
 }

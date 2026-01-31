@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c32b3049ebf6e4a4aa38249a49c7708c
+guid: 2de7117bf847de649ae3e1df428bc232
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3141369889099230394
-    second: lock_button_cropped_0
+      213: 9166689907307753440
+    second: purple_button_cropped_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,11 +96,37 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: lock_button_cropped_0
+      name: purple_button_cropped_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: abc2edb3543689b20800000000000000
-      internalID: 3141369889099230394
+      spriteID: 0efac3b47ef963f70800000000000000
+      internalID: 9166689907307753440
       vertices: []
       indices: 
       edges: []
@@ -135,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      lock_button_cropped_0: 3141369889099230394
+      purple_button_cropped_0: 9166689907307753440
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

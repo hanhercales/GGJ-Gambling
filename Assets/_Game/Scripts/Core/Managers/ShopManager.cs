@@ -131,7 +131,7 @@ namespace _Game.Scripts.Core.Managers
             {
                 if (!ResourceManager.Instance.TrySpendResource(ResourceType.Coin, rerollCost))
                 {
-                    Debug.Log("Không đủ tiền Reroll!");
+                    Debug.Log("Không đủ Coin để Reroll!");
                     return;
                 }
             }
@@ -219,17 +219,40 @@ namespace _Game.Scripts.Core.Managers
             int finalPrice = GetFinalPrice(item);
             
             if (ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin) < finalPrice) 
+            if (item == null)
             {
-                Debug.Log($"[Shop] Not enough money. Need {finalPrice}, have {ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin)}");
+                Debug.LogWarning($"[Shop] Slot {slotIndex} is empty (already bought).");
                 return false;
             }
-            if (playerInventory.GetContent().Count >= playerInventory.GetSize()) return false;
-            ResourceManager.Instance.TrySpendResource(ResourceType.Coin, finalPrice);
-    
+
+            // 2. Kiểm tra TICKET (Thay vì Coin)
+            // Lấy số lượng Ticket hiện có
+            var currentTicket = ResourceManager.Instance.GetResourceBigInt(ResourceType.Ticket);
+            
+            // So sánh với giá item (Lúc này item.price được hiểu là giá Ticket)
+            if (currentTicket < item.price) 
+            {
+                Debug.Log($"[Shop] Mua thất bại: Không đủ Ticket! (Có: {currentTicket}, Cần: {item.price})");
+                return false;
+            }
+            
+            // 3. Kiểm tra túi đồ (Inventory Full)
+            if (playerInventory.GetContent().Count >= playerInventory.GetSize()) 
+            {
+                Debug.Log("[Shop] Mua thất bại: Túi đồ đã đầy (Inventory Full)!");
+                return false;
+            }
+
+            // 4. Thực hiện giao dịch (Trừ Ticket)
+            ResourceManager.Instance.TrySpendResource(ResourceType.Ticket, item.price);
+            
+            // Thêm đồ vào túi
             playerInventory.AddCharm(item);
 
             _currentShopItems[slotIndex] = null;
             OnShopRefreshed?.Invoke(_currentShopItems);
+            
+            Debug.Log($"[Shop] Mua thành công Charm '{item.charmName}' với giá {item.price} Ticket.");
             return true;
         }
         
