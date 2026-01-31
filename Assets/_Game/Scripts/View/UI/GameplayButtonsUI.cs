@@ -1,12 +1,17 @@
 ﻿using UnityEngine;
 using _Game.Scripts.Core.Data;     // Để dùng GameState
-using _Game.Scripts.Core.Managers; // Để gọi GameManager
+using _Game.Scripts.Core.Managers;
+using UnityEngine.UI; // Để gọi GameManager
 
 namespace _Game.Scripts.View.UI
 {
     [RequireComponent(typeof(CanvasGroup))]
     public class GameplayButtonsUI : MonoBehaviour
     {
+        [SerializeField] private Image shopButtonImage;
+        [SerializeField] private Sprite normalSprite;
+        [SerializeField] private Sprite lockedSprite;
+        
         private CanvasGroup _canvasGroup;
 
         private void Awake()
@@ -49,6 +54,7 @@ namespace _Game.Scripts.View.UI
             {
                 _canvasGroup.interactable = isInteractable;
                 _canvasGroup.blocksRaycasts = isInteractable; // Chặn chuột hoàn toàn
+                shopButtonImage.sprite = isInteractable ? normalSprite : lockedSprite;
                 
                 // Làm mờ để người chơi biết là đang bị khóa
                 _canvasGroup.alpha = isInteractable ? 1f : 0.6f; 
