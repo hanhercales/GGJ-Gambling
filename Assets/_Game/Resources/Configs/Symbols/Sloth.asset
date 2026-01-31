@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Sloth
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.SymbolData
   idName: Sloth
-  icon: {fileID: 5291173259673462501, guid: 0762eddff2289bf4985e4cc97d26234b, type: 3}
-  baseSpawnWeight: 149
+  icon: {fileID: 21300000, guid: 41d4f988f6a74e0419e3253e18de9a6b, type: 3}
+  baseSpawnWeight: 10
   baseValue: 3
-  currentWeight: 149
+  currentWeight: 10
   currentValue: 3

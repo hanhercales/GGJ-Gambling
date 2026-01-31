@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Wrath
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.SymbolData
   idName: Wrath
-  icon: {fileID: 3138087806127103237, guid: a36d23e3a9c4e8f4a88d68719d0db685, type: 3}
-  baseSpawnWeight: 119
+  icon: {fileID: 21300000, guid: 9983576635f79c345b6136a48a801571, type: 3}
+  baseSpawnWeight: 8
   baseValue: 5
-  currentWeight: 119
+  currentWeight: 8
   currentValue: 5

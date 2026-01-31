@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3f9ea7bab6f56349a592f7be8c4db28, type: 3}
   m_Name: Lust
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.SymbolData
-  idName: Heart
-  icon: {fileID: 4373404682713169414, guid: 37c1602263cfe8b4abf38551c1e4f8c9, type: 3}
-  baseSpawnWeight: 194
+  idName: Lust
+  icon: {fileID: 21300000, guid: 01c7f46ca090c2447a9ab681646b2c3f, type: 3}
+  baseSpawnWeight: 13
   baseValue: 2
-  currentWeight: 194
+  currentWeight: 13
   currentValue: 0
