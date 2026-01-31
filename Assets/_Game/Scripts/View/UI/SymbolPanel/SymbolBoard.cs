@@ -9,7 +9,6 @@ public class SymbolBoard : MonoBehaviour
     {
         SetUpUI();
     }
-
     public void SetUpUI()
     {
         for (int i = 0; i < this.transform.childCount; i++)
