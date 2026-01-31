@@ -130,6 +130,11 @@ namespace _Game.Scripts.Controllers.Machines
 
             // 4. BÁO CÁO KẾT QUẢ VỀ GAMEMANAGER
             onSpinComplete?.Invoke(totalWin, results);
+
+            if(results.Count() > 2)
+            {
+                AudioManager.Instance.PlayWin(results.Count() > 7);
+            }
         }
         
         private IEnumerator ShowWinSequence(List<MatchResult> results)
@@ -160,6 +165,8 @@ namespace _Game.Scripts.Controllers.Machines
 
                 ResourceManager.Instance.AddResource(ResourceType.Coin, (int)matchScore);
                 scoreText.text = $"WIN: {matchScore}";
+                
+                AudioManager.Instance.PlayPatternMatch();
 
                 // Giữ nguyên trạng thái này trong 1.5s để người chơi tận hưởng
                 yield return new WaitForSeconds(1.5f);
@@ -182,6 +189,8 @@ namespace _Game.Scripts.Controllers.Machines
                     scoreText.text = $"WIN: {currentDisplayedScore}";
 
                     yield return new WaitForSeconds(0.4f);
+                    
+                    AudioManager.Instance.PlayPatternMatch();
 
                     // Tắt đi để chuyển sang cái tiếp theo
                     boardView.SetHighlightPattern(match.matchedCoordinates, false);

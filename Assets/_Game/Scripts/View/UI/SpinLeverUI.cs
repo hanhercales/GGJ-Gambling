@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using _Game.Scripts.Core.Managers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -72,6 +73,7 @@ namespace _Game.Scripts.View.UI
         private IEnumerator ReleaseRoutine()
         {
             // 1. Đang ở Pulled (Sprite 3)
+            AudioManager.Instance.PlayLeverPull();
 
             // 2. Chuyển về Middle (Sprite 2)
             if (spriteMiddle != null) targetImage.sprite = spriteMiddle;
