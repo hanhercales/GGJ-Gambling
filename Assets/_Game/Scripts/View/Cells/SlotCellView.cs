@@ -94,8 +94,17 @@ namespace _Game.Scripts.View.Cells
         {
             if (backgroundHighlight != null)
             {
-                backgroundHighlight.gameObject.SetActive(true); // Đảm bảo bật object
+                // 1. Bật lên
+                backgroundHighlight.gameObject.SetActive(true); 
                 backgroundHighlight.DOKill();
+
+                // --- DÒNG QUAN TRỌNG CẦN THÊM ---
+                // Reset về trong suốt (Alpha = 0) để tạo đà cho hiệu ứng nhấp nháy
+                // Nếu không có dòng này, nó sẽ tween từ Vàng -> Vàng (đứng im)
+                backgroundHighlight.color = new Color(1f, 1f, 0f, 0f); 
+                // --------------------------------
+
+                // 2. Tween từ 0 -> 0.5 (Yoyo)
                 backgroundHighlight.DOColor(new Color(1f, 1f, 0f, 0.5f), 0.5f)
                     .SetLoops(-1, LoopType.Yoyo);
             }

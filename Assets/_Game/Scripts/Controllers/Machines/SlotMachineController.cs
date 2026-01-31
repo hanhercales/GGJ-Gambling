@@ -128,55 +128,63 @@ namespace _Game.Scripts.Controllers.Machines
             float gSymMult = ScoreManager.Instance.GetSymbolMult();
             float gPatMult = ScoreManager.Instance.GetPatternMult();
 
-            // =========================================================================
-            // BƯỚC QUAN TRỌNG: SẮP XẾP LẠI ĐỂ HIỂN THỊ
-            // Logic tính toán trả về: Ưu tiên Cao -> Thấp (để lọc trùng).
-            // Logic hiển thị cần: Ưu tiên Thấp -> Cao (để tạo kịch tính).
-            // =========================================================================
-            
+            // Sắp xếp: Nhỏ hiện trước, Lớn hiện sau
             var displaySequence = results
-                .OrderBy(r => r.pattern.priority) // 1. Xếp theo độ ưu tiên (0, 1, 2...) -> Nhỏ hiện trước
-                .ThenBy(r => r.GetScore(gSymMult, gPatMult)) // 2. Nếu cùng ưu tiên, xếp theo điểm số (Ít tiền hiện trước)
+                .OrderBy(r => r.pattern.priority)
+                .ThenBy(r => r.GetScore(gSymMult, gPatMult))
                 .ToList();
             
             yield return new WaitForSeconds(0.2f);
 
-            // === GIAI ĐOẠN 1: HIGHLIGHT TỪNG PATTERN (TUẦN TỰ TỪ NHỎ ĐẾN LỚN) ===
-            foreach (var match in displaySequence)
+            // === TRƯỜNG HỢP 1: CHỈ ĂN ĐÚNG 1 PATTERN ===
+            // Logic: Bật Highlight "xịn" (nhấp nháy/loop) ngay lập tức và cộng tiền luôn
+            if (displaySequence.Count == 1)
             {
+                var match = displaySequence[0];
                 float matchScore = match.GetScore(gSymMult, gPatMult);
-                
-                // A. Bật Highlight các ô thắng của pattern này
-                boardView.SetHighlightPattern(match.matchedCoordinates, true);
 
-                // B. Cộng tiền vào ResourceManager
+                // Dùng hàm HighlightWinCells (loại nhấp nháy) thay vì SetHighlightPattern (loại tĩnh)
+                boardView.HighlightWinCells(match.matchedCoordinates, rows, cols);
+
                 ResourceManager.Instance.AddResource(ResourceType.Coin, (int)matchScore);
-                
-                // C. Cập nhật Text Score chạy lên
-                currentDisplayedScore += matchScore;
-                scoreText.text = $"WIN: {currentDisplayedScore}";
+                scoreText.text = $"WIN: {matchScore}";
 
-                // D. Chờ người chơi nhìn thấy
-                yield return new WaitForSeconds(0.4f);
-
-                // E. Tắt Highlight pattern này để nhường chỗ cho cái to hơn
-                boardView.SetHighlightPattern(match.matchedCoordinates, false);
-                
-                yield return new WaitForSeconds(0.1f); 
+                // Giữ nguyên trạng thái này trong 1.5s để người chơi tận hưởng
+                yield return new WaitForSeconds(1.5f);
             }
-
-            // === GIAI ĐOẠN 2: HIGHLIGHT TỔNG (CHỈ CHẠY NẾU CÓ > 1 PATTERN) ===
-            // Logic: Nếu chỉ thắng 1 pattern thì Giai đoạn 1 đã show rồi, không cần show lại.
-            if (results.Count > 1) 
+            // === TRƯỜNG HỢP 2: ĂN NHIỀU PATTERN (COMBO) ===
+            // Logic: Chạy tuần tự từng cái (Highlight tĩnh -> tắt) rồi mới chốt hạ bằng Highlight tổng
+            else
             {
+                // A. Giai đoạn tuần tự (Cộng dồn cảm xúc)
+                foreach (var match in displaySequence)
+                {
+                    float matchScore = match.GetScore(gSymMult, gPatMult);
+                    
+                    // Bật Highlight thường (tĩnh)
+                    boardView.SetHighlightPattern(match.matchedCoordinates, true);
+
+                    ResourceManager.Instance.AddResource(ResourceType.Coin, (int)matchScore);
+                    
+                    currentDisplayedScore += matchScore;
+                    scoreText.text = $"WIN: {currentDisplayedScore}";
+
+                    yield return new WaitForSeconds(0.4f);
+
+                    // Tắt đi để chuyển sang cái tiếp theo
+                    boardView.SetHighlightPattern(match.matchedCoordinates, false);
+                    
+                    yield return new WaitForSeconds(0.1f); 
+                }
+
+                // B. Giai đoạn chốt hạ (Show tất cả)
                 HashSet<Vector2Int> allCoords = new HashSet<Vector2Int>();
                 foreach (var r in results) 
-                foreach (var c in r.matchedCoordinates) allCoords.Add(c);
+                    foreach (var c in r.matchedCoordinates) allCoords.Add(c);
 
-                // Highlight tất cả cùng lúc để chốt hạ
+                // Bật Highlight xịn (nhấp nháy) cho toàn bộ
                 boardView.HighlightWinCells(new List<Vector2Int>(allCoords), rows, cols);
                 
-                // Chờ ăn mừng tổng thể
                 yield return new WaitForSeconds(1.5f); 
             }
         }
