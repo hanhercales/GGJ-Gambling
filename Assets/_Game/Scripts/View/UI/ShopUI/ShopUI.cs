@@ -17,7 +17,7 @@ namespace _Game.Scripts.View.UI.ShopUI
         [SerializeField] private Button btnReroll;
         [SerializeField] private Button btnBack;
         
-        // [SerializeField] private TextMeshProUGUI rerollCostText; // Tạm thời chưa cần hiển thị text
+        [SerializeField] private TextMeshProUGUI rerollCostText;
 
         private int _selectedIndex = -1; // -1 nghĩa là chưa chọn gì
 
@@ -28,22 +28,20 @@ namespace _Game.Scripts.View.UI.ShopUI
             btnReroll.onClick.AddListener(OnRerollClick);
             btnBack.onClick.AddListener(OnBackClick);
         }
-
-        // --- ĐỔI TỪ START -> ONENABLE ---
+        
         private void OnEnable()
         {
-            // Reset trạng thái nút mua mỗi khi mở shop
             _selectedIndex = -1;
             btnPurchase.interactable = false;
 
-            // Đăng ký sự kiện
             if (ShopManager.Instance != null)
             {
                 ShopManager.Instance.OnShopRefreshed += UpdateUI;
                 
-                // Cưỡng ép cập nhật ngay lập tức khi mở Panel
-                // Điều này giúp slot hiện lên ngay, không chờ sự kiện
                 UpdateUI(ShopManager.Instance.GetCurrentItems());
+                
+                if (rerollCostText != null)
+                    rerollCostText.text = $"Reroll: {ShopManager.Instance.GetRerollCost()}";
             }
         }
 

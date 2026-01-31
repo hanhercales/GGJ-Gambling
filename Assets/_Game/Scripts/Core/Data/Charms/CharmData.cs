@@ -20,12 +20,16 @@ namespace _Game.Scripts.Core.Data
     
     public class CharmData : RandomSOData
     {
+        [Header("Basic Charm Info")]
         public CharmTier tier;
         public string charmName;
         public int price;
         public bool isEquipped;
-        
         [TextArea] public string description;
+        
+        [Header("Shop Settings")]
+        [Tooltip("If true, this item will NEVER return to the Shop pool after being bought (even if sold).")]
+        public bool oneTimePurchase = false;
         public CharmData[] requiredCharmToUnlock;
 
         public virtual void OnSpinStart(SlotMachineController machine, LuckManager luckManager) { }

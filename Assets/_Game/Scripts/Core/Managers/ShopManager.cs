@@ -18,6 +18,9 @@ namespace _Game.Scripts.Core.Managers
         [Header("Config")]
         [SerializeField] private int shopSlots = 6;
         [SerializeField] private int rerollCost = 5;
+        
+        [Header("Runtime State")]
+        [SerializeField] private int _globalDiscount = 0;
 
         [Header("Probability Settings")]
         [SerializeField] private ShopProbabilitySO currentProbabilityProfile;
@@ -92,7 +95,6 @@ namespace _Game.Scripts.Core.Managers
         }
 
         private void OnPlayerObtainedCharm(CharmData charm) => RemoveFromPool(charm);
-        private void OnPlayerLostCharm(CharmData charm) => AddToPool(charm);
 
         private void RemoveFromPool(CharmData charm)
         {
@@ -181,23 +183,47 @@ namespace _Game.Scripts.Core.Managers
         {
             currentProbabilityProfile = newProfile;
         }
+        
+        public int GetFinalPrice(CharmData item)
+        {
+            if (item == null) return 0;
+            int finalPrice = item.price - _globalDiscount;
+            return Mathf.Max(0, finalPrice); // "Max is 0" (cannot be negative)
+        }
+        
+        public void ModifyDiscount(int amount)
+        {
+            _globalDiscount += amount;
+            // Optional: Refresh UI here if you want to see prices update instantly
+            OnShopRefreshed?.Invoke(_currentShopItems); 
+        }
+        
+        private void OnPlayerLostCharm(CharmData charm)
+        {
+            // NEW: Check the flag before adding back
+            if (charm.oneTimePurchase)
+            {
+                Debug.Log($"[Shop] {charm.charmName} is a One-Time item. Removed from pool forever.");
+                return; // Stop here! Don't add to pool.
+            }
+
+            AddToPool(charm);
+        }
 
         public bool TryBuyItem(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= _currentShopItems.Count) return false;
             CharmData item = _currentShopItems[slotIndex];
             if (item == null) return false;
-
-            if (ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin) < item.price) return false;
             
-            // Check full túi
+            int realPrice = GetFinalPrice(item);
+    
+            if (ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin) < realPrice) return false;
             if (playerInventory.GetContent().Count >= playerInventory.GetSize()) return false;
-
-            ResourceManager.Instance.TrySpendResource(ResourceType.Coin, item.price);
             
-            // AddCharm sẽ kích hoạt Event -> Gọi RemoveFromPool tự động
+            ResourceManager.Instance.TrySpendResource(ResourceType.Coin, realPrice);
+    
             playerInventory.AddCharm(item);
-
             _currentShopItems[slotIndex] = null;
             OnShopRefreshed?.Invoke(_currentShopItems);
             return true;

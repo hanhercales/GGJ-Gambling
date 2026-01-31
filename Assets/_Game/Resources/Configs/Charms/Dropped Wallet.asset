@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d42fd2c6f436f3a4c9d27bf3f9bac46d, type: 3}
+  m_Name: Dropped Wallet
+  m_EditorClassIdentifier: Assembly-CSharp::WalletCharm
+  idName: 
+  icon: {fileID: 0}
+  baseSpawnWeight: 0
+  tier: 0
+  charmName: Dropped Wallet
+  price: 0
+  isEquipped: 0
+  description: 
+  oneTimePurchase: 0
+  requiredCharmToUnlock: []
+  consumeType: 0
+  autoDiscard: 1
+  percentage: 40

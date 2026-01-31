@@ -1,4 +1,5 @@
 ﻿using _Game.Scripts.Core.Data;
+using _Game.Scripts.Core.Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,35 +34,42 @@ namespace _Game.Scripts.View.UI.ShopUI
 
             if (data != null)
             {
-                // Có hàng
                 if (data.icon != null)
                 {
                     iconImage.sprite = data.icon;
                     iconImage.gameObject.SetActive(true);
+                    iconImage.color = Color.aquamarine;
                 }
                 else
                 {
-                    // Tạm thời hiện 1 màu đỏ để biết là có data nhưng thiếu ảnh
                     iconImage.color = Color.red; 
                     iconImage.gameObject.SetActive(true);
                 }
 
-                priceText.text = data.price.ToString();
-                nameText.text = data.charmName; // Đảm bảo charmName có chữ
+                nameText.text = data.charmName;
+                int finalPrice = data.price;
+
+                if (ShopManager.Instance != null)
+                {
+                    // Ask Manager for the real price (handling discounts)
+                    finalPrice = ShopManager.Instance.GetFinalPrice(data);
+                }
+
+                priceText.text = finalPrice.ToString();
                 
                 if (selectButton) selectButton.interactable = true;
                 if (soldOutOverlay) soldOutOverlay.SetActive(false);
             }
             else
             {
-                // Hết hàng / Slot trống
-                // Đừng ẩn toàn bộ, hãy để lại khung nền
+                // Empty / Sold Out Logic
                 iconImage.gameObject.SetActive(false);
-                priceText.text = "EMPTY"; // Hiện chữ EMPTY để dễ debug
+                priceText.text = "EMPTY"; 
+                priceText.color = Color.gray; // Grey out text for empty slots
                 nameText.text = "";
                 
                 if (selectButton) selectButton.interactable = false;
-                if (soldOutOverlay) soldOutOverlay.SetActive(true); // Đảm bảo Overlay có màu (vd: xám bán trong suốt)
+                if (soldOutOverlay) soldOutOverlay.SetActive(true);
             }
         }
         

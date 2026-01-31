@@ -1201,9 +1201,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b34a67d5a9ed6934c82be6ffae869e26, type: 2}
   - {fileID: 11400000, guid: 38b67bf8e12c437489efae8d4410c2b8, type: 2}
   - {fileID: 11400000, guid: 2168f90c3b352314bba3bb8b1e6bb328, type: 2}
-  - {fileID: 11400000, guid: db826455d4ec89442bc45155947cffff, type: 2}
-  - {fileID: 11400000, guid: 183309a109ffd8640886524b60d2e81d, type: 2}
-  - {fileID: 11400000, guid: 52726c4c69be26940afa06dba281fdd8, type: 2}
   shopSlots: 6
   rerollCost: 0
   _globalDiscount: 0
