@@ -15,5 +15,5 @@ MonoBehaviour:
   packName: Pack 1
   description: 
   spinCount: 7
-  coinCost: 10
+  coinCost: 7
   ticketReward: 1

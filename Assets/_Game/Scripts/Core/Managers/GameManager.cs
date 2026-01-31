@@ -16,15 +16,13 @@ namespace _Game.Scripts.Core.Managers
         [Header("References")]
         [SerializeField] private SlotMachineController slotMachine;
         [SerializeField] private LuckManager luckManager;
-        [SerializeField] private CharmHolder charmHolder;
         
         [Header("Game Config")]
-        [SerializeField] private DebtDifficultySO difficultyProfile; 
         [SerializeField] private int startingCoin = 10; 
         [SerializeField] private int stagesPerDebtRound = 4;
 
         [Header("Shop Progression")]
-        [Tooltip("Danh sách tỉ lệ Shop theo độ khó. VD: Element 0 = Early, Element 1 = Mid...")]
+        [Tooltip("Danh sách tỉ lệ Shop theo độ khó.")]
         [SerializeField] private List<ShopProbabilitySO> shopProfiles;
         
         [Header("Current State (Read Only)")]
@@ -32,14 +30,19 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private int currentDebtRound = 1;
         [SerializeField] private int currentStage = 1;
         [SerializeField] private int spinsRemaining = 0;
-        [SerializeField] private SpinPackSO currentPack;
+        
+        // Option hiện tại (để tính thưởng vé khi quay xong)
+        [SerializeField] private SpinOption currentSpinOption; 
+        
+        public int SpinsRemaining => spinsRemaining;
 
         // Events
         public event Action<int> OnSpinsChanged;
         public event Action<GameState> OnStateChanged;
-        
-        // Event cập nhật UI: (CurrentRound, CurrentStage, MaxStage)
         public event Action<int, int, int> OnRoundInfoChanged;
+        
+        // Event gửi 2 option (Trái/Phải) ra cho UI vẽ
+        public event Action<SpinOption, SpinOption> OnSpinOptionsUpdated;
 
         private void Awake()
         {
@@ -49,48 +52,59 @@ namespace _Game.Scripts.Core.Managers
 
         private void Start()
         {
+            Debug.Log(">>> GAME STARTED <<<");
+
+            // Lắng nghe sự kiện từ DebtManager
+            if (DebtManager.Instance != null)
+            {
+                DebtManager.Instance.OnDebtPaidSuccess += HandleDebtPaid;
+                DebtManager.Instance.OnGameOver += HandleGameOver;
+                Debug.Log("GameManager: Connected to DebtManager.");
+            }
+            else
+            {
+                Debug.LogError("CẢNH BÁO: Không tìm thấy DebtManager trong scene!");
+            }
+            
             StartNewGame();
+        }
+
+        private void OnDestroy()
+        {
+            if (DebtManager.Instance != null)
+            {
+                DebtManager.Instance.OnDebtPaidSuccess -= HandleDebtPaid;
+                DebtManager.Instance.OnGameOver -= HandleGameOver;
+            }
         }
 
         private void StartNewGame()
         {
+            Debug.Log("--- Initializing New Game Data ---");
             currentDebtRound = 1;
             currentStage = 1; 
             
-            // 1. Reset Tiền & Nợ
+            // 1. Reset Tài Nguyên
             ResourceManager.Instance.ResetAllData(startingCoin);
+            Debug.Log($"Reset Resources: Coin = {startingCoin}");
                 
-            // 2. Reset Symbol (Weight & Value)
+            // 2. Reset Logic Game
             WeightManager.Instance.ResetAllWeights();
+            if (ScoreManager.Instance != null) ScoreManager.Instance.ResetMultipliers();
+            if (slotMachine != null) slotMachine.ResetPatternStats();
             
-            // 3. Reset Global Multipliers (MỚI)
-            if (ScoreManager.Instance != null)
-                ScoreManager.Instance.ResetMultipliers();
-            
-            // 4. Reset Patterns (MỚI)
-            // Gọi thông qua SlotMachineController vì nó giữ list Pattern
-            if (slotMachine != null)
-                slotMachine.ResetPatternStats();
-            
-            // Cập nhật tỉ lệ Shop về Early Game
+            // 3. Setup Shop
             UpdateShopDifficulty();
-            
-            // Reroll Shop miễn phí cho khởi đầu mới
-            if (ShopManager.Instance != null)
-                ShopManager.Instance.RerollShop(true);
+            if (ShopManager.Instance != null) ShopManager.Instance.RerollShop(true);
 
-            // Setup Nợ ban đầu
-            if (difficultyProfile != null)
+            // 4. Setup Nợ (Giao cho DebtManager)
+            if (DebtManager.Instance != null)
             {
-                BigInteger firstDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
-                ResourceManager.Instance.SetNewDebt(firstDebt);
-            }
-            else
-            {
-                Debug.LogError("CẢNH BÁO: Chưa gán DebtDifficultySO!");
-                ResourceManager.Instance.SetNewDebt(25);
+                Debug.Log($"Requesting DebtManager to setup debt for Round {currentDebtRound}...");
+                DebtManager.Instance.SetupDebtForRound(currentDebtRound);
             }
 
+            // 5. Kích hoạt Charm đầu game
             if (CharmManager.Instance != null)
                 CharmManager.Instance.NotifyRoundStart(this);
             
@@ -98,49 +112,92 @@ namespace _Game.Scripts.Core.Managers
             NotifyRoundInfo();
         }
 
-        // --- CORE LOOP ---
-
-        // 1. Người chơi chọn gói Spin (Gọi từ UI Button)
-        public void SelectSpinPack(SpinPackSO pack)
+        // --- PUBLIC API: UI GỌI ĐỂ LẤY OPTION ---
+        public void RequestSpinOptionsUpdate()
         {
-            if (currentState != GameState.Preparation) return;
-
-            // Kiểm tra ví tiền
-            if (ResourceManager.Instance.TrySpendResource(ResourceType.Coin, pack.coinCost))
+            if (SpinManager.Instance != null)
             {
-                currentPack = pack;
-                spinsRemaining += pack.spinCount;
-                OnSpinsChanged?.Invoke(spinsRemaining);
+                var coin = ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
+                var options = SpinManager.Instance.GetSpinOptions(currentDebtRound, coin);
                 
-                // Chuyển sang giai đoạn quay
-                ChangeState(GameState.Spinning);
+                // Bắn event cập nhật UI
+                OnSpinOptionsUpdated?.Invoke(options.option1, options.option2);
             }
             else
             {
-                Debug.Log("Không đủ tiền mua gói này!");
+                Debug.LogError("CRITICAL: SpinManager not found!");
             }
         }
 
-        // 2. Người chơi bấm nút Spin (Gọi từ UI Button)
+        // --- PUBLIC API: UI GỌI KHI CHỌN GÓI ---
+        public void SelectSpinOption(SpinOption option)
+        {
+            if (currentState != GameState.Preparation)
+            {
+                Debug.LogWarning($"Cannot select spin option. Wrong State: {currentState}");
+                return;
+            }
+            
+            if (!option.isAvailable)
+            {
+                Debug.LogWarning("Player tried to select an unavailable option.");
+                return;
+            }
+
+            Debug.Log($"Player selecting option: {option.type} | Title: {option.title} | Cost: {option.coinCost}");
+
+            // 1. Trừ tiền (Nếu gói tốn tiền)
+            if (option.coinCost > 0)
+            {
+                if (ResourceManager.Instance.TrySpendResource(ResourceType.Coin, option.coinCost))
+                {
+                    Debug.Log($"Purchase Successful! Spent {option.coinCost} coins.");
+                    ApplySpinOption(option);
+                }
+                else
+                {
+                    Debug.LogError("FAILED: UI allows click but ResourceManager says Not Enough Coin!");
+                }
+            }
+            // 2. Miễn phí (Free Spin / Bankruptcy)
+            else
+            {
+                Debug.Log("Free Spin / Bankruptcy Option Selected.");
+                ApplySpinOption(option);
+            }
+        }
+
+        private void ApplySpinOption(SpinOption option)
+        {
+            currentSpinOption = option; 
+            AddSpins(option.spinCount);
+            
+            ChangeState(GameState.Spinning);
+        }
+
+        // --- CORE LOOP ---
+
         public void TriggerSpin()
         {
             if (currentState != GameState.Spinning) return;
-            if (spinsRemaining <= 0) return;
+            if (spinsRemaining <= 0)
+            {
+                Debug.LogWarning("TriggerSpin called but No Spins Remaining!");
+                return;
+            }
             
-            if (CharmManager.Instance != null)
-                CharmManager.Instance.NotifySpinStart();
+            if (CharmManager.Instance != null) CharmManager.Instance.NotifySpinStart();
             
-            // Lấy Luck từ manager
             int calculatedLuck = LuckManager.Instance.CalculateLuckForSpin();
-            Debug.Log($"Spin {LuckManager.Instance.SpinCount + 1} - Luck Applied: {calculatedLuck}");
+            Debug.Log($"SPINNING... (Luck Applied: {calculatedLuck})");
 
-            // Truyền Luck vào slot machine
             slotMachine.PerformSpin(calculatedLuck, OnSpinCompleted);
         }
         
         private void OnSpinCompleted(float winAmount, List<MatchResult> results)
         {
-            // Báo cáo kết quả để tính Pity
+            Debug.Log($"Spin Completed. Win Amount: {winAmount}");
+            
             bool isWin = winAmount > 0;
             LuckManager.Instance.ReportSpinResult(isWin);
             
@@ -150,109 +207,126 @@ namespace _Game.Scripts.Core.Managers
                 CharmManager.Instance.NotifySpinEnd();
             }
 
-            // Trừ lượt quay
             spinsRemaining--;
             OnSpinsChanged?.Invoke(spinsRemaining);
 
-            // Kiểm tra hết lượt chưa
             if (spinsRemaining <= 0)
             {
+                Debug.Log("Pack Finished (0 spins left). Checking Stage progression...");
                 OnSpinPackFinished();
             }
         }
         
         private void OnSpinPackFinished()
         {
-            // 1. Thưởng Ticket ngay sau khi quay xong gói (bất kể đang ở stage nào)
-            if (currentPack != null)
+            // 1. Cộng Ticket từ Gói Spin (Nguồn thu 1)
+            if (currentSpinOption != null)
             {
-                ResourceManager.Instance.AddResource(ResourceType.Ticket, currentPack.ticketReward);
-                Debug.Log($"Pack Finished! Reward: {currentPack.ticketReward} Tickets.");
+                ResourceManager.Instance.AddResource(ResourceType.Ticket, currentSpinOption.ticketReward);
+                Debug.Log($"Reward: Added {currentSpinOption.ticketReward} Tickets (Source: Spin Pack).");
             }
 
             // 2. Kiểm tra tiến độ Stage
             if (currentStage < stagesPerDebtRound)
             {
-                // Chưa đến lúc trả nợ -> Sang stage tiếp theo
                 currentStage++;
-                Debug.Log($"Moving to Stage {currentStage}/{stagesPerDebtRound}");
+                Debug.Log($">>> ADVANCING TO STAGE {currentStage}/{stagesPerDebtRound} <<<");
                 
-                ChangeState(GameState.Preparation); // Quay lại Shop mua gói tiếp
+                ChangeState(GameState.Preparation); 
                 NotifyRoundInfo();
             }
             else
             {
-                // Đã xong stage cuối (4/4) -> Đến lúc trả nợ
+                Debug.Log("Stage Limit Reached. Resolving Debt Cycle...");
                 ResolveDebtCycle();
             }
         }
 
-        // 4. Tổng kết vòng nợ
         private void ResolveDebtCycle()
         {
+            // Chuyển sang trạng thái chờ kết quả
             ChangeState(GameState.RoundEnd);
 
-            // Bước 1: Thử trả nợ
-            if (ResourceManager.Instance.TryPayDebt())
+            // Ủy quyền kiểm tra cho DebtManager
+            if (DebtManager.Instance != null)
             {
-                OnDebtPaidSuccess();
-                return;
-            }
-
-            // Bước 2: Nếu không đủ tiền -> Hỏi Charm xem có ai cứu không? (AnkhCharm)
-            bool isSaved = false;
-            if (CharmManager.Instance != null)
-            {
-                int coin = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
-                int debt = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Debt);
-                
-                isSaved = CharmManager.Instance.CheckPaymentSavior(coin, debt);
-            }
-
-            if (isSaved)
-            {
-                // Nếu được cứu -> Coi như thành công qua màn
-                OnDebtPaidSuccess();
+                Debug.Log("Calling DebtManager.EvaluateRoundEnd()...");
+                DebtManager.Instance.EvaluateRoundEnd();
             }
             else
             {
-                // Bước 3: Chết thật
-                Debug.Log("Phá sản! Game Over.");
-                ChangeState(GameState.GameOver);
-                if (UIManager.Instance != null) UIManager.Instance.CloseAllDialogs();
+                Debug.LogError("CRITICAL: DebtManager not found!");
             }
         }
         
-        private void OnDebtPaidSuccess()
+        // --- CALLBACKS TỪ DEBT MANAGER ---
+
+        private void HandleDebtPaid()
         {
-            Debug.Log($"DEBT ROUND {currentDebtRound} CLEARED!");
+            Debug.Log("[Event Received] DebtManager says: Debt Paid / Clear!");
+
+            // 1. Tính toán Ticket thưởng nếu trả sớm (Nguồn thu 2)
+            int skippedStages = 0;
+            if (currentState != GameState.RoundEnd)
+            {
+                // [FIX LOGIC] Cộng thêm 1 để tính cả stage hiện tại
+                skippedStages = (stagesPerDebtRound - currentStage) + 1;
+            }
+
+            if (skippedStages > 0)
+            {
+                int bonusTickets = skippedStages * 4;
+                ResourceManager.Instance.AddResource(ResourceType.Ticket, bonusTickets);
+                Debug.Log($"[Debt] Early Pay Bonus: +{bonusTickets} Tickets ({skippedStages} stages skipped).");
+            }
+
+            // 2. Xử lý chuyển Round
+            Debug.Log($"ROUND {currentDebtRound} COMPLETE! Preparing next round...");
 
             currentDebtRound++;
             currentStage = 1;
+            
+            // [FIX LOGIC] Reset lượt quay dư thừa để tránh exploit ở Round sau
+            spinsRemaining = 0;
+            currentSpinOption = null;
+            OnSpinsChanged?.Invoke(0);
             
             if (CharmManager.Instance != null)
                 CharmManager.Instance.NotifyRoundStart(this);
             
             luckManager.IncrementDebtCompleted();
 
-            if (difficultyProfile != null)
+            // Setup Nợ mới
+            if (DebtManager.Instance != null)
             {
-                BigInteger nextDebt = difficultyProfile.GetDebtForRound(currentDebtRound);
-                ResourceManager.Instance.SetNewDebt(nextDebt);
+                Debug.Log($"Setting up new debt target for Round {currentDebtRound}");
+                DebtManager.Instance.SetupDebtForRound(currentDebtRound);
             }
             
-            // Update Shop Probability (Logic bạn đã thêm trước đó)
             UpdateShopDifficulty();
-
             ChangeState(GameState.Preparation);
             NotifyRoundInfo();
         }
 
+        private void HandleGameOver()
+        {
+            Debug.Log("[Event Received] DebtManager says: GAME OVER (Bankrupt).");
+            ChangeState(GameState.GameOver);
+        }
+
+        // --- HELPER METHODS ---
+
         private void ChangeState(GameState newState)
         {
             currentState = newState;
+            Debug.Log($"[GameState] Changed to: {newState}");
             
-            // Khi bắt đầu quay, đóng tất cả Shop/Dialog để người chơi tập trung
+            // Khi vào Preparation -> Báo UI cập nhật lại giá tiền & nút bấm
+            if (newState == GameState.Preparation)
+            {
+                RequestSpinOptionsUpdate();
+            }
+
             if (newState == GameState.Spinning || newState == GameState.GameOver)
             {
                 if (UIManager.Instance != null)
@@ -260,18 +334,14 @@ namespace _Game.Scripts.Core.Managers
             }
             
             OnStateChanged?.Invoke(newState);
-            Debug.Log($"Game State Changed: {newState}");
         }
         
         private void UpdateShopDifficulty()
         {
             if (shopProfiles == null || shopProfiles.Count == 0) return;
-
-            // Logic ví dụ: Cứ mỗi 3 Round thì tăng độ khó shop lên 1 bậc
-            // Round 1-3: Index 0
-            // Round 4-6: Index 1
-            // ...
+            
             int profileIndex = Mathf.Clamp((currentDebtRound - 1) / 3, 0, shopProfiles.Count - 1);
+            Debug.Log($"Updating Shop Difficulty to Profile Index: {profileIndex}");
             
             if (ShopManager.Instance != null)
             {
@@ -282,6 +352,7 @@ namespace _Game.Scripts.Core.Managers
         public void AddSpins(int amount)
         {
             spinsRemaining += amount;
+            Debug.Log($"AddSpins called: +{amount}. New Total: {spinsRemaining}");
             OnSpinsChanged?.Invoke(spinsRemaining); 
         }
         

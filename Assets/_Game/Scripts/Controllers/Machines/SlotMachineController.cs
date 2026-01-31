@@ -28,6 +28,8 @@ namespace _Game.Scripts.Controllers.Machines
         public BoardView boardView;
         public SpinLeverUI spinLever;
         public TextMeshProUGUI scoreText;
+        [Tooltip("Quản lý nhóm nút Shop và Pack")]
+        public GameplayButtonsUI gameplayButtons;
         #endregion
 
         private GridModel _gridModel;
@@ -78,6 +80,11 @@ namespace _Game.Scripts.Controllers.Machines
                 spinLever.PlayPullAnimation();    // Chạy hoạt ảnh gạt (1->2->3)
             }
             
+            if (gameplayButtons != null)
+            {
+                gameplayButtons.SetInteractable(false);
+            }
+            
             // 1. LOGIC: Tính toán kết quả
             SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, luckValue);
             List<MatchResult> results = _evaluator.Evaluate(finalGrid, cols, rows);
@@ -114,6 +121,11 @@ namespace _Game.Scripts.Controllers.Machines
             {
                 spinLever.PlayReleaseAnimation(); // Chạy hoạt ảnh nhả (3->2->1)
                 spinLever.SetInteractable(true);  // Mở lại nút
+            }
+            
+            if (gameplayButtons != null)
+            {
+                gameplayButtons.SetInteractable(true);
             }
 
             // 4. BÁO CÁO KẾT QUẢ VỀ GAMEMANAGER

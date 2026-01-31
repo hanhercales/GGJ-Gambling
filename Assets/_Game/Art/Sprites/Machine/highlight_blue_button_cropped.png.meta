@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 24a794ae76f055a41bbb6328c501a4d9
+guid: 3ae909de98e933d4ead8fed5cecd95cd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4395749828471742004
-    second: pressedbutton_cropped_0
+      213: 3051222308290064179
+    second: highlight_blue_button_cropped_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pressedbutton_cropped_0
+      name: highlight_blue_button_cropped_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 24
-        height: 19
+        height: 22
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 43eda87ed27d00d30800000000000000
-      internalID: 4395749828471742004
+      spriteID: 33f6068f58e185a20800000000000000
+      internalID: 3051222308290064179
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pressedbutton_cropped_0: 4395749828471742004
+      highlight_blue_button_cropped_0: 3051222308290064179
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
