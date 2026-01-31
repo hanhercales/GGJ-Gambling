@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::USymbolCharm
   idName: 
   icon: {fileID: 21300000, guid: 53d3e13a075968b4bbf593a981a2d0d3, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 5
   tier: 1
   charmName: Skeleton Hand
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: Coin appears more often. (+2)

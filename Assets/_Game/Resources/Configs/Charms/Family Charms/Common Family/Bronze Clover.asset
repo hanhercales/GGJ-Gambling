@@ -14,13 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CSymbolCharm
   idName: 
   icon: {fileID: 21300000, guid: ae07243a49ccee94bbcfb4b9dedf87c6, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 5
   tier: 0
   charmName: '"Hair"'
-  price: 0
+  price: 2
   isEquipped: 0
   oneTimePurchase: 0
-  description: Scoring Clover increases the Symbol by its base value, permanently.
+  description: 'Chance to Trigger (30%)
+
+    Scoring Clover increases the Symbol
+    by its base value, permanently.'
   requiredCharmToUnlock: []
   triggerChance: 30
   targetedSymbol: {fileID: 11400000, guid: 345c52dbb02010b48a7ea8e2a58780fa, type: 2}

@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::USymbolCharm
   idName: 
   icon: {fileID: 21300000, guid: d9eb5f2f7e38d034080a0c8e5055f9d3, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 5
   tier: 1
   charmName: Diamon Necklace
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: Diamond appears more often. (+2)

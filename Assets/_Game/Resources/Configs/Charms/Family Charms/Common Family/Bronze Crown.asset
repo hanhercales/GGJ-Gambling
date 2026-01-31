@@ -14,13 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CSymbolCharm
   idName: 
   icon: {fileID: 21300000, guid: 5487c97486116d945a6d5528ada62aff, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 5
   tier: 0
   charmName: Skull
-  price: 0
+  price: 2
   isEquipped: 0
   oneTimePurchase: 0
-  description: Scoring Crown increases the Symbol by its base value, permanently.
+  description: 'Chance to Trigger (30%)
+
+    Scoring Crown increases the Symbol by
+    its base value, permanently.'
   requiredCharmToUnlock: []
   triggerChance: 30
   targetedSymbol: {fileID: 11400000, guid: 88c0899ff2813184a97a75f51ea04950, type: 2}

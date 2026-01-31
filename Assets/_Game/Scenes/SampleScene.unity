@@ -3605,9 +3605,17 @@ MonoBehaviour:
   clickClip: {fileID: 8300000, guid: da8d6b2deccdb4f4ba5d70625e3d9533, type: 3}
   leverPullClip: {fileID: 8300000, guid: 9f39bae94b28d494e8bc987b46a49a76, type: 3}
   spinningLoopClip: {fileID: 8300000, guid: 7d4bda1df271cab4faebd4fa89209f1d, type: 3}
-  patternMatchClip: {fileID: 0}
-  winSmallClip: {fileID: 8300000, guid: 4958a319ec4b9544391ba8024a5d4236, type: 3}
-  winBigClip: {fileID: 8300000, guid: 4958a319ec4b9544391ba8024a5d4236, type: 3}
+  patternMatchClip: {fileID: 8300000, guid: 3e963424541026b439641cca78c97387, type: 3}
+  winClip:
+  - {fileID: 8300000, guid: 4958a319ec4b9544391ba8024a5d4236, type: 3}
+  - {fileID: 8300000, guid: a053d36b6dffec14fb8579a129e0db7d, type: 3}
+  - {fileID: 8300000, guid: 71c1e635bac22cd41b03c5e76fe33d9c, type: 3}
+  - {fileID: 8300000, guid: 552cdc56f252f3b4a8a3e8e71b05e0d1, type: 3}
+  - {fileID: 8300000, guid: ebb11e7724633534aa70bdf915e4ecc1, type: 3}
+  - {fileID: 8300000, guid: c7cfca2a131f2d946927f2f8b0213e06, type: 3}
+  - {fileID: 8300000, guid: 7d99a1497a188ce448ba7ac032dea7cd, type: 3}
+  - {fileID: 8300000, guid: 5290599702fb8c948be99e0603d4eae8, type: 3}
+  - {fileID: 8300000, guid: 9334c32953e0f604f9065f6d11856b22, type: 3}
   maskUnlockClip: {fileID: 8300000, guid: bccad758b9c7208438658884281f30fb, type: 3}
 --- !u!224 &649105521 stripped
 RectTransform:

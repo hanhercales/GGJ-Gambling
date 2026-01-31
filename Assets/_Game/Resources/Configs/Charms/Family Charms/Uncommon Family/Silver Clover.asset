@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::USymbolCharm
   idName: 
   icon: {fileID: 21300000, guid: aa20fb2c7acc21f449b3e6dc07c659e0, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 5
   tier: 1
   charmName: Teeth
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: Clover appears more often. (+2)

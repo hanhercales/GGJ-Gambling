@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LightbulbCharm
   idName: lightBulb
   icon: {fileID: 3955255558220673233, guid: bbf427c8e52a7f74b9e5902c52cdf3c3, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 10
   tier: 2
   charmName: The Sun
   price: 4

@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::USymbolCharm
   idName: 
   icon: {fileID: 21300000, guid: a172678f1c35b9e4e871f49af1dc121e, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 5
   tier: 1
   charmName: Skeleton Foot
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: Circle appears more often. (+2)

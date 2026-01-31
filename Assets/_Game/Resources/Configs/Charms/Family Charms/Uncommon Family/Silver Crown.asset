@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::USymbolCharm
   idName: 
   icon: {fileID: 21300000, guid: 43663c5266f45e74ebe612bfa573aab3, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 5
   tier: 1
   charmName: Viking Helmet
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: Crown appears more often. (+2)

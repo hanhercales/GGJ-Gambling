@@ -133,7 +133,7 @@ namespace _Game.Scripts.Controllers.Machines
 
             if(results.Count() > 2)
             {
-                AudioManager.Instance.PlayWin(results.Count() > 7);
+                AudioManager.Instance.PlayWin();
             }
         }
         

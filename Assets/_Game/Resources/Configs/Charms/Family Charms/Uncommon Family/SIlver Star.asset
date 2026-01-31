@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::USymbolCharm
   idName: 
   icon: {fileID: 21300000, guid: 014e0a4a5c3b3df4b82c5f9ec6b54524, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 5
   tier: 1
   charmName: Broken Arrow
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: Star appears more often. (+2)

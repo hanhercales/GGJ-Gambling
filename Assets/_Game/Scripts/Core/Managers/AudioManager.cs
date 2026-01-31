@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace _Game.Scripts.Core.Managers
@@ -16,8 +17,7 @@ namespace _Game.Scripts.Core.Managers
         public AudioClip spinningLoopClip;
         public AudioClip patternMatchClip;
         
-        public AudioClip winSmallClip;
-        public AudioClip winBigClip;
+        public List<AudioClip> winClip = new List<AudioClip>();
         public AudioClip maskUnlockClip;
         
         private void Awake()
@@ -67,9 +67,9 @@ namespace _Game.Scripts.Core.Managers
             Debug.Log("Pattern match played");
         }
     
-        public void PlayWin(bool isBigWin)
+        public void PlayWin()
         {
-            PlaySFX(isBigWin ? winBigClip : winSmallClip);
+           PlaySFX(winClip[Random.Range(0, winClip.Count)]);
         }
     
         public void PlayUnlockMask()
