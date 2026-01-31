@@ -33,6 +33,8 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private int currentStage = 1;
         [SerializeField] private int spinsRemaining = 0;
         [SerializeField] private SpinPackSO currentPack;
+        
+        public int SpinsRemaining => spinsRemaining;
 
         // Events
         public event Action<int> OnSpinsChanged;
