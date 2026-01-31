@@ -5131,7 +5131,7 @@ GameObject:
   - component: {fileID: 1916981135}
   - component: {fileID: 1916981134}
   m_Layer: 0
-  m_Name: GameController
+  m_Name: SlotMachineController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5194,8 +5194,6 @@ MonoBehaviour:
   boardView: {fileID: 1916981134}
   spinButton: {fileID: 1560163310}
   scoreText: {fileID: 1565976741}
-  charmHolder: {fileID: 1661107992}
-  luckManager: {fileID: 2090457733}
 --- !u!4 &1916981136
 Transform:
   m_ObjectHideFlags: 0
@@ -5362,6 +5360,7 @@ GameObject:
   - component: {fileID: 2090457733}
   - component: {fileID: 2090457734}
   - component: {fileID: 2090457735}
+  - component: {fileID: 2090457736}
   m_Layer: 0
   m_Name: '[MANAGER]'
   m_TagString: Untagged
@@ -5476,6 +5475,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.ScoreManager
   globalSymbolMultiplier: 1
   globalPatternMultiplier: 1
+--- !u!114 &2090457736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090457729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f80d051d0204084b490b15024f96b18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.CharmManager
+  charmHolder: {fileID: 1661107992}
+  luckManager: {fileID: 2090457733}
+  slotMachine: {fileID: 1916981135}
 --- !u!1001 &4381221160907126437
 PrefabInstance:
   m_ObjectHideFlags: 0
