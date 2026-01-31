@@ -20,7 +20,7 @@ namespace _Game.Scripts.View.UI
                 _canvasGroup.interactable = isInteractable;
                 
                 // Tùy chọn: Giảm alpha một chút để người chơi biết nó đang bị khóa
-                _canvasGroup.alpha = isInteractable ? 1f : 0.6f; 
+                // _canvasGroup.alpha = isInteractable ? 1f : 0.6f; 
             }
         }
     }

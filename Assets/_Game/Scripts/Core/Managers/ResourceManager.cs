@@ -105,6 +105,11 @@ namespace _Game.Scripts.Core.Managers
             if (coin >= currentDebt)
             {
                 AddResource(ResourceType.Coin, -currentDebt);
+                
+                currentDebt = 0; 
+                OnResourceChanged?.Invoke(ResourceType.Debt, FormatBigInt(currentDebt));
+                UpdateInspectorDisplay();
+                
                 return true; 
             }
             return false;
