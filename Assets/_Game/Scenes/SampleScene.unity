@@ -2411,7 +2411,7 @@ MonoBehaviour:
   m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 200, y: 200}
+  m_CellSize: {x: 192, y: 192}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 1
   m_ConstraintCount: 5
@@ -5441,6 +5441,7 @@ MonoBehaviour:
   spinCount: 0
   loseStreak: 0
   debtCompleted: 0
+  _horseshoeCount: 0
 --- !u!114 &2090457734
 MonoBehaviour:
   m_ObjectHideFlags: 0

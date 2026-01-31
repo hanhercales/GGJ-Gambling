@@ -37,6 +37,9 @@ namespace _Game.Scripts.View.UI
         public SlotCellView cellPrefab;
         public Transform gridContainer;
         private List<SlotCellView> _spawnedCells = new List<SlotCellView>();
+        
+        private int _currentRows;
+        private int _currentCols;
         #endregion
 
         #region Init Setup
@@ -45,6 +48,10 @@ namespace _Game.Scripts.View.UI
 #if UNITY_EDITOR
             UnityEditor.Selection.activeGameObject = null; 
 #endif
+            
+            _currentRows = rows;
+            _currentCols = cols;
+            
             foreach (Transform child in gridContainer) Destroy(child.gameObject);
             _spawnedCells.Clear();
 
@@ -98,11 +105,11 @@ namespace _Game.Scripts.View.UI
                 yield return new WaitForSeconds(animSettings.delayPerColumn); 
             }
 
-            // Tính thời gian chờ cột cuối cùng dựa trên Config
+            // Tính toán thời gian cột cuối cùng quay
             int lastColLength = animSettings.baseReelLength + (cols * animSettings.reelLengthIncrement);
-            float lastColTime = lastColLength * animSettings.timePerSymbol; 
+            float lastColSpinDuration = lastColLength * animSettings.timePerSymbol; 
             
-            yield return new WaitForSeconds(lastColTime * 0.6f); // Buffer an toàn
+            yield return new WaitForSeconds(lastColSpinDuration + 0.5f);
 
             onComplete?.Invoke();
         }
@@ -113,6 +120,20 @@ namespace _Game.Scripts.View.UI
             {
                 int index = GetIndex(c.x, c.y, rows, cols);
                 if (index < _spawnedCells.Count) _spawnedCells[index].HighlightWin();
+            }
+        }
+        
+        public void SetHighlightPattern(List<Vector2Int> coordinates, bool isActive)
+        {
+            foreach (var c in coordinates)
+            {
+                // Sử dụng _currentRows và _currentCols đã lưu
+                int index = GetIndex(c.x, c.y, _currentRows, _currentCols);
+                if (index >= 0 && index < _spawnedCells.Count)
+                {
+                    // Gọi hàm SetHighlightState mà chúng ta đã thêm vào SlotCellView
+                    _spawnedCells[index].SetHighlightState(isActive);
+                }
             }
         }
 

@@ -94,9 +94,30 @@ namespace _Game.Scripts.View.Cells
         {
             if (backgroundHighlight != null)
             {
+                backgroundHighlight.gameObject.SetActive(true); // Đảm bảo bật object
                 backgroundHighlight.DOKill();
                 backgroundHighlight.DOColor(new Color(1f, 1f, 0f, 0.5f), 0.5f)
                     .SetLoops(-1, LoopType.Yoyo);
+            }
+        }
+        
+        public void SetHighlightState(bool isActive)
+        {
+            if (backgroundHighlight != null)
+            {
+                if (isActive)
+                {
+                    // Bật highlight nhẹ (không cần nhấp nháy hoặc nhấp nháy nhẹ)
+                    backgroundHighlight.gameObject.SetActive(true);
+                    backgroundHighlight.DOKill();
+                    backgroundHighlight.color = new Color(1f, 1f, 0f, 0.5f); // Màu vàng
+                }
+                else
+                {
+                    // Tắt highlight
+                    backgroundHighlight.DOKill();
+                    backgroundHighlight.gameObject.SetActive(false);
+                }
             }
         }
         #endregion

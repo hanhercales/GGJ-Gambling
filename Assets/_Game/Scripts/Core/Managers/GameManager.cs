@@ -159,12 +159,6 @@ namespace _Game.Scripts.Core.Managers
             bool isWin = winAmount > 0;
             LuckManager.Instance.ReportSpinResult(isWin);
             
-            // Cộng tiền thắng
-            if (winAmount > 0)
-            {
-                ResourceManager.Instance.AddResource(ResourceType.Coin, (int)winAmount);
-            }
-            
             if (charmHolder != null)
             {
                 // Tạo bản sao list (ToList) để tránh lỗi khi Charm tự xóa mình (NumberCharm, Lightbulb)
