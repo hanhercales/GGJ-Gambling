@@ -9,6 +9,9 @@ namespace _Game.Scripts.Core.Managers
         [Header("Global Multipliers")]
         [SerializeField] private float globalSymbolMultiplier = 1.0f;  
         [SerializeField] private float globalPatternMultiplier = 1.0f; 
+        
+        // --- NEW: The Greed Multiplier (Default 1.0) ---
+        private float _greedFactor = 1.0f;
 
         private void Awake()
         {
@@ -21,25 +24,32 @@ namespace _Game.Scripts.Core.Managers
         public void ModifySymbolMultiplier(float amount)
         {
             globalSymbolMultiplier += amount;
-            // Chặn dưới là 1.0 (hoặc 0 tùy design, nhưng thường nhân thì tối thiểu là 1)
-            if (globalSymbolMultiplier < 1f) globalSymbolMultiplier = 1f;
+            if (globalSymbolMultiplier < 0f) globalSymbolMultiplier = 0f; // Allow 0, but usually not negative
         }
 
         public void ModifyPatternMultiplier(float amount)
         {
             globalPatternMultiplier += amount;
-            if (globalPatternMultiplier < 1f) globalPatternMultiplier = 1f;
+            if (globalPatternMultiplier < 0f) globalPatternMultiplier = 0f;
+        }
+
+        // --- NEW: Set Greed (Mask of Greed calls this) ---
+        public void SetGreedMultiplier(float value)
+        {
+            _greedFactor = value;
+            Debug.Log($"ScoreManager: Greed Factor set to {value}x");
         }
 
         public void ResetMultipliers()
         {
             globalSymbolMultiplier = 1.0f;
             globalPatternMultiplier = 1.0f;
-            Debug.Log("ScoreManager: Reset Multipliers về 1.0");
+            _greedFactor = 1.0f; // Reset Greed too
+            Debug.Log("ScoreManager: All Multipliers reset.");
         }
 
-        // --- Getters ---
-        public float GetSymbolMult() => globalSymbolMultiplier;
-        public float GetPatternMult() => globalPatternMultiplier;
+        // --- UPDATED GETTERS (Apply Greed here) ---
+        public float GetSymbolMult() => globalSymbolMultiplier * _greedFactor;
+        public float GetPatternMult() => globalPatternMultiplier * _greedFactor;
     }
 }

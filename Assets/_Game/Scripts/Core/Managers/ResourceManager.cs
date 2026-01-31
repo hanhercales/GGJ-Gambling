@@ -18,9 +18,10 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private string coinDisplay = "0";
         [SerializeField] private int ticket = 0;
         [SerializeField] private string debtDisplay = "0";
-
-        // Sự kiện để UI tự động cập nhật (Observer Pattern)
-        // Tham số 1: Loại tài nguyên, Tham số 2: Giá trị mới
+        
+        [Header("Restrictions")]
+        private bool _ticketsBlocked = false;
+        
         public event Action<ResourceType, string> OnResourceChanged;
 
         private void Awake()
@@ -62,6 +63,11 @@ namespace _Game.Scripts.Core.Managers
                     break;
                     
                 case ResourceType.Ticket:
+                    if (_ticketsBlocked)
+                    {
+                        Debug.Log("[ResourceManager] Blocked Ticket gain due to active Curse.");
+                        return; // Reject the deposit
+                    }
                     ticket += (int)amount;
                     if (ticket < 0) ticket = 0;
                     OnResourceChanged?.Invoke(type, ticket.ToString());
@@ -84,6 +90,12 @@ namespace _Game.Scripts.Core.Managers
                 return true; 
             }
             return false; 
+        }
+        
+        public void SetTicketBlock(bool isBlocked)
+        {
+            _ticketsBlocked = isBlocked;
+            Debug.Log($"[ResourceManager] Ticket Block set to: {isBlocked}");
         }
 
         // Overload cho cost int

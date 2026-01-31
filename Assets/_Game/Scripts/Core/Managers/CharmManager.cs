@@ -71,6 +71,15 @@ namespace _Game.Scripts.Core.Managers
             }
         }
         
+        public void NotifyShopRolled(ShopManager shop)
+        {
+            if (charmHolder == null) return;
+            foreach (var charm in charmHolder.GetContent())
+            {
+                charm.OnShopRolled(shop);
+            }
+        }
+        
         public void NotifyRoundCompleted(GameManager gm)
         {
             if (charmHolder == null) return;

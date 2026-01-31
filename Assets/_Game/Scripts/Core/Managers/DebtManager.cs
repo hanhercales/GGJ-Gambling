@@ -14,6 +14,7 @@ namespace _Game.Scripts.Core.Managers
 
         [Header("Config")]
         [SerializeField] private DebtDifficultySO difficultyProfile;
+        private float _debtMultiplier = 1.0f;
         
         [Header("UI References")]
         [SerializeField] private Button payDebtButton;
@@ -54,13 +55,26 @@ namespace _Game.Scripts.Core.Managers
         }
 
         // --- PUBLIC API ---
+        public void ModifyDebtMultiplier(float amount)
+        {
+            _debtMultiplier += amount;
+            // Safety: Don't let multiplier go below 0.1 (10%)
+            if (_debtMultiplier < 0.1f) _debtMultiplier = 0.1f;
+            
+            Debug.Log($"[DebtManager] Multiplier changed. Current: {_debtMultiplier:F2}x");
+        }
 
         public void SetupDebtForRound(int roundIndex)
         {
             if (difficultyProfile != null)
             {
-                BigInteger newDebt = difficultyProfile.GetDebtForRound(roundIndex);
-                ResourceManager.Instance.SetNewDebt(newDebt);
+                BigInteger baseDebt = difficultyProfile.GetDebtForRound(roundIndex);
+                BigInteger finalDebt = (BigInteger)((double)baseDebt * _debtMultiplier);
+
+                Debug.Log($"[DebtManager] Setup Round {roundIndex}. Base: {baseDebt} x {_debtMultiplier} = {finalDebt}");
+
+                // 3. Set it to Resource Manager
+                ResourceManager.Instance.SetNewDebt(finalDebt);
                 UpdateButtonState();
             }
             else

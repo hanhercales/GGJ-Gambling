@@ -1,16 +1,45 @@
 using UnityEngine;
+using _Game.Scripts.Core.Data;
+using _Game.Scripts.Core.Inventory;
+using _Game.Scripts.Core.Managers;
 
-public class GreedMask : MonoBehaviour
+[CreateAssetMenu(menuName = "Charms/Masks/Mask of Greed")]
+public class GreedMask : CharmData
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [Header("Settings")]
+    public float moneyMultiplier = 2f; // Double Money
+
+    public override void OnEquip(CharmHolder holder)
     {
+        // 1. Activate Greed (Double Money)
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.SetGreedMultiplier(moneyMultiplier);
+        }
+
+        // 2. Activate Curse (No Tickets)
+        if (ResourceManager.Instance != null)
+        {
+            ResourceManager.Instance.SetTicketBlock(true);
+        }
         
+        Debug.Log("[Mask of Greed] EQUIPPED: Money x2, Tickets BLOCKED.");
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OnUnequip(CharmHolder holder)
     {
-        
+        // 1. Deactivate Greed (Reset to 1x)
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.SetGreedMultiplier(1f);
+        }
+
+        // 2. Lift Curse (Allow Tickets)
+        if (ResourceManager.Instance != null)
+        {
+            ResourceManager.Instance.SetTicketBlock(false);
+        }
+
+        Debug.Log("[Mask of Greed] UNEQUIPPED: Normal stats restored.");
     }
 }
