@@ -103,10 +103,10 @@ TextureImporter:
       name: PrideMask_0
       rect:
         serializedVersion: 2
-        x: 13
-        y: 9
-        width: 38
-        height: 47
+        x: 2
+        y: 8
+        width: 60
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

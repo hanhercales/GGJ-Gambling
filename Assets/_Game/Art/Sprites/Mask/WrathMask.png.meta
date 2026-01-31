@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 550d1136e455e6941a6b387c3f15e7d9
+guid: 2dae98674fd0af64394a30fbea857c7b
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -103,10 +103,10 @@ TextureImporter:
       name: AngerMask_0
       rect:
         serializedVersion: 2
-        x: 13
-        y: 9
-        width: 38
-        height: 47
+        x: 6
+        y: 5
+        width: 53
+        height: 55
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

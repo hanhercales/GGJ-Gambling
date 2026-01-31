@@ -103,9 +103,9 @@ TextureImporter:
       name: SlothMask_0
       rect:
         serializedVersion: 2
-        x: 13
+        x: 8
         y: 9
-        width: 38
+        width: 48
         height: 47
       alignment: 0
       pivot: {x: 0, y: 0}

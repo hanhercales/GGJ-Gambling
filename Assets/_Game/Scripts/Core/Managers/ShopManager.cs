@@ -212,20 +212,58 @@ namespace _Game.Scripts.Core.Managers
 
         public bool TryBuyItem(int slotIndex)
         {
-            if (slotIndex < 0 || slotIndex >= _currentShopItems.Count) return false;
+            // 1. Kiểm tra Slot hợp lệ
+            if (slotIndex < 0 || slotIndex >= _currentShopItems.Count) 
+            {
+                Debug.LogError($"[Shop] Invalid Slot Index: {slotIndex}");
+                return false;
+            }
+
             CharmData item = _currentShopItems[slotIndex];
             if (item == null) return false;
             
             int realPrice = GetFinalPrice(item);
+            if (realPrice < item.price) 
+            {
+                Debug.Log($"[Shop] Mua thất bại: Không đủ tiền! (Có: {currentCoin}, Cần: {item.price})");
+                return false;
+            }
     
             if (ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin) < realPrice) return false;
             if (playerInventory.GetContent().Count >= playerInventory.GetSize()) return false;
             
             ResourceManager.Instance.TrySpendResource(ResourceType.Coin, realPrice);
     
+            if (item == null)
+            {
+                Debug.LogWarning($"[Shop] Slot {slotIndex} is empty (already bought).");
+                return false;
+            }
+
+            // 2. Kiểm tra tiền
+            var currentCoin = ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
+            if (currentCoin < item.price) 
+            {
+                Debug.Log($"[Shop] Mua thất bại: Không đủ tiền! (Có: {currentCoin}, Cần: {item.price})");
+                return false;
+            }
+            
+            // 3. Kiểm tra túi đồ (Inventory Full)
+            // LƯU Ý: Đây là nguyên nhân phổ biến nhất khiến bấm vào không có gì xảy ra
+            if (playerInventory.GetContent().Count >= playerInventory.GetSize()) 
+            {
+                Debug.Log("[Shop] Mua thất bại: Túi đồ đã đầy (Inventory Full)!");
+                return false;
+            }
+
+            // 4. Thực hiện giao dịch
+            ResourceManager.Instance.TrySpendResource(ResourceType.Coin, item.price);
             playerInventory.AddCharm(item);
+
             _currentShopItems[slotIndex] = null;
             OnShopRefreshed?.Invoke(_currentShopItems);
+            
+            Debug.Log($"[Shop] Mua thành công: {item.name}");
             return true;
         }
         

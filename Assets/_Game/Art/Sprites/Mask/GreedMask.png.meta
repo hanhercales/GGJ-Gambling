@@ -103,9 +103,9 @@ TextureImporter:
       name: GreedMask_0
       rect:
         serializedVersion: 2
-        x: 13
+        x: 7
         y: 9
-        width: 38
+        width: 50
         height: 47
       alignment: 0
       pivot: {x: 0, y: 0}
