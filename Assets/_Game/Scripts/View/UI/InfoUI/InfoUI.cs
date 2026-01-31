@@ -2,9 +2,9 @@
 using UnityEngine.UI;
 using _Game.Scripts.Core.Managers;
 
-namespace _Game.Scripts.View.UI.BookUI
+namespace _Game.Scripts.View.UI.InfoUI
 {
-    public class BookUI : MonoBehaviour
+    public class InfoUI : MonoBehaviour
     {
         [Header("Internal UI")]
         [SerializeField] private Button closeButton;
@@ -15,22 +15,14 @@ namespace _Game.Scripts.View.UI.BookUI
                 closeButton.onClick.AddListener(OnCloseClicked);
         }
 
-        private void OnEnable()
-        {
-            // Reset trạng thái (nếu có) khi mở sách, giống ShopUI
-            // Ví dụ: Update nội dung sách
-        }
-
         private void OnCloseClicked()
         {
-            // Gọi UIManager để đóng đúng quy trình (tắt Panel con -> check tắt Container cha)
             if (UIManager.Instance != null)
             {
-                UIManager.Instance.CloseBook();
+                UIManager.Instance.CloseInfo();
             }
             else
             {
-                // Fallback nếu không có UIManager
                 gameObject.SetActive(false);
             }
         }

@@ -325,6 +325,19 @@ namespace _Game.Scripts.Core.Managers
             ChangeState(GameState.Preparation);
             NotifyRoundInfo();
         }
+        
+        public int GetCurrentEarlyPayBonus()
+        {
+            // Nếu đã hết vòng (RoundEnd) thì không còn khái niệm trả sớm
+            if (currentState == GameState.RoundEnd) return 0;
+
+            // Công thức: (Tổng Stage - Stage hiện tại + 1) * 4
+            int remainingStages = (stagesPerDebtRound - currentStage) + 1;
+            
+            if (remainingStages < 0) remainingStages = 0;
+            
+            return remainingStages * 4;
+        }
 
         private void HandleGameOver()
         {
