@@ -15,9 +15,9 @@ MonoBehaviour:
   idName: 
   icon: {fileID: 21300000, guid: f344fe1a9c0a6ca459ca944c2031cb9b, type: 3}
   baseSpawnWeight: 0
-  tier: 0
+  tier: 1
   charmName: Flesh Foot
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: "Charms with \u201CChance to Trigger\u201D activate twice more often."

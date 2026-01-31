@@ -15,9 +15,9 @@ MonoBehaviour:
   idName: 
   icon: {fileID: 21300000, guid: 942c7d8e951a98e408b4963124b57a87, type: 3}
   baseSpawnWeight: 0
-  tier: 0
+  tier: 3
   charmName: Wheel of Fate
-  price: 0
+  price: 5
   isEquipped: 0
   oneTimePurchase: 0
   description: 'The symbol with the highest chance appears more often (+1).

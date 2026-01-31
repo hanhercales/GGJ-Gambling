@@ -15,9 +15,9 @@ MonoBehaviour:
   idName: 
   icon: {fileID: 21300000, guid: a11168e82e565ff4bb96a9585a3703de, type: 3}
   baseSpawnWeight: 0
-  tier: 0
+  tier: 1
   charmName: Voodoo Puppet
-  price: 0
+  price: 2
   isEquipped: 0
   oneTimePurchase: 0
   description: 'Give players 2 more extra rounds to pay debt when they are about

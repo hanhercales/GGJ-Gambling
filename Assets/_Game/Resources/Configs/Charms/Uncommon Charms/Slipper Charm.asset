@@ -15,9 +15,9 @@ MonoBehaviour:
   idName: 
   icon: {fileID: 21300000, guid: 3c7b8d9ac5abb9941a9d4107b8b85f0b, type: 3}
   baseSpawnWeight: 0
-  tier: 0
+  tier: 1
   charmName: DepToOng
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: "Luck +9 if the last three spins don\u2019t score.\r\nHave a base

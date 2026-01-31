@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DogHouseCharm
   idName: 
   icon: {fileID: 21300000, guid: bbcac3188f5652243ac7f552ed2465f7, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 10
   tier: 0
   charmName: Warehouse Key
-  price: 0
+  price: 1
   isEquipped: 0
   oneTimePurchase: 1
   description: "Doesn\u2019t take space.\r\nMake space for 1 more Charm."

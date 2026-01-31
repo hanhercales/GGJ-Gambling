@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TicketBundleCharm
   idName: 
   icon: {fileID: 21300000, guid: f9dc36c50730d084da98d582b72de08e, type: 3}
-  baseSpawnWeight: 0
+  baseSpawnWeight: 10
   tier: 0
   charmName: Mail of Ticket
-  price: 0
+  price: 2
   isEquipped: 0
   oneTimePurchase: 0
   description: 'Doesn''t take space.

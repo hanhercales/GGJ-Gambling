@@ -15,9 +15,9 @@ MonoBehaviour:
   idName: 
   icon: {fileID: 21300000, guid: 0c92dc4bb02dd7746a365ee875c31e8b, type: 3}
   baseSpawnWeight: 0
-  tier: 0
+  tier: 2
   charmName: Receipt Printer
-  price: 0
+  price: 5
   isEquipped: 0
   oneTimePurchase: 0
   description: 'Chance to Trigger (20%)

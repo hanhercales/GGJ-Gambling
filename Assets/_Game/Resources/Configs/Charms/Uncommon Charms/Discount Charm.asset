@@ -15,9 +15,9 @@ MonoBehaviour:
   idName: 
   icon: {fileID: 21300000, guid: 7f528dd4da6c60249a37288b7765ba53, type: 3}
   baseSpawnWeight: 0
-  tier: 0
+  tier: 1
   charmName: Discount Contract
-  price: 0
+  price: 3
   isEquipped: 0
   oneTimePurchase: 0
   description: Charms in the Store cost 1 less.
