@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Core.Logic;
+using _Game.Scripts.Core.Managers;
 using _Game.Scripts.View.Cells;
 
 namespace _Game.Scripts.View.UI
@@ -86,6 +87,7 @@ namespace _Game.Scripts.View.UI
                 List<SymbolData> reelStrip = model.CreateRandomStrip(stripLength); 
 
                 // 2. Kích hoạt quay cho cột này
+                AudioManager.Instance.StartSpinningSound();
                 for (int y = 0; y < rows; y++)
                 {
                     int index = GetIndex(x, y, rows, cols);
@@ -100,7 +102,7 @@ namespace _Game.Scripts.View.UI
                         _spawnedCells[index].SpinSequence(cellSequence, animSettings.timePerSymbol);
                     }
                 }
-
+                
                 // TRUYỀN ĐỘ TRỄ TỪ CONFIG VÀO ĐÂY
                 yield return new WaitForSeconds(animSettings.delayPerColumn); 
             }
@@ -112,6 +114,8 @@ namespace _Game.Scripts.View.UI
             yield return new WaitForSeconds(lastColSpinDuration + 0.5f);
 
             onComplete?.Invoke();
+            
+            AudioManager.Instance.StopSpinningSound();
         }
         
         public void HighlightWinCells(List<Vector2Int> coordinates, int rows, int cols)
