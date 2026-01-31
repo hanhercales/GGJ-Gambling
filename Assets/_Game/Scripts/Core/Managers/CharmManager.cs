@@ -4,6 +4,7 @@ using _Game.Scripts.Core.Data;
 using _Game.Scripts.Core.Inventory;
 using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Logic;
+using _Game.Scripts.View.UI;
 
 namespace _Game.Scripts.Core.Managers
 {
@@ -15,11 +16,14 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private CharmHolder charmHolder;
         [SerializeField] private LuckManager luckManager;
         [SerializeField] private SlotMachineController slotMachine; 
+        [SerializeField] private HolderDisplay holderDisplay;
 
         private void Awake()
         {
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
+            
+            if (holderDisplay == null) holderDisplay = FindFirstObjectByType<HolderDisplay>();
         }
 
         // --- PUBLIC API: Gọi từ GameManager ---
@@ -51,6 +55,8 @@ namespace _Game.Scripts.Core.Managers
 
                 // 2. Xử lý logic buff Symbol (CSymbolCharm)
                 charm.OnSpinResultBuff(slotMachine, results);
+                
+                TriggerVisual(charm);
             }
         }
 
@@ -100,6 +106,14 @@ namespace _Game.Scripts.Core.Managers
         public List<CharmData> GetActiveCharms()
         {
             return charmHolder != null ? charmHolder.GetContent() : new List<CharmData>();
+        }
+        
+        private void TriggerVisual(CharmData charm)
+        {
+            if (holderDisplay != null)
+            {
+                holderDisplay.PlayCharmEffect(charm);
+            }
         }
     }
 }
