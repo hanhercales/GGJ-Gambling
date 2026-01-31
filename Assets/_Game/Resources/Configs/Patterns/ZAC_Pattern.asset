@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: ZAC_Pattern
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.PatternData
   patternName: ZAC
-  multiplier: 4
+  baseMultiplier: 4
   priority: 61
+  currentMultiplier: 4
   editorRows: 3
   editorCols: 5
   relativeCoordinates:

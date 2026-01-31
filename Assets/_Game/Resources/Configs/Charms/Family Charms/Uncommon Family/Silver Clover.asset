@@ -19,8 +19,9 @@ MonoBehaviour:
   charmName: Silver Clover
   price: 0
   isEquipped: 0
+  oneTimePurchase: 0
   description: 
   requiredCharmToUnlock:
-  - {fileID: 11400000, guid: ad1856fc94cfd5b4ca69c6ace97d0628, type: 2}
-  targetedSymbol: {fileID: 11400000, guid: e9020101daf34ef49a73cf74151aaa7f, type: 2}
+  - {fileID: 11400000, guid: 95b5b9573fa9387479292a5f53a38cfb, type: 2}
+  targetedSymbol: {fileID: 11400000, guid: 345c52dbb02010b48a7ea8e2a58780fa, type: 2}
   bonusLevels: 2

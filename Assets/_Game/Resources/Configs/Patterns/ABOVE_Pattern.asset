@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: ABOVE_Pattern
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.PatternData
   patternName: ABOVE
-  multiplier: 7
+  baseMultiplier: 7
   priority: 80
+  currentMultiplier: 7
   editorRows: 3
   editorCols: 5
   relativeCoordinates:

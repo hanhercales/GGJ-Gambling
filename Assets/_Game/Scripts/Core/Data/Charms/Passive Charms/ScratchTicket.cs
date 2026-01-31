@@ -21,7 +21,7 @@ public class ScratchTicket : CharmData
         ApplyEffect();
     }
     
-    public override void OnRoundStart(GameManager gm)
+    public override void OnDeadlineStart(GameManager gm)
     {
         RemoveEffect();
         ApplyEffect();

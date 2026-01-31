@@ -9,17 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2bd64964abea5bd40aa19a83cc663913, type: 3}
-  m_Name: Bronze Seven
-  m_EditorClassIdentifier: Assembly-CSharp::CSymbolCharm
+  m_Script: {fileID: 11500000, guid: a990ed8ac1f9c7d47b674b872fa020bd, type: 3}
+  m_Name: Silver Crown
+  m_EditorClassIdentifier: Assembly-CSharp::USymbolCharm
   idName: 
   icon: {fileID: 0}
   baseSpawnWeight: 0
-  tier: 0
-  charmName: Bronze Seven
+  tier: 1
+  charmName: Silver Crown
   price: 0
   isEquipped: 0
+  oneTimePurchase: 0
   description: 
-  requiredCharmToUnlock: []
-  triggerChance: 30
+  requiredCharmToUnlock:
+  - {fileID: 11400000, guid: 170dfc1645646084f9b654340936791c, type: 2}
   targetedSymbol: {fileID: 11400000, guid: 88c0899ff2813184a97a75f51ea04950, type: 2}
+  bonusLevels: 2
