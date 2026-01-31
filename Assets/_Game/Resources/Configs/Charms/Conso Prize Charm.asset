@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc667db0c1eb69e4c8fcd2b1cebd0a7c, type: 3}
+  m_Name: Conso Prize Charm
+  m_EditorClassIdentifier: Assembly-CSharp::ConsoPrizeCharm
+  idName: 
+  icon: {fileID: 0}
+  baseSpawnWeight: 0
+  tier: 0
+  charmName: 
+  price: 0
+  isEquipped: 0
+  oneTimePurchase: 0
+  description: 
+  requiredCharmToUnlock: []
+  requiredLosses: 2
+  luckBonus: 7

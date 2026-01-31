@@ -9,17 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8491eb4f30431334891c91f1592323e7, type: 3}
-  m_Name: Ankh
-  m_EditorClassIdentifier: Assembly-CSharp::AnkhCharm
-  idName: Ankh
+  m_Script: {fileID: 11500000, guid: b5751d1d93866714b8f852ff475a5785, type: 3}
+  m_Name: Receipt Printer
+  m_EditorClassIdentifier: Assembly-CSharp::ReceiptPrinter
+  idName: 
   icon: {fileID: 0}
   baseSpawnWeight: 0
-  tier: 1
-  charmName: Ankh
-  price: 1
+  tier: 0
+  charmName: 
+  price: 0
   isEquipped: 0
+  oneTimePurchase: 0
   description: 
   requiredCharmToUnlock: []
-  condition: 0
-  destroyOnUse: 1
+  triggerChance: 10
+  ticketAmount: 1
