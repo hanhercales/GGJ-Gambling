@@ -91,16 +91,8 @@ namespace _Game.Scripts.Core.Managers
                 ResourceManager.Instance.SetNewDebt(25);
             }
 
-            // Trigger Charm OnRoundStart (nếu có giữ lại charm từ game trước - tùy logic)
-            if (charmHolder != null)
-            {
-                // Lưu ý: Thường StartNewGame sẽ clear charm, nhưng nếu game cho giữ thì gọi dòng này
-                // charmHolder.ClearCharms(); // Nếu muốn xóa sạch túi
-                foreach (var charm in charmHolder.GetContent())
-                {
-                    charm.OnRoundStart(this); 
-                }
-            }
+            if (CharmManager.Instance != null)
+                CharmManager.Instance.NotifyRoundStart(this);
             
             ChangeState(GameState.Preparation);
             NotifyRoundInfo();
@@ -135,15 +127,8 @@ namespace _Game.Scripts.Core.Managers
             if (currentState != GameState.Spinning) return;
             if (spinsRemaining <= 0) return;
             
-            if (charmHolder != null)
-            {
-                // Tạo bản sao list để tránh lỗi nếu charm tự hủy trong quá trình duyệt
-                var charms = new List<CharmData>(charmHolder.GetContent());
-                foreach (var charm in charms)
-                {
-                    charm.OnSpinStart(slotMachine, luckManager);
-                }
-            }
+            if (CharmManager.Instance != null)
+                CharmManager.Instance.NotifySpinStart();
             
             // Lấy Luck từ manager
             int calculatedLuck = LuckManager.Instance.CalculateLuckForSpin();
@@ -159,22 +144,10 @@ namespace _Game.Scripts.Core.Managers
             bool isWin = winAmount > 0;
             LuckManager.Instance.ReportSpinResult(isWin);
             
-            if (charmHolder != null)
+            if (CharmManager.Instance != null)
             {
-                // Tạo bản sao list (ToList) để tránh lỗi khi Charm tự xóa mình (NumberCharm, Lightbulb)
-                var charms = new List<CharmData>(charmHolder.GetContent());
-        
-                foreach (var charm in charms)
-                {
-                    // 1. Xử lý kết quả thắng thua (ConsoPrizeCharm)
-                    charm.OnSpinResult(slotMachine, luckManager, winAmount);
-            
-                    // 2. Xử lý Buff Symbol vĩnh viễn (CSymbolCharm) - QUAN TRỌNG
-                    charm.OnSpinResultBuff(slotMachine, results);
-            
-                    // 3. Dọn dẹp cuối turn & Tự hủy (NumberCharm, Lightbulb)
-                    charm.OnSpinEnd(slotMachine, luckManager);
-                }
+                CharmManager.Instance.NotifySpinResult(winAmount, results);
+                CharmManager.Instance.NotifySpinEnd();
             }
 
             // Trừ lượt quay
@@ -228,31 +201,12 @@ namespace _Game.Scripts.Core.Managers
 
             // Bước 2: Nếu không đủ tiền -> Hỏi Charm xem có ai cứu không? (AnkhCharm)
             bool isSaved = false;
-            if (charmHolder != null)
+            if (CharmManager.Instance != null)
             {
-                // Duyệt qua từng charm để tìm phao cứu sinh
-                var charms = new List<CharmData>(charmHolder.GetContent());
-                foreach (var charm in charms)
-                {
-                    int currentCoin = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
-                    int currentDebt = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Debt);
-
-                    // Nếu Charm trả về true nghĩa là nó đã cứu
-                    if (charm.OnPaymentCheck(currentCoin, currentDebt))
-                    {
-                        isSaved = true;
-                        Debug.Log($"<color=green>SAVED BY CHARM: {charm.charmName}</color>");
-                        
-                        // Xử lý tiêu thụ charm Ankh (trong script AnkhCharm cần gọi holder.RemoveCharm)
-                        // Trong AnkhCharm của bạn, bạn cần bỏ comment dòng Consume() hoặc xử lý logic đó.
-                        if (charm is ConsumableCharm consumable && consumable.destroyOnUse)
-                        {
-                             charmHolder.RemoveCharm(charm);
-                        }
-                        
-                        break; // Chỉ cần 1 cái cứu là đủ
-                    }
-                }
+                int coin = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
+                int debt = (int)ResourceManager.Instance.GetResourceBigInt(ResourceType.Debt);
+                
+                isSaved = CharmManager.Instance.CheckPaymentSavior(coin, debt);
             }
 
             if (isSaved)
@@ -276,14 +230,8 @@ namespace _Game.Scripts.Core.Managers
             currentDebtRound++;
             currentStage = 1;
             
-            // Trigger Charm OnRoundStart (ExtraSpinCharm)
-            if (charmHolder != null)
-            {
-                foreach (var charm in charmHolder.GetContent())
-                {
-                    charm.OnRoundStart(this); 
-                }
-            }
+            if (CharmManager.Instance != null)
+                CharmManager.Instance.NotifyRoundStart(this);
             
             luckManager.IncrementDebtCompleted();
 

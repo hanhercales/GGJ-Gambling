@@ -33,8 +33,6 @@ namespace _Game.Scripts.Controllers.Machines
         private GridModel _gridModel;
         private PatternEvaluator _evaluator;
         private bool _isSpinning = false;
-        public CharmHolder charmHolder;
-        [SerializeField] public LuckManager luckManager;
 
         #region Initialization
         private void Start()
@@ -74,16 +72,6 @@ namespace _Game.Scripts.Controllers.Machines
             _isSpinning = true;
             spinButton.interactable = false;
             scoreText.text = "SPINNING...";
-    
-            // Check buff đầu game
-            if (charmHolder != null)
-            {
-                var charms = charmHolder.GetContent(); 
-                for (int i = 0; i < charms.Count; i++)
-                {
-                    charms[i].OnSpinStart(this, luckManager);
-                }
-            }
             
             // 1. LOGIC: Tính toán kết quả
             SymbolData[,] finalGrid = _gridModel.GenerateLuckyMatrix(rows, cols, luckValue);
@@ -115,23 +103,6 @@ namespace _Game.Scripts.Controllers.Machines
                 scoreText.text = "0";
             }
             
-            // Dọn dẹp truớc khi rút
-            if (charmHolder != null)
-            {
-                var charms = charmHolder.GetContent();
-                for (int i = 0; i < charms.Count; i++)
-                {
-                    charms[i].OnSpinResult(this, luckManager, totalWin);
-                    charms[i].OnSpinResultBuff(this, results); 
-                }
-    
-                // 3. Cleanup (Backwards loop)
-                for (int i = charms.Count - 1; i >= 0; i--)
-                {
-                    charms[i].OnSpinEnd(this, luckManager);
-                }
-            }
-    
             _isSpinning = false;
             spinButton.interactable = true;
 

@@ -15,18 +15,27 @@ namespace _Game.Scripts.Core.Logic
 
         #region Logic Phụ trợ
         // CÔNG THỨC CHUẨN: 4 THÀNH PHẦN
-        public float GetScore(float globalSymMult, float globalPatMult)
+        // Thêm tham số activeCharms (có thể null) để tính các buff từ Charm
+        public float GetScore(float globalSymMult, float globalPatMult, List<CharmData> activeCharms = null)
         {
-            // 1. Symbol Value (Dynamic)
-            float valSymbol = symbol.currentValue;
+            // 1. Symbol Value (Dynamic) - Bắt đầu từ giá trị gốc
+            // Dùng long để tránh tràn số nếu sau này nhân quá lớn
+            long processedSymbolVal = symbol.currentValue;
+            
+            // Nếu có charm, chạy qua từng charm để sửa đổi giá trị Symbol (VD: Chanh +1)
+            if (activeCharms != null)
+            {
+                foreach (var charm in activeCharms)
+                {
+                    processedSymbolVal = charm.ModifySymbolScore(processedSymbolVal, symbol, symbol.idName);
+                }
+            }
 
             // 2. Pattern Value (Dynamic)
             float valPattern = pattern.currentMultiplier;
 
-            // 3 & 4. Global Multipliers (truyền vào từ ScoreManager)
-            
-            // Tính toán: (SymVal * GlobalSymMult) * (PatVal * GlobalPatMult)
-            return (valSymbol * globalSymMult) * (valPattern * globalPatMult);
+            // 3 & 4. Tính toán: (SymVal * GlobalSymMult) * (PatVal * GlobalPatMult)
+            return (processedSymbolVal * globalSymMult) * (valPattern * globalPatMult);
         }
 
         public bool Contains(MatchResult other)
