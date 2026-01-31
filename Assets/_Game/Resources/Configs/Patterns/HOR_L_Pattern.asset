@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: HOR_L_Pattern
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.PatternData
   patternName: HOR-L
-  multiplier: 2
+  baseMultiplier: 2
   priority: 40
+  currentMultiplier: 2
   editorRows: 1
   editorCols: 4
   relativeCoordinates:

@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: JACKPOT_Pattern
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.PatternData
   patternName: JACKPOT
-  multiplier: 10
+  baseMultiplier: 10
   priority: 100
+  currentMultiplier: 10
   editorRows: 3
   editorCols: 5
   relativeCoordinates:

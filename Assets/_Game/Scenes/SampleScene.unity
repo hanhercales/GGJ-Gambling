@@ -789,8 +789,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3758a91caf6404d843c290ed6ed1673, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.View.UI.BookUI.BookUI
-  openButton: {fileID: 601697361}
-  closeButton: {fileID: 1020340787}
+  openButton: {fileID: 0}
+  closeButton: {fileID: 0}
 --- !u!114 &155068146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1502,7 +1502,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.UIManager
   panelDialogContainer: {fileID: 489624016}
   panelShop: {fileID: 348680393}
-  panelBook: {fileID: 155068143}
+  panelBook: {fileID: 0}
 --- !u!4 &370394948
 Transform:
   m_ObjectHideFlags: 0
@@ -1866,6 +1866,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b34a67d5a9ed6934c82be6ffae869e26, type: 2}
   - {fileID: 11400000, guid: 38b67bf8e12c437489efae8d4410c2b8, type: 2}
   - {fileID: 11400000, guid: 2168f90c3b352314bba3bb8b1e6bb328, type: 2}
+  - {fileID: 11400000, guid: cba2425cb1225214d979ee03f4706282, type: 2}
+  - {fileID: 11400000, guid: a1a33905655cbf34eae6bf39ca174214, type: 2}
   shopSlots: 6
   rerollCost: 0
   _globalDiscount: 0
@@ -3567,7 +3569,7 @@ MonoBehaviour:
   clickClip: {fileID: 8300000, guid: da8d6b2deccdb4f4ba5d70625e3d9533, type: 3}
   leverPullClip: {fileID: 8300000, guid: 9f39bae94b28d494e8bc987b46a49a76, type: 3}
   spinningLoopClip: {fileID: 8300000, guid: 7d4bda1df271cab4faebd4fa89209f1d, type: 3}
-  patternMatchClip: {fileID: 8300000, guid: 3e963424541026b439641cca78c97387, type: 3}
+  patternMatchClip: {fileID: 0}
   winSmallClip: {fileID: 8300000, guid: 4958a319ec4b9544391ba8024a5d4236, type: 3}
   winBigClip: {fileID: 8300000, guid: 4958a319ec4b9544391ba8024a5d4236, type: 3}
   maskUnlockClip: {fileID: 8300000, guid: bccad758b9c7208438658884281f30fb, type: 3}
@@ -8037,7 +8039,7 @@ MonoBehaviour:
   charmHolder: {fileID: 1661107992}
   luckManager: {fileID: 2090457733}
   slotMachine: {fileID: 1916981135}
-  holderDisplay: {fileID: 1661107987}
+  holderDisplay: {fileID: 0}
 --- !u!1 &1510775690
 GameObject:
   m_ObjectHideFlags: 0
@@ -11139,6 +11141,7 @@ MonoBehaviour:
   currentDebtRound: 1
   currentStage: 1
   spinsRemaining: 0
+  globalSpinModifier: 0
   currentSpinOption:
     type: 0
     title: 

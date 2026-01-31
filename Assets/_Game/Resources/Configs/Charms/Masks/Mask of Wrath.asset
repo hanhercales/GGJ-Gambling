@@ -9,17 +9,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2bd64964abea5bd40aa19a83cc663913, type: 3}
-  m_Name: Bronze Bell
-  m_EditorClassIdentifier: Assembly-CSharp::CSymbolCharm
-  idName: 
+  m_Script: {fileID: 11500000, guid: 5c20f4f7adcb1544aad0d557d112e9bf, type: 3}
+  m_Name: Mask of Wrath
+  m_EditorClassIdentifier: Assembly-CSharp::MaskOfWrathCharm
+  idName: wrathMask
   icon: {fileID: 0}
   baseSpawnWeight: 0
   tier: 0
-  charmName: Bronze Bell
+  charmName: Mask of Wrath
   price: 0
   isEquipped: 0
+  oneTimePurchase: 0
   description: 
   requiredCharmToUnlock: []
-  triggerChance: 30
-  targetedSymbol: {fileID: 11400000, guid: cee35f6c399c3f74eafab04910b921d6, type: 2}
+  luckBonus: 5
+  forbiddenPatterns:
+  - ABOVE
+  - BELOW
+  - EYE
+  - JACKPOT

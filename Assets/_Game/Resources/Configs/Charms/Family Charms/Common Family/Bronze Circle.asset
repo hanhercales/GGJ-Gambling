@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2bd64964abea5bd40aa19a83cc663913, type: 3}
-  m_Name: Bronze Lemon
+  m_Name: Bronze Circle
   m_EditorClassIdentifier: Assembly-CSharp::CSymbolCharm
   idName: 
   icon: {fileID: 0}
   baseSpawnWeight: 0
   tier: 0
-  charmName: Bronze Diamond
+  charmName: Bronze Circle
   price: 0
   isEquipped: 0
+  oneTimePurchase: 0
   description: 
   requiredCharmToUnlock: []
   triggerChance: 30
-  targetedSymbol: {fileID: 11400000, guid: 345c52dbb02010b48a7ea8e2a58780fa, type: 2}
+  targetedSymbol: {fileID: 11400000, guid: e9020101daf34ef49a73cf74151aaa7f, type: 2}

@@ -30,6 +30,7 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private int currentDebtRound = 1;
         [SerializeField] private int currentStage = 1;
         [SerializeField] private int spinsRemaining = 0;
+        [SerializeField] private int globalSpinModifier = 0;
         
         // Option hiện tại (để tính thưởng vé khi quay xong)
         [SerializeField] private SpinOption currentSpinOption; 
@@ -92,7 +93,8 @@ namespace _Game.Scripts.Core.Managers
         {
             Debug.Log("--- Initializing New Game Data ---");
             currentDebtRound = 1;
-            currentStage = 1; 
+            currentStage = 1;
+            globalSpinModifier = 0;
             
             // 1. Reset Tài Nguyên
             ResourceManager.Instance.ResetAllData(startingCoin);
@@ -115,10 +117,33 @@ namespace _Game.Scripts.Core.Managers
 
             // 5. Kích hoạt Charm đầu game
             if (CharmManager.Instance != null)
-                CharmManager.Instance.NotifyRoundStart(this);
+                CharmManager.Instance.NotifyDeadlineStart(this);
             
             ChangeState(GameState.Preparation);
             NotifyRoundInfo();
+        }
+        
+        public void ModifyGlobalSpinCount(int amount)
+        {
+            globalSpinModifier += amount;
+            Debug.Log($"[GameManager] Global Spin Modifier changed: {globalSpinModifier}");
+        }
+        
+        private void ApplySpinOption(SpinOption option)
+        {
+            currentSpinOption = option; 
+            
+            // --- [NEW] Apply the Modifier here! ---
+            // Calculate final spins: Pack Amount + Modifier (e.g., 10 + (-2) = 8)
+            int finalSpins = option.spinCount + globalSpinModifier;
+            
+            // Safety: Ensure at least 1 spin so the game doesn't softlock
+            if (finalSpins < 1) finalSpins = 1; 
+
+            Debug.Log($"[GameManager] Pack Selected: {option.spinCount} spins. Modifier: {globalSpinModifier}. Final: {finalSpins}");
+            
+            AddSpins(finalSpins);
+            ChangeState(GameState.Spinning);
         }
 
         // --- XỬ LÝ KHI TÀI NGUYÊN THAY ĐỔI ---
@@ -183,15 +208,6 @@ namespace _Game.Scripts.Core.Managers
             }
         }
 
-        private void ApplySpinOption(SpinOption option)
-        {
-            currentSpinOption = option; 
-            AddSpins(option.spinCount);
-            ChangeState(GameState.Spinning);
-        }
-
-        // --- CORE LOOP ---
-
         public void TriggerSpin()
         {
             if (currentState != GameState.Spinning) return;
@@ -228,16 +244,21 @@ namespace _Game.Scripts.Core.Managers
             if (spinsRemaining <= 0)
             {
                 Debug.Log("Pack Finished (0 spins left). Checking Stage progression...");
-                OnSpinPackFinished();
+                OnRoundFinished();
             }
         }
         
-        private void OnSpinPackFinished()
+        private void OnRoundFinished()
         {
             if (currentSpinOption != null)
             {
                 ResourceManager.Instance.AddResource(ResourceType.Ticket, currentSpinOption.ticketReward);
                 Debug.Log($"Reward: Added {currentSpinOption.ticketReward} Tickets.");
+            }
+            
+            if (CharmManager.Instance != null)
+            {
+                CharmManager.Instance.NotifyRoundCompleted(this);
             }
 
             if (currentStage < stagesPerDebtRound)
@@ -291,7 +312,7 @@ namespace _Game.Scripts.Core.Managers
             OnSpinsChanged?.Invoke(0);
             
             if (CharmManager.Instance != null)
-                CharmManager.Instance.NotifyRoundStart(this);
+                CharmManager.Instance.NotifyDeadlineStart(this);
             
             luckManager.IncrementDebtCompleted();
 

@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: EYE_Pattern
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.PatternData
   patternName: EYE
-  multiplier: 8
+  baseMultiplier: 8
   priority: 85
+  currentMultiplier: 8
   editorRows: 3
   editorCols: 5
   relativeCoordinates:

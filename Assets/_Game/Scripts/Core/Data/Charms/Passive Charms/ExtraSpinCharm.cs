@@ -10,7 +10,7 @@ public class ExtraSpinCharm : CharmData
     public int extraSpins = 2;
 
     // 1. Trường hợp: Đã sở hữu từ trước -> Kích hoạt khi bắt đầu vòng mới
-    public override void OnRoundStart(GameManager gameManager)
+    public override void OnDeadlineStart(GameManager gameManager)
     {
         gameManager.AddSpins(extraSpins);
         Debug.Log($"[ExtraSpin] New Round Bonus: +{extraSpins} spins.");

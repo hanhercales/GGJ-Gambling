@@ -137,75 +137,88 @@ namespace _Game.Scripts.Controllers.Machines
             }
         }
         
+        public IEnumerator HandleSingleWinVisual(MatchResult match, float duration = 1.5f)
+        {
+            float gSymMult = ScoreManager.Instance.GetSymbolMult();
+            float gPatMult = ScoreManager.Instance.GetPatternMult();
+            float matchScore = match.GetScore(gSymMult, gPatMult);
+            
+            boardView.HighlightWinCells(match.matchedCoordinates, rows, cols);
+            AudioManager.Instance.PlayPatternMatch();
+            if (matchScore > 0)
+            {
+                ResourceManager.Instance.AddResource(ResourceType.Coin, (int)matchScore);
+            }
+
+            yield return new WaitForSeconds(duration);
+        }
+        
+        private IEnumerator HandleComboStepVisual(MatchResult match, float displayScore)
+        {
+            float gSymMult = ScoreManager.Instance.GetSymbolMult();
+            float gPatMult = ScoreManager.Instance.GetPatternMult();
+            float matchScore = match.GetScore(gSymMult, gPatMult);
+            
+            boardView.SetHighlightPattern(match.matchedCoordinates, true);
+            AudioManager.Instance.PlayPatternMatch();
+            
+            ResourceManager.Instance.AddResource(ResourceType.Coin, (int)matchScore);
+            scoreText.text = $"WIN: {displayScore}";
+
+            yield return new WaitForSeconds(0.4f);
+            
+            boardView.SetHighlightPattern(match.matchedCoordinates, false);
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        public void ForceStopVisuals()
+        {
+            StopAllCoroutines();
+            if (boardView != null)
+            {
+                boardView.HighlightWinCells(new List<Vector2Int>(), rows, cols);
+            }
+        }
+
         private IEnumerator ShowWinSequence(List<MatchResult> results)
         {
             float currentDisplayedScore = 0;
             scoreText.text = "0";
-
+            
             float gSymMult = ScoreManager.Instance.GetSymbolMult();
             float gPatMult = ScoreManager.Instance.GetPatternMult();
 
-            // Sắp xếp: Nhỏ hiện trước, Lớn hiện sau
             var displaySequence = results
                 .OrderBy(r => r.pattern.priority)
                 .ThenBy(r => r.GetScore(gSymMult, gPatMult))
                 .ToList();
-            
-            yield return new WaitForSeconds(0.2f);
 
-            // === TRƯỜNG HỢP 1: CHỈ ĂN ĐÚNG 1 PATTERN ===
-            // Logic: Bật Highlight "xịn" (nhấp nháy/loop) ngay lập tức và cộng tiền luôn
+            yield return new WaitForSeconds(0.2f);
+            
             if (displaySequence.Count == 1)
             {
                 var match = displaySequence[0];
-                float matchScore = match.GetScore(gSymMult, gPatMult);
-
-                // Dùng hàm HighlightWinCells (loại nhấp nháy) thay vì SetHighlightPattern (loại tĩnh)
-                boardView.HighlightWinCells(match.matchedCoordinates, rows, cols);
-
-                ResourceManager.Instance.AddResource(ResourceType.Coin, (int)matchScore);
-                scoreText.text = $"WIN: {matchScore}";
+                float score = match.GetScore(gSymMult, gPatMult);
+                scoreText.text = $"WIN: {score}";
                 
-                AudioManager.Instance.PlayPatternMatch();
-
-                // Giữ nguyên trạng thái này trong 1.5s để người chơi tận hưởng
-                yield return new WaitForSeconds(1.5f);
+                yield return StartCoroutine(HandleSingleWinVisual(match, 1.5f));
             }
-            // === TRƯỜNG HỢP 2: ĂN NHIỀU PATTERN (COMBO) ===
-            // Logic: Chạy tuần tự từng cái (Highlight tĩnh -> tắt) rồi mới chốt hạ bằng Highlight tổng
             else
             {
-                // A. Giai đoạn tuần tự (Cộng dồn cảm xúc)
                 foreach (var match in displaySequence)
                 {
                     float matchScore = match.GetScore(gSymMult, gPatMult);
-                    
-                    // Bật Highlight thường (tĩnh)
-                    boardView.SetHighlightPattern(match.matchedCoordinates, true);
-
-                    ResourceManager.Instance.AddResource(ResourceType.Coin, (int)matchScore);
-                    
                     currentDisplayedScore += matchScore;
-                    scoreText.text = $"WIN: {currentDisplayedScore}";
-
-                    yield return new WaitForSeconds(0.4f);
                     
-                    AudioManager.Instance.PlayPatternMatch();
-
-                    // Tắt đi để chuyển sang cái tiếp theo
-                    boardView.SetHighlightPattern(match.matchedCoordinates, false);
-                    
-                    yield return new WaitForSeconds(0.1f); 
+                    // REUSE: Call the shared step function
+                    yield return StartCoroutine(HandleComboStepVisual(match, currentDisplayedScore));
                 }
-
-                // B. Giai đoạn chốt hạ (Show tất cả)
+                
                 HashSet<Vector2Int> allCoords = new HashSet<Vector2Int>();
                 foreach (var r in results) 
                     foreach (var c in r.matchedCoordinates) allCoords.Add(c);
 
-                // Bật Highlight xịn (nhấp nháy) cho toàn bộ
                 boardView.HighlightWinCells(new List<Vector2Int>(allCoords), rows, cols);
-                
                 yield return new WaitForSeconds(1.5f); 
             }
         }
