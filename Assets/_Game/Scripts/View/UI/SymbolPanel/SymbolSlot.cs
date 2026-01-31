@@ -16,10 +16,26 @@ public class SymbolSlot : MonoBehaviour
 
     public void TakeInformation(float totalWeight)
     {
-        float weight = (float) symbolData.currentWeight / totalWeight * 100f;
+        if (symbolData == null)
+        {
+            // Nếu null -> Ẩn icon hoặc xóa text để tránh hiện thông tin rác
+            if (icon != null) icon.enabled = false;
+            if (currentWeight != null) currentWeight.text = "-";
+            if (value != null) value.text = "-";
+            return; 
+        }
+
+        // Nếu có data -> Đảm bảo icon được bật
+        if (icon != null) icon.enabled = true;
         
-        icon.sprite = symbolData.icon;
-        currentWeight.text = weight.ToString("F1", CultureInfo.InvariantCulture) + '%';
-        value.text = symbolData.currentValue.ToString();
+        float weight = (totalWeight > 0) ? ((float) symbolData.currentWeight / totalWeight * 100f) : 0f;
+        
+        if (icon != null) icon.sprite = symbolData.icon;
+        
+        if (currentWeight != null)
+            currentWeight.text = weight.ToString("F1", CultureInfo.InvariantCulture) + '%';
+        
+        if (value != null)
+            value.text = symbolData.currentValue.ToString();
     }
 }
