@@ -13,14 +13,16 @@ MonoBehaviour:
   m_Name: TicketBundle
   m_EditorClassIdentifier: Assembly-CSharp::TicketBundleCharm
   idName: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: f9dc36c50730d084da98d582b72de08e, type: 3}
   baseSpawnWeight: 0
   tier: 0
-  charmName: 
+  charmName: Mail of Ticket
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: 'Doesn''t take space.
+
+    +4 ticket.'
   requiredCharmToUnlock: []
   consumeType: 0
   autoDiscard: 1

@@ -1,4 +1,5 @@
-﻿using _Game.Scripts.Core.Data;
+﻿using System;
+using _Game.Scripts.Core.Data;
 using _Game.Scripts.Core.Managers;
 using TMPro;
 using UnityEngine;
@@ -15,9 +16,16 @@ namespace _Game.Scripts.View.UI.ShopUI
         [SerializeField] private Button selectButton; // Nút vô hình hoặc background để click chọn
         [SerializeField] private GameObject selectionHighlight; // Viền sáng khi được chọn
         [SerializeField] private GameObject soldOutOverlay;
+        
+        private TooltipTrigger _tooltip;
 
         private int _myIndex;
         private System.Action<int> _onSelectedCallback;
+
+        private void Awake()
+        {
+            _tooltip = GetComponent<TooltipTrigger>();
+        }
 
         private void Start()
         {
@@ -38,12 +46,6 @@ namespace _Game.Scripts.View.UI.ShopUI
                 if (data.icon != null)
                 {
                     iconImage.sprite = data.icon;
-                    iconImage.gameObject.SetActive(true);
-                }
-                else
-                {
-                    // Tạm thời hiện 1 màu đỏ để biết là có data nhưng thiếu ảnh
-                    iconImage.color = Color.red; 
                     iconImage.gameObject.SetActive(true);
                 }
 
@@ -69,6 +71,12 @@ namespace _Game.Scripts.View.UI.ShopUI
                 
                 if (selectButton) selectButton.interactable = true;
                 if (soldOutOverlay) soldOutOverlay.SetActive(false);
+                
+                if (_tooltip != null)
+                {
+                    _tooltip.header = data.charmName;
+                    _tooltip.content = data.description;
+                }
             }
             else
             {

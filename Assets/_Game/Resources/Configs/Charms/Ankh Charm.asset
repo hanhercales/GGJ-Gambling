@@ -13,14 +13,17 @@ MonoBehaviour:
   m_Name: Ankh Charm
   m_EditorClassIdentifier: Assembly-CSharp::AnkhCharm
   idName: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: a11168e82e565ff4bb96a9585a3703de, type: 3}
   baseSpawnWeight: 0
   tier: 0
-  charmName: 
+  charmName: Voodoo Puppet
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: 'Give players 2 more extra rounds to pay debt when they are about
+    to be expelled.
+
+    Discard after triggered.'
   requiredCharmToUnlock: []
   consumeType: 1
   autoDiscard: 1

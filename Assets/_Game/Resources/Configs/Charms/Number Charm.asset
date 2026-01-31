@@ -13,14 +13,19 @@ MonoBehaviour:
   m_Name: Number Charm
   m_EditorClassIdentifier: Assembly-CSharp::NumberCharm
   idName: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 8950b4159c7d6294d9c615fed07101ab, type: 3}
   baseSpawnWeight: 0
   tier: 0
-  charmName: 
+  charmName: Cancer
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: 'Chance to Trigger (69%)
+
+    Luck +6 for the current spin.
+
+    Discard
+    after triggering for 9 times.'
   requiredCharmToUnlock: []
   triggerChance: 10
   luckBonus: 6

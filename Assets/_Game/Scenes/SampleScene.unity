@@ -1006,7 +1006,6 @@ RectTransform:
   - {fileID: 1705119804}
   - {fileID: 683225356}
   - {fileID: 1661107986}
-  - {fileID: 2131852792}
   m_Father: {fileID: 1256805561}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1684,8 +1683,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 14
+  m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1773,29 +1772,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.ShopManager
   playerInventory: {fileID: 1661107992}
   allCharmsPool:
-  - {fileID: 11400000, guid: c2f13510321abd046a155e99dec3211d, type: 2}
-  - {fileID: 11400000, guid: b3bdf9fa0d56ec54cb10a113c9aa64b3, type: 2}
-  - {fileID: 11400000, guid: f72cc000d0c675d47844099b05fe02d3, type: 2}
-  - {fileID: 11400000, guid: 06f7e21eeeafb1b45b49aecf74409151, type: 2}
-  - {fileID: 11400000, guid: bee5dbc2aca8a82449e846150b949ee4, type: 2}
-  - {fileID: 11400000, guid: 9cd6499cd58a5a5428fca98c34a76815, type: 2}
-  - {fileID: 11400000, guid: 6cb596b85928a8448bfb760bfe072a88, type: 2}
-  - {fileID: 11400000, guid: 99f17ff89c305b941ada4200463d12b8, type: 2}
-  - {fileID: 11400000, guid: 4e43ebb3af170014580961d6cb5a25ba, type: 2}
+  - {fileID: 11400000, guid: 7439a50131d6a054eb65bcebc91d4891, type: 2}
+  - {fileID: 11400000, guid: f203033bc2936cb43996b2ea60795f4f, type: 2}
+  - {fileID: 11400000, guid: b95657af1a8a1e34d8eb221f5b4f9ff2, type: 2}
+  - {fileID: 11400000, guid: 1431706c0699f6b4fbb0a1a8e8cc69cb, type: 2}
+  - {fileID: 11400000, guid: 19c00cba3458b8c49a59fddd5266e60d, type: 2}
+  - {fileID: 11400000, guid: 660a3237d59bc47409f42100a76ffdda, type: 2}
+  - {fileID: 11400000, guid: d53e1d9f72bf1aa409c726893afbf396, type: 2}
+  - {fileID: 11400000, guid: f3a71a9522a669f49b70d23a36dde55c, type: 2}
+  - {fileID: 11400000, guid: 2bcf8eaa9b256cf46a08afebf275a86e, type: 2}
+  - {fileID: 11400000, guid: 31aee0e02a26e574ea2686286f1b6933, type: 2}
+  - {fileID: 11400000, guid: f0825043dc8c2d24a97c0293d46889a0, type: 2}
+  - {fileID: 11400000, guid: d38e151828549614f8228fad63329811, type: 2}
+  - {fileID: 11400000, guid: 0aa5d0522a1ef3f4dbbf69d2d480fd17, type: 2}
+  - {fileID: 11400000, guid: 82098b6386575874685c4ff8ef9b5550, type: 2}
+  - {fileID: 11400000, guid: 151a52a763224cc41bb00f7b3989ed34, type: 2}
   - {fileID: 11400000, guid: ad1856fc94cfd5b4ca69c6ace97d0628, type: 2}
-  - {fileID: 11400000, guid: 1077c9676e5c67841809798494966355, type: 2}
-  - {fileID: 11400000, guid: 60904f481d2a61a47a50d357ae5166b4, type: 2}
+  - {fileID: 11400000, guid: 99f17ff89c305b941ada4200463d12b8, type: 2}
   - {fileID: 11400000, guid: 170dfc1645646084f9b654340936791c, type: 2}
+  - {fileID: 11400000, guid: 1077c9676e5c67841809798494966355, type: 2}
+  - {fileID: 11400000, guid: 4e43ebb3af170014580961d6cb5a25ba, type: 2}
   - {fileID: 11400000, guid: fecddc14e970cf840a1218cdd2b47017, type: 2}
-  - {fileID: 11400000, guid: e304abb3b5684924b8833fa30a13db3e, type: 2}
-  - {fileID: 11400000, guid: 339e5009967628c458470711906ec7dc, type: 2}
+  - {fileID: 11400000, guid: 6499f4ea39ae38f4fbe589ce6addc1ca, type: 2}
   - {fileID: 11400000, guid: 207bf8f5d65b716419fb9202e51d6cdc, type: 2}
-  - {fileID: 11400000, guid: d496d4bd40cec5a4b9b72dd0f4af31c1, type: 2}
-  - {fileID: 11400000, guid: 04dfe1568ff846d4bb86bbca0288ba51, type: 2}
+  - {fileID: 11400000, guid: e304abb3b5684924b8833fa30a13db3e, type: 2}
   - {fileID: 11400000, guid: 38b67bf8e12c437489efae8d4410c2b8, type: 2}
+  - {fileID: 11400000, guid: d496d4bd40cec5a4b9b72dd0f4af31c1, type: 2}
+  - {fileID: 11400000, guid: 339e5009967628c458470711906ec7dc, type: 2}
   - {fileID: 11400000, guid: 2168f90c3b352314bba3bb8b1e6bb328, type: 2}
-  - {fileID: 11400000, guid: cba2425cb1225214d979ee03f4706282, type: 2}
-  - {fileID: 11400000, guid: a1a33905655cbf34eae6bf39ca174214, type: 2}
   shopSlots: 6
   rerollCost: 0
   _globalDiscount: 0
@@ -2890,7 +2894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.78039217}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5033,8 +5037,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5632,6 +5636,7 @@ RectTransform:
   - {fileID: 1565976740}
   - {fileID: 264224546}
   - {fileID: 489624017}
+  - {fileID: 2131852792}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -10214,7 +10219,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 606542409}
-  m_Father: {fileID: 264224546}
+  m_Father: {fileID: 1256805561}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2131852793
 MonoBehaviour:
@@ -10232,7 +10237,7 @@ MonoBehaviour:
   headerText: {fileID: 1210227197}
   contentText: {fileID: 444160829}
   layoutElement: {fileID: 606542410}
-  characterWrapLimit: 80
+  characterWrapLimit: 64
   offset: {x: 15, y: -15}
 --- !u!1 &2142177862
 GameObject:

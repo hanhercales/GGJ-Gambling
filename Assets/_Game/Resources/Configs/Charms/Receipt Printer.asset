@@ -13,14 +13,16 @@ MonoBehaviour:
   m_Name: Receipt Printer
   m_EditorClassIdentifier: Assembly-CSharp::ReceiptPrinter
   idName: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 0c92dc4bb02dd7746a365ee875c31e8b, type: 3}
   baseSpawnWeight: 0
   tier: 0
-  charmName: 
+  charmName: Receipt Printer
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: 'Chance to Trigger (20%)
+
+    Scoring gives 1 ticket.'
   requiredCharmToUnlock: []
   triggerChance: 10
   ticketAmount: 1

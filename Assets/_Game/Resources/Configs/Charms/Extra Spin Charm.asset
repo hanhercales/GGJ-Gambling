@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Extra Spin Charm
   m_EditorClassIdentifier: Assembly-CSharp::ExtraSpinCharm
   idName: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 93aab875e4c862744ae719db0b15258e, type: 3}
   baseSpawnWeight: 0
   tier: 0
-  charmName: 
+  charmName: The Eyes
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: +2 spin per round.
   requiredCharmToUnlock: []
   extraSpins: 2

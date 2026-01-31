@@ -13,14 +13,15 @@ MonoBehaviour:
   m_Name: Conso Prize Charm
   m_EditorClassIdentifier: Assembly-CSharp::ConsoPrizeCharm
   idName: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d0ec586fc3941ac43a554300fde0d6f8, type: 3}
   baseSpawnWeight: 0
   tier: 0
-  charmName: 
+  charmName: Last Finger
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: "If the last two spins didn\u2019t score, the next spin will grant
+    Luck +7."
   requiredCharmToUnlock: []
   requiredLosses: 2
   luckBonus: 7

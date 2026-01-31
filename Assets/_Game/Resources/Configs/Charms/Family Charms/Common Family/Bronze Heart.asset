@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bd64964abea5bd40aa19a83cc663913, type: 3}
+  m_Name: Bronze Heart
+  m_EditorClassIdentifier: Assembly-CSharp::CSymbolCharm
+  idName: 
+  icon: {fileID: 21300000, guid: ef073be4aa00ee64386a2a85f14bb6b0, type: 3}
+  baseSpawnWeight: 0
+  tier: 0
+  charmName: Broken Bone
+  price: 0
+  isEquipped: 0
+  oneTimePurchase: 0
+  description: Scoring Heart increases the Symbol by its base value, permanently.
+  requiredCharmToUnlock: []
+  triggerChance: 30
+  targetedSymbol: {fileID: 11400000, guid: a1186c9672f10e4479d888e58ce6d2bf, type: 2}

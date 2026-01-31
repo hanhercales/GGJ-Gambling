@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Estate Charm
   m_EditorClassIdentifier: Assembly-CSharp::EstateCharm
   idName: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: cd001c8a1031af849ac49ee82710d840, type: 3}
   baseSpawnWeight: 0
   tier: 0
-  charmName: 
+  charmName: Extra Heart
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: Make space for 2 more Charms.
   requiredCharmToUnlock: []
   extraSlots: 2

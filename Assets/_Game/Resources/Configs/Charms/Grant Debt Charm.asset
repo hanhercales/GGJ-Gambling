@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Grant Debt Charm
   m_EditorClassIdentifier: Assembly-CSharp::GrantDebtCharm
   idName: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 4046e03fcbc99da47aaac72ed7c51560, type: 3}
   baseSpawnWeight: 0
   tier: 0
-  charmName: 
+  charmName: Dropped Coin Bag
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: "Doesn\u2019t take space.\r\nImmediately pay 40% of the debt.\r\n"
   requiredCharmToUnlock: []
   consumeType: 0
   autoDiscard: 1
