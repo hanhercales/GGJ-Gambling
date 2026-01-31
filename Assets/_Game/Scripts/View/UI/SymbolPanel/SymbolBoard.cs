@@ -18,12 +18,27 @@ public class SymbolBoard : MonoBehaviour
         
         SetUpUI();
     }
+
+    private void OnDisable()
+    {
+        totalWeight = 0f;
+    }
+
     private void SetUpUI()
     {
         for (int i = 0; i < this.transform.childCount; i++)
         {
             GameObject child = this.transform.GetChild(i).gameObject;
             child.GetComponent<SymbolSlot>().TakeInformation(totalWeight);
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        for (int i = 0; i < this.transform.childCount; i++)
+        {
+            GameObject child = this.transform.GetChild(i).gameObject;
+            child.GetComponent<SymbolSlot>().symbolData.ResetStats();
         }
     }
 }
