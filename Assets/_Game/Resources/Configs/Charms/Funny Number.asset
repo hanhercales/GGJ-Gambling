@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 231fae0714b032944a7311d345e7f1ce, type: 3}
+  m_Name: Funny Number
+  m_EditorClassIdentifier: Assembly-CSharp::NumberCharm
+  idName: 
+  icon: {fileID: 0}
+  baseSpawnWeight: 0
+  tier: 0
+  charmName: 69
+  price: 0
+  isEquipped: 0
+  description: 
+  requiredCharmToUnlock: []
+  triggerChance: 69
+  luckBonus: 6
+  maxUses: 9

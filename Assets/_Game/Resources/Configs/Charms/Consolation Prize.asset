@@ -9,18 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 231fae0714b032944a7311d345e7f1ce, type: 3}
-  m_Name: Num1 3
-  m_EditorClassIdentifier: Assembly-CSharp::NumberCharm
-  idName: Num4
+  m_Script: {fileID: 11500000, guid: bc667db0c1eb69e4c8fcd2b1cebd0a7c, type: 3}
+  m_Name: Consolation Prize
+  m_EditorClassIdentifier: Assembly-CSharp::ConsoPrizeCharm
+  idName: 
   icon: {fileID: 0}
   baseSpawnWeight: 0
   tier: 0
-  charmName: Num4
+  charmName: Consolation
   price: 0
   isEquipped: 0
   description: 
   requiredCharmToUnlock: []
-  triggerChance: 10
-  luckBonus: 6
-  maxUses: 9
+  requiredLosses: 2
+  luckBonus: 7

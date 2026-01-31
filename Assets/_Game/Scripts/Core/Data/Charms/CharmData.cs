@@ -21,7 +21,7 @@ namespace _Game.Scripts.Core.Data
     public class CharmData : RandomSOData
     {
         public CharmTier tier;
-        [TextArea] public string charmName;
+        public string charmName;
         public int price;
         public bool isEquipped;
         
@@ -56,6 +56,20 @@ namespace _Game.Scripts.Core.Data
         public virtual void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
         {
             
+        }
+        
+        public bool IsUnlockable(CharmHolder playerInventory)
+        {
+            if (requiredCharmToUnlock == null || requiredCharmToUnlock.Length == 0) 
+                return true;
+
+            foreach (var req in requiredCharmToUnlock)
+            {
+                // If we don't have the required parent, we can't buy this child
+                if (!playerInventory.HasCharm(req)) 
+                    return false;
+            }
+            return true;
         }
     }
 }

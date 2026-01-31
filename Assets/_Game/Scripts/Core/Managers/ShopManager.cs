@@ -149,35 +149,31 @@ namespace _Game.Scripts.Core.Managers
         {
             if (currentProbabilityProfile == null) return null;
 
-            int maxAttempts = 10; // Giới hạn số lần thử để tránh treo máy nếu hết sạch đồ
-            
+            int maxAttempts = 10; 
+    
             for (int attempt = 0; attempt < maxAttempts; attempt++)
             {
-                // 1. Chọn Tier
+                // 1. Pick Tier
                 TierWeight selectedTierInfo = WeightedRandomSelector.Select(
                     currentProbabilityProfile.tierWeights, 
                     t => t.weight
                 );
                 CharmTier targetTier = selectedTierInfo.tier;
-
-                // 2. Lấy danh sách khả dụng của Tier đó
+                
                 if (_availablePool.TryGetValue(targetTier, out var pool) && pool.Count > 0)
                 {
-                    // Lọc ra những cái chưa bị chọn trong mẻ này
-                    // (Cách này hơi tốn hiệu năng nhưng đảm bảo an toàn với list nhỏ)
-                    var candidates = pool.Where(c => !excludeList.Contains(c)).ToList();
+                    var candidates = pool.Where(c => 
+                            !excludeList.Contains(c) &&       // 1. Not picked in this reroll yet
+                            c.IsUnlockable(playerInventory)   // 2. NEW: Requirements met?
+                    ).ToList();
 
                     if (candidates.Count > 0)
                     {
-                        // Chọn 1 cái từ danh sách đã lọc
                         return WeightedRandomSelector.Select(candidates, c => c.baseSpawnWeight);
                     }
                 }
-                
-                // Nếu Tier này hết đồ, vòng lặp sẽ tự thử lại (có thể ra Tier khác)
             }
 
-            // Nếu quay mãi không ra (do hết sạch đồ ở mọi Tier khả thi) -> Trả về null
             return null;
         }
 
