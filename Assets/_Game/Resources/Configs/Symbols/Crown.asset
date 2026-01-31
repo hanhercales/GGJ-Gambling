@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3f9ea7bab6f56349a592f7be8c4db28, type: 3}
-  m_Name: Wrath
+  m_Name: Crown
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.SymbolData
-  idName: Wrath
-  icon: {fileID: 21300000, guid: e90418100d1305d4aa1f18ca2e6bda84, type: 3}
-  baseSpawnWeight: 8
-  baseValue: 5
-  currentWeight: 8
-  currentValue: 5
+  idName: Crown
+  icon: {fileID: 21300000, guid: e4a5e47abeac68e42b6d057ecd621374, type: 3}
+  baseSpawnWeight: 5
+  baseValue: 7
+  currentWeight: 5
+  currentValue: 7
