@@ -18,6 +18,9 @@ namespace _Game.Scripts.Core.Managers
         [Header("Config")]
         [SerializeField] private int shopSlots = 6;
         [SerializeField] private int rerollCost = 5;
+        
+        [Header("Runtime State")]
+        [SerializeField] private int _globalDiscount = 0;
 
         [Header("Probability Settings")]
         [SerializeField] private ShopProbabilitySO currentProbabilityProfile;
@@ -92,8 +95,18 @@ namespace _Game.Scripts.Core.Managers
         }
 
         private void OnPlayerObtainedCharm(CharmData charm) => RemoveFromPool(charm);
-        private void OnPlayerLostCharm(CharmData charm) => AddToPool(charm);
+        private void OnPlayerLostCharm(CharmData charm)
+        {
+            // NEW: Check the flag before adding back
+            if (charm.oneTimePurchase)
+            {
+                Debug.Log($"[Shop] {charm.charmName} is a One-Time item. Removed from pool forever.");
+                return; // Stop here! Don't add to pool.
+            }
 
+            AddToPool(charm);
+        }
+        
         private void RemoveFromPool(CharmData charm)
         {
             if (_availablePool.TryGetValue(charm.tier, out var list))
@@ -182,46 +195,41 @@ namespace _Game.Scripts.Core.Managers
             currentProbabilityProfile = newProfile;
         }
 
+        public int GetFinalPrice(CharmData item)
+        {
+            if (item == null) return 0;
+            // Price cannot be lower than 0
+            return Mathf.Max(0, item.price - _globalDiscount);
+        }
+        
+        public void ModifyDiscount(int amount)
+        {
+            _globalDiscount += amount;
+            // Force UI refresh so prices update instantly in the shop view
+            OnShopRefreshed?.Invoke(_currentShopItems); 
+        }
+        
         public bool TryBuyItem(int slotIndex)
         {
-            // 1. Kiểm tra Slot hợp lệ
-            if (slotIndex < 0 || slotIndex >= _currentShopItems.Count) 
-            {
-                Debug.LogError($"[Shop] Invalid Slot Index: {slotIndex}");
-                return false;
-            }
+            if (slotIndex < 0 || slotIndex >= _currentShopItems.Count) return false;
 
             CharmData item = _currentShopItems[slotIndex];
-            if (item == null)
-            {
-                Debug.LogWarning($"[Shop] Slot {slotIndex} is empty (already bought).");
-                return false;
-            }
-
-            // 2. Kiểm tra tiền
-            var currentCoin = ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
-            if (currentCoin < item.price) 
-            {
-                Debug.Log($"[Shop] Mua thất bại: Không đủ tiền! (Có: {currentCoin}, Cần: {item.price})");
-                return false;
-            }
+            if (item == null) return false;
             
-            // 3. Kiểm tra túi đồ (Inventory Full)
-            // LƯU Ý: Đây là nguyên nhân phổ biến nhất khiến bấm vào không có gì xảy ra
-            if (playerInventory.GetContent().Count >= playerInventory.GetSize()) 
+            int finalPrice = GetFinalPrice(item);
+            
+            if (ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin) < finalPrice) 
             {
-                Debug.Log("[Shop] Mua thất bại: Túi đồ đã đầy (Inventory Full)!");
+                Debug.Log($"[Shop] Not enough money. Need {finalPrice}, have {ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin)}");
                 return false;
             }
-
-            // 4. Thực hiện giao dịch
-            ResourceManager.Instance.TrySpendResource(ResourceType.Coin, item.price);
+            if (playerInventory.GetContent().Count >= playerInventory.GetSize()) return false;
+            ResourceManager.Instance.TrySpendResource(ResourceType.Coin, finalPrice);
+    
             playerInventory.AddCharm(item);
 
             _currentShopItems[slotIndex] = null;
             OnShopRefreshed?.Invoke(_currentShopItems);
-            
-            Debug.Log($"[Shop] Mua thành công: {item.name}");
             return true;
         }
         

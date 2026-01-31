@@ -78,5 +78,30 @@ namespace _Game.Scripts.Core.Managers
             // Format lấy 1 số sau dấu phẩy (VD: 19.4)
             return percent.ToString("F1") + "%";
         }
+        
+        // Inside WeightManager.cs
+        
+        public List<SymbolData> GetHighestWeightSymbols()
+        {
+            List<SymbolData> leaders = new List<SymbolData>();
+            int maxW = -1;
+
+            foreach (var sym in allSymbols)
+            {
+                // Case A: Found a new highest
+                if (sym.currentWeight > maxW)
+                {
+                    maxW = sym.currentWeight;
+                    leaders.Clear(); // Discard previous leaders
+                    leaders.Add(sym);
+                }
+                // Case B: It's a tie
+                else if (sym.currentWeight == maxW)
+                {
+                    leaders.Add(sym);
+                }
+            }
+            return leaders;
+        }
     }
 }

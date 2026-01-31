@@ -22,18 +22,13 @@ namespace _Game.Scripts.Core.Managers
             else Destroy(gameObject);
         }
 
-        // --- PUBLIC API: Gọi từ GameManager ---
-
         public void NotifySpinStart()
         {
             if (charmHolder == null) return;
-
-            // Tạo bản sao list để tránh lỗi nếu Charm tự hủy giữa chừng
             var charms = new List<CharmData>(charmHolder.GetContent());
             
             foreach (var charm in charms)
             {
-                // Gọi hàm kích hoạt
                 charm.OnSpinStart(slotMachine, luckManager);
             }
         }
@@ -41,15 +36,11 @@ namespace _Game.Scripts.Core.Managers
         public void NotifySpinResult(float winAmount, List<MatchResult> results)
         {
             if (charmHolder == null) return;
-
             var charms = new List<CharmData>(charmHolder.GetContent());
             
             foreach (var charm in charms)
             {
-                // 1. Xử lý logic thắng thua (ConsoPrize)
                 charm.OnSpinResult(slotMachine, luckManager, winAmount);
-
-                // 2. Xử lý logic buff Symbol (CSymbolCharm)
                 charm.OnSpinResultBuff(slotMachine, results);
             }
         }
@@ -57,8 +48,7 @@ namespace _Game.Scripts.Core.Managers
         public void NotifySpinEnd()
         {
             if (charmHolder == null) return;
-
-            // Duyệt ngược để an toàn hơn khi xóa
+            
             var charms = new List<CharmData>(charmHolder.GetContent());
             for (int i = charms.Count - 1; i >= 0; i--)
             {
@@ -75,28 +65,30 @@ namespace _Game.Scripts.Core.Managers
             }
         }
 
-        // Kiểm tra xem có charm nào cứu mạng không (Ankh)
         public bool CheckPaymentSavior(int currentCoin, int currentDebt)
         {
             if (charmHolder == null) return false;
-
+            
             var charms = new List<CharmData>(charmHolder.GetContent());
+            
             foreach (var charm in charms)
             {
                 if (charm.OnPaymentCheck(currentCoin, currentDebt))
                 {
-                    // Nếu là Consumable dùng 1 lần, phải xóa nó đi
-                    if (charm is ConsumableCharm consumable && consumable.destroyOnUse)
+                    Debug.Log($"[CharmManager] Player saved by {charm.charmName}!");
+                    
+                    if (charm is ConsumableCharm cons && cons.autoDiscard)
                     {
                         charmHolder.RemoveCharm(charm);
+                        Debug.Log($"[CharmManager] {charm.charmName} consumed.");
                     }
-                    return true; // Được cứu!
+
+                    return true;
                 }
             }
             return false;
         }
 
-        // Helper để SlotMachine lấy list charm tính điểm
         public List<CharmData> GetActiveCharms()
         {
             return charmHolder != null ? charmHolder.GetContent() : new List<CharmData>();

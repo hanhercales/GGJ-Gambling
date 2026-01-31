@@ -24,6 +24,7 @@ namespace _Game.Scripts.Core.Data
         public string charmName;
         public int price;
         public bool isEquipped;
+        public bool oneTimePurchase = false;
         
         [TextArea] public string description;
         public CharmData[] requiredCharmToUnlock;

@@ -1,4 +1,5 @@
 ﻿using _Game.Scripts.Core.Data;
+using _Game.Scripts.Core.Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,7 +48,24 @@ namespace _Game.Scripts.View.UI.ShopUI
                 }
 
                 priceText.text = data.price.ToString();
-                nameText.text = data.charmName; // Đảm bảo charmName có chữ
+                nameText.text = data.charmName; 
+                int finalPrice = data.price;
+                
+                if (ShopManager.Instance != null)
+                {
+                    finalPrice = ShopManager.Instance.GetFinalPrice(data);
+                }
+                
+                if (finalPrice < data.price)
+                {
+                    priceText.color = Color.green; 
+                }
+                else
+                {
+                    priceText.color = Color.white; // Or your default color
+                }
+
+                priceText.text = finalPrice.ToString();
                 
                 if (selectButton) selectButton.interactable = true;
                 if (soldOutOverlay) soldOutOverlay.SetActive(false);
