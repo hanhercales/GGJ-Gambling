@@ -31,6 +31,7 @@ namespace _Game.Scripts.Core.Managers
         // Kho hàng khả dụng (những món người chơi CHƯA có)
         private Dictionary<CharmTier, List<CharmData>> _availablePool = new Dictionary<CharmTier, List<CharmData>>();
 
+        private HashSet<int> _freeSlots = new HashSet<int>();
         public event System.Action<List<CharmData>> OnShopRefreshed;
 
         private void Awake()
@@ -137,6 +138,7 @@ namespace _Game.Scripts.Core.Managers
             }
 
             _currentShopItems.Clear();
+            _freeSlots.Clear();
             
             // Danh sách tạm để kiểm tra trùng lặp TRONG MẺ QUAY NÀY
             List<CharmData> sessionPicks = new List<CharmData>();
@@ -153,6 +155,8 @@ namespace _Game.Scripts.Core.Managers
                 
                 _currentShopItems.Add(picked);
             }
+            if (CharmManager.Instance != null)
+                CharmManager.Instance.NotifyShopRolled(this);
 
             OnShopRefreshed?.Invoke(_currentShopItems);
         }
@@ -216,44 +220,58 @@ namespace _Game.Scripts.Core.Managers
             CharmData item = _currentShopItems[slotIndex];
             if (item == null) return false;
             
-            int finalPrice = GetFinalPrice(item);
+            // 1. Calculate Ticket Price (with Coupon)
+            int finalPrice = GetSlotPrice(slotIndex);
             
-            if (ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin) < finalPrice) 
-            if (item == null)
-            {
-                Debug.LogWarning($"[Shop] Slot {slotIndex} is empty (already bought).");
-                return false;
-            }
-
-            // 2. Kiểm tra TICKET (Thay vì Coin)
-            // Lấy số lượng Ticket hiện có
+            // 2. Check TICKETS
             var currentTicket = ResourceManager.Instance.GetResourceBigInt(ResourceType.Ticket);
-            
-            // So sánh với giá item (Lúc này item.price được hiểu là giá Ticket)
-            if (currentTicket < item.price) 
+            if (currentTicket < finalPrice) 
             {
-                Debug.Log($"[Shop] Mua thất bại: Không đủ Ticket! (Có: {currentTicket}, Cần: {item.price})");
+                Debug.Log($"[Shop] Not enough TICKETS! (Have: {currentTicket}, Need: {finalPrice})");
                 return false;
             }
             
-            // 3. Kiểm tra túi đồ (Inventory Full)
+            // 3. Check Capacity
             if (playerInventory.GetContent().Count >= playerInventory.GetSize()) 
             {
-                Debug.Log("[Shop] Mua thất bại: Túi đồ đã đầy (Inventory Full)!");
+                Debug.Log("[Shop] Inventory Full!");
                 return false;
             }
 
-            // 4. Thực hiện giao dịch (Trừ Ticket)
-            ResourceManager.Instance.TrySpendResource(ResourceType.Ticket, item.price);
-            
-            // Thêm đồ vào túi
-            playerInventory.AddCharm(item);
+            // 4. Pay in TICKETS
+            if (ResourceManager.Instance.TrySpendResource(ResourceType.Ticket, finalPrice))
+            {
+                playerInventory.AddCharm(item);
 
-            _currentShopItems[slotIndex] = null;
-            OnShopRefreshed?.Invoke(_currentShopItems);
-            
-            Debug.Log($"[Shop] Mua thành công Charm '{item.charmName}' với giá {item.price} Ticket.");
-            return true;
+                _currentShopItems[slotIndex] = null;
+                OnShopRefreshed?.Invoke(_currentShopItems);
+                
+                Debug.Log($"[Shop] Bought '{item.charmName}' for {finalPrice} Tickets.");
+                return true;
+            }
+
+            return false;
+        }
+        
+        public void SetSlotFree(int index)
+        {
+            if (!_freeSlots.Contains(index))
+            {
+                _freeSlots.Add(index);
+                // Debug.Log($"[Shop] Slot {index} is now FREE!");
+            }
+        }
+        
+        public int GetSlotPrice(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= _currentShopItems.Count) return 0;
+    
+            // 1. If this slot is marked free, cost is 0
+            if (_freeSlots.Contains(slotIndex)) return 0;
+
+            // 2. Otherwise, calculate normal price
+            CharmData item = _currentShopItems[slotIndex];
+            return GetFinalPrice(item);
         }
         
         public int GetRerollCost() => rerollCost;

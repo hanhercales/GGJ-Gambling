@@ -7,41 +7,48 @@ namespace _Game.Scripts.Core.Data
     [CreateAssetMenu(fileName = "NewPattern", menuName = "GameConfig/Pattern Data")]
     public class PatternData : ScriptableObject
     {
-        #region Thông tin Pattern
+        #region Pattern Info
         [Header("Info")]
         public string patternName;
         #endregion
 
-        #region Cách tính điểm
+        #region Scoring
         [Header("Scoring")]
-        [Tooltip("Giá trị nội tại của Pattern (Gốc). VD: HOR = 1.0")]
-        public float baseMultiplier = 1.0f; // Hệ số nhân
+        [Tooltip("Base Intrinsic Value. E.g: HOR = 1.0")]
+        public float baseMultiplier = 1.0f; 
         
-        public int priority = 0; // Độ ưu tiên (Số càng to càng được xét trước)
+        public int priority = 0;
         
         [Header("Runtime Info (Read Only)")]
-        public float currentMultiplier;
+        public float currentMultiplier; // The value used by the game
+        
+        // We keep this just for debugging (to see how much we grew)
+        [System.NonSerialized] private float _runtimeValueBonus = 0f;
         #endregion
 
-        #region Cấu hình Editor (Không dùng trong game)
+        #region Editor & Coordinates
         [Header("Editor Config")]
         [Min(1)] public int editorRows = 3; 
         [Min(1)] public int editorCols = 3;
-        #endregion
 
-        #region Dữ liệu tọa độ
         [Header("Coordinate Data")]
-        // Danh sách tọa độ tương đối tạo nên hình dáng pattern
         public List<Vector2Int> relativeCoordinates = new List<Vector2Int>();
         #endregion
         
+        // 1. RESET: Go back to base stats
         public void ResetStats()
         {
             currentMultiplier = baseMultiplier;
+            _runtimeValueBonus = 0f;
         }
-
-        // Dùng để buff giá trị nội tại của Pattern
-        // VD: Charm "Các đường thẳng (HOR) được +0.5x giá trị"
+        
+        public void AddPermanentValue(float amount)
+        {
+            _runtimeValueBonus += amount;
+            currentMultiplier += amount; 
+            Debug.Log($"[Pattern] {patternName} leveled up! Bonus: +{_runtimeValueBonus} | Total: {currentMultiplier}x");
+        }
+        
         public void ModifyMultiplier(float amount)
         {
             currentMultiplier += amount;

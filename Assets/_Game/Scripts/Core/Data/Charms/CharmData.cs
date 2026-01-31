@@ -55,10 +55,8 @@ namespace _Game.Scripts.Core.Data
 
         public virtual void OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount) { }
 
-        public virtual void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
-        {
-            
-        }
+        public virtual void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results) { }
+        public virtual void OnShopRolled(ShopManager shop) { }
         
         public bool IsUnlockable(CharmHolder playerInventory)
         {
