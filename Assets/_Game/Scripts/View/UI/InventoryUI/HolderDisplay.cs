@@ -36,12 +36,14 @@ namespace _Game.Scripts.View.UI
 
         public void SetupUI()
         {
+            // Xóa hết slot cũ
             foreach (Transform slot in slotParent)
             {
-                Destroy( slot.gameObject);
+                Destroy(slot.gameObject);
             }
             holderSlots.Clear();
 
+            // Sinh slot mới dựa trên Size hiện tại (đã được EstateCharm cộng thêm)
             for (int i = 0; i < charmHolder.GetSize(); ++i)
             {
                 GameObject slot = Instantiate(holderSlotPrefab, slotParent);
@@ -50,11 +52,12 @@ namespace _Game.Scripts.View.UI
                 {
                     holderSlots.Add(slotUI);
                     Button slotButton = slot.GetComponent<Button>();
-                    if(slotButton == null)  slotButton = slot.AddComponent<Button>();
+                    if(slotButton == null) slotButton = slot.AddComponent<Button>();
                     slotButton.onClick.AddListener(() => OnSlotUI_Clicked(slotUI));
                 }
             }
 
+            // Sau khi sinh xong thì cập nhật nội dung
             UpdateHolderUI();
         }
 
@@ -77,11 +80,20 @@ namespace _Game.Scripts.View.UI
 
         public void UpdateHolderUI()
         {
+            // 1. Kiểm tra xem số lượng slot trên UI có khớp với dữ liệu thực tế không
+            // Nếu CharmHolder đã tăng size (ví dụ mua Estate), ta phải Setup lại UI từ đầu
+            if (holderSlots.Count != charmHolder.GetSize())
+            {
+                SetupUI(); 
+                return; // SetupUI sẽ gọi lại UpdateHolderUI ở cuối, nên ta return luôn để tránh chạy 2 lần
+            }
+
+            // 2. Cập nhật icon như bình thường
             List<CharmData> content = charmHolder.GetContent();
 
             for (int i = 0; i < holderSlots.Count; i++)
             {
-                if(i <  content.Count)
+                if(i < content.Count)
                     holderSlots[i].UpdateSlot(content[i]);
                 else
                     holderSlots[i].UpdateSlot(null);

@@ -109,7 +109,7 @@ namespace _Game.Scripts.Core.Managers
             if (ResourceManager.Instance.TrySpendResource(ResourceType.Coin, pack.coinCost))
             {
                 currentPack = pack;
-                spinsRemaining = pack.spinCount;
+                spinsRemaining += pack.spinCount;
                 OnSpinsChanged?.Invoke(spinsRemaining);
                 
                 // Chuyển sang giai đoạn quay

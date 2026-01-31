@@ -18,6 +18,11 @@ namespace _Game.Scripts.Core.Managers
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
         }
+        
+        private void Start()
+        {
+            RecalculateTotalWeight();
+        }
 
         // 1. Reset tất cả về zin (Gọi khi Start Game)
         public void ResetAllWeights()
