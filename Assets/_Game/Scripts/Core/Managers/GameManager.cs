@@ -119,6 +119,11 @@ namespace _Game.Scripts.Core.Managers
             if (CharmManager.Instance != null)
                 CharmManager.Instance.NotifyDeadlineStart(this);
             
+            if (MaskManager.Instance != null)
+            {
+                MaskManager.Instance.ResetAllMasksForNewGame();
+            }
+            
             ChangeState(GameState.Preparation);
             NotifyRoundInfo();
         }
@@ -218,6 +223,8 @@ namespace _Game.Scripts.Core.Managers
             }
             
             if (CharmManager.Instance != null) CharmManager.Instance.NotifySpinStart();
+            if (MaskManager.Instance != null) 
+                MaskManager.Instance.NotifySpinStart(slotMachine, luckManager);
             
             int calculatedLuck = LuckManager.Instance.CalculateLuckForSpin();
             Debug.Log($"SPINNING... (Luck Applied: {calculatedLuck})");
@@ -238,6 +245,13 @@ namespace _Game.Scripts.Core.Managers
                 CharmManager.Instance.NotifySpinEnd();
             }
 
+            if (MaskManager.Instance != null)
+            {
+                MaskManager.Instance.NotifySpinResult(slotMachine, luckManager, winAmount);
+                MaskManager.Instance.NotifySpinResultBuff(slotMachine, results);
+                MaskManager.Instance.NotifySpinEnd(slotMachine, luckManager);
+            }
+            
             spinsRemaining--;
             OnSpinsChanged?.Invoke(spinsRemaining);
 
