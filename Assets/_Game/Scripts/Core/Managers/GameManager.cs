@@ -21,6 +21,7 @@ namespace _Game.Scripts.Core.Managers
         [Header("Game Config")]
         [SerializeField] private int startingCoin = 10; 
         [SerializeField] private int stagesPerDebtRound = 4;
+        [SerializeField] private int maxRoundsToWin = 12;
 
         [Header("Shop Progression")]
         [Tooltip("Danh sách tỉ lệ Shop theo độ khó.")]
@@ -338,6 +339,7 @@ namespace _Game.Scripts.Core.Managers
         {
             Debug.Log("[Event Received] DebtManager says: Debt Paid / Clear!");
 
+            // 1. Tính thưởng trả sớm (Logic cũ)
             int skippedStages = 0;
             if (currentState != GameState.RoundEnd)
             {
@@ -351,6 +353,40 @@ namespace _Game.Scripts.Core.Managers
                 Debug.Log($"[Debt] Early Pay Bonus: +{bonusTickets} Tickets ({skippedStages} stages skipped).");
             }
 
+            // 2. [MỚI] KIỂM TRA ĐIỀU KIỆN THẮNG
+            if (currentDebtRound == maxRoundsToWin)
+            {
+                HandleWinGame();
+            }
+            else
+            {
+                // Nếu chưa thắng, sang vòng tiếp theo ngay
+                PrepareNextRound();
+            }
+        }
+        
+        private void HandleWinGame()
+        {
+            Debug.Log(">>> VICTORY! Max Round Reached. <<<");
+            
+            _isGameRunning = false; // Tạm dừng game (logic Esc)
+            
+            // Hiện bảng Win
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.OpenGameMenu(MenuMode.WinGame);
+            }
+        }
+        
+        public void ContinueEndlessMode()
+        {
+            Debug.Log(">>> CONTINUING TO ENDLESS MODE <<<");
+            _isGameRunning = true;
+            PrepareNextRound();
+        }
+        
+        private void PrepareNextRound()
+        {
             Debug.Log($"ROUND {currentDebtRound} COMPLETE! Preparing next round...");
             currentDebtRound++;
             currentStage = 1;

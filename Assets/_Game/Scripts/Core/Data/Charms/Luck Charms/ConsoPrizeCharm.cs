@@ -31,18 +31,18 @@ public class ConsoPrizeCharm : CharmData
         }
     }
     
-    public override void OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount)
+    public override bool OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount)
     {
-        // Clean after eating
+        // Clean after eating bonus
         if (_bonusActive)
         {
             luckManager.baseLuckFromCharms -= luckBonus;
             _bonusActive = false;
             _lossStreak = 0; 
-            return; 
+            return true; // Đã dùng buff -> Kích hoạt Visual
         }
 
-        // Reset streak
+        // Reset streak (Passive update)
         if (winAmount > 0)
         {
             _lossStreak = 0;
@@ -52,5 +52,7 @@ public class ConsoPrizeCharm : CharmData
             _lossStreak++;
             Debug.Log($"[Clutch] Lost spin. Current streak: {_lossStreak}");
         }
+
+        return false; // Chỉ cập nhật ngầm
     }
 }

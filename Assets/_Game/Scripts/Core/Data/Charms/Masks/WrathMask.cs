@@ -40,17 +40,17 @@ public class WrathMask : MaskData // [THAY ĐỔI] Kế thừa MaskData
         _buffApplied = true;
     }
     
-    public override void OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount)
+    public override bool OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount)
     {
         if (winAmount > 0)
         {
             _accumulatedRoundProfit += (int)winAmount;
         }
+        return false; // Chỉ tích lũy ngầm, không cần visual mỗi lần thắng
     }
-    
-    public override void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
+
+    public override bool OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
     {
-        // Did we hit a forbidden pattern?
         bool triggeredWrath = results.Any(match => forbiddenPatterns.Contains(match.pattern.patternName));
 
         if (triggeredWrath)
@@ -68,8 +68,10 @@ public class WrathMask : MaskData // [THAY ĐỔI] Kế thừa MaskData
                     machine.ForceStopVisuals();
                     if (machine.scoreText != null) machine.scoreText.text = "VOIDED";
                 }
+                return true; // Kích hoạt Curse -> True
             }
         }
+        return false;
     }
 
     // 5. CLEANUP

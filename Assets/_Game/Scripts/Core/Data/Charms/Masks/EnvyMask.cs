@@ -13,12 +13,12 @@ public class MaskOfEnvyCharm : MaskData // [THAY ĐỔI] Kế thừa MaskData
     [Range(0f, 1f)] public float triggerChance = 0.3f; // 30%
     public float bonusMultiplier = 1.5f; // x1.5
 
-    public override void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
+    public override bool OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
     {
-        if (results.Count == 0) return;
+        if (results.Count == 0) return false;
 
         // 1. Roll Logic (30%)
-        if (Random.value > triggerChance) return;
+        if (Random.value > triggerChance) return false; // Không trúng -> False
 
         // 2. Determine Fate (50/50)
         bool isGoodOutcome = Random.value > 0.5f;
@@ -31,6 +31,8 @@ public class MaskOfEnvyCharm : MaskData // [THAY ĐỔI] Kế thừa MaskData
         {
             ApplyEnvyCurse(results);
         }
+
+        return true; // Đã kích hoạt hiệu ứng -> True
     }
 
     private void ApplyEnvyBonus(List<MatchResult> results)

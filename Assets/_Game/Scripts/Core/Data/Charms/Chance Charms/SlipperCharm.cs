@@ -41,8 +41,9 @@ public class FragileClutchCharm : CharmData
         }
     }
     
-    public override void OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount)
+    public override bool OnSpinResult(SlotMachineController machine, LuckManager luckManager, float winAmount)
     {
+        // Trường hợp 1: Đang có Bonus -> Xử lý kết quả (Vỡ hoặc Mất buff)
         if (_bonusActive)
         {
             luckManager.baseLuckFromCharms -= luckBonus;
@@ -63,9 +64,10 @@ public class FragileClutchCharm : CharmData
             {
                 Debug.Log($"[Fragile Clutch] The charm survived. (Rolled {roll})");
             }
-            return; 
+            return true; // Đã kích hoạt hiệu ứng (Dù vỡ hay không thì cũng đã dùng buff)
         }
         
+        // Trường hợp 2: Chỉ là tích lũy chuỗi thua (Passive)
         if (winAmount > 0)
         {
             _lossStreak = 0;
@@ -75,5 +77,7 @@ public class FragileClutchCharm : CharmData
             _lossStreak++;
             Debug.Log($"[Fragile Clutch] Streak increased: {_lossStreak}");
         }
+        
+        return false; // Chỉ cập nhật ngầm, không cần Visual
     }
 }

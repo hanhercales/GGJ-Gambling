@@ -15,7 +15,7 @@ public class MaskOfPrideCharm : MaskData // [THAY ĐỔI] Kế thừa MaskData
     [Tooltip("These symbols will pay 0 coins (Heart, Clover, Coin, Circle).")]
     public List<SymbolData> peasantSymbols; 
     
-    public override void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
+    public override bool OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
     {
         bool hitTheJackpot = false;
         foreach (var match in results)
@@ -39,7 +39,9 @@ public class MaskOfPrideCharm : MaskData // [THAY ĐỔI] Kế thừa MaskData
                     pat.AddPermanentValue(pat.baseMultiplier); 
                 }
             }
+            return true; // Kích hoạt hiệu ứng -> True
         }
+        return false;
     }
     
     public override long ModifySymbolScore(long currentScore, SymbolData symbol, string symbolID)

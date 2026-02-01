@@ -40,14 +40,21 @@ namespace _Game.Scripts.Core.Managers
         public void NotifySpinResult(float winAmount, List<MatchResult> results)
         {
             if (charmHolder == null) return;
+            
+            // Tạo bản sao list để tránh lỗi nếu charm bị xóa giữa chừng
             var charms = new List<CharmData>(charmHolder.GetContent());
             
             foreach (var charm in charms)
             {
-                charm.OnSpinResult(slotMachine, luckManager, winAmount);
-                charm.OnSpinResultBuff(slotMachine, results);
+                // Gọi hàm và nhận kết quả xem charm có hoạt động không
+                bool activatedLogic1 = charm.OnSpinResult(slotMachine, luckManager, winAmount);
+                bool activatedLogic2 = charm.OnSpinResultBuff(slotMachine, results);
                 
-                TriggerVisual(charm);
+                // Nếu 1 trong 2 logic trả về true -> Kích hoạt visual
+                if (activatedLogic1 || activatedLogic2)
+                {
+                    TriggerVisual(charm);
+                }
             }
         }
 
