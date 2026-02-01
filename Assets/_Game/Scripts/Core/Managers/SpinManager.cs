@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using _Game.Scripts.Core.Data;
-using _Game.Scripts.Core.Inventory; // Để dùng ResourceType
+using _Game.Scripts.Core.Inventory; 
 using System.Numerics;
 
 namespace _Game.Scripts.Core.Managers
@@ -8,6 +8,9 @@ namespace _Game.Scripts.Core.Managers
     public class SpinManager : MonoBehaviour
     {
         public static SpinManager Instance { get; private set; }
+        
+        // --- [NEW] COST MULTIPLIER ---
+        private float _costMultiplier = 1.0f;
 
         private void Awake()
         {
@@ -15,12 +18,21 @@ namespace _Game.Scripts.Core.Managers
             else Destroy(gameObject);
         }
 
+        // --- [NEW] API FOR CHARMS ---
+        public void SetCostMultiplier(float value)
+        {
+            _costMultiplier = value;
+            Debug.Log($"[SpinManager] Cost Multiplier set to {_costMultiplier}x");
+            
+            // Refresh UI immediately if GameManager is present
+            if (GameManager.Instance != null) 
+                GameManager.Instance.RequestSpinOptionsUpdate();
+        }
+
         // --- CÔNG THỨC TÍNH GIÁ ---
         public int CalculateBaseSpinCost(int currentDebtRound)
         {
-            // Công thức: Max(1, 2 * (Round - 1) * (1 + ((Round - 1) / 5)))
-            // Round bắt đầu từ 1
-            if (currentDebtRound <= 1) return 1; // Round 1 giá mặc định là 1 (hoặc theo công thức trả về 0 thì clamp lên 1)
+            if (currentDebtRound <= 1) return 1; 
 
             int term1 = 2 * (currentDebtRound - 1);
             int term2 = 1 + ((currentDebtRound - 1) / 5);
@@ -32,25 +44,25 @@ namespace _Game.Scripts.Core.Managers
         // --- LOGIC TẠO GÓI SPIN ---
         public (SpinOption option1, SpinOption option2) GetSpinOptions(int currentRound, BigInteger currentCoin)
         {
-            int baseCost = CalculateBaseSpinCost(currentRound);
+            // 1. Calculate Base Cost
+            int rawBaseCost = CalculateBaseSpinCost(currentRound);
             
-            // Ép kiểu BigInt sang int để tính toán spin (vì giá spin không quá lớn đến mức tràn int)
-            // Nếu coin quá lớn thì kẹp lại max int
+            // 2. [NEW] Apply Multiplier (e.g., Mask of Lust doubles this)
+            // We verify it's at least 1 to avoid divide-by-zero later
+            int finalBaseCost = Mathf.RoundToInt(rawBaseCost * _costMultiplier);
+            if (finalBaseCost < 1) finalBaseCost = 1;
+
             int coin = (currentCoin > int.MaxValue) ? int.MaxValue : (int)currentCoin;
 
-            // Option 1: Nút bên trái (Thường là Standard hoặc Underspin)
             SpinOption opt1 = new SpinOption();
-            
-            // Option 2: Nút bên phải (Thường là Fewer Spins hoặc Disable)
             SpinOption opt2 = new SpinOption();
 
-            int standardCost = baseCost * 7;
-            int fewerCost = baseCost * 4;
+            int standardCost = finalBaseCost * 7;
+            int fewerCost = finalBaseCost * 4;
 
-            // CASE 1: ĐỦ TIỀN MUA GÓI CHUẨN (Standard)
+            // CASE 1: ĐỦ TIỀN MUA GÓI CHUẨN
             if (coin >= standardCost)
             {
-                // Setup Option 1: Standard (7 Spins, +1 Ticket)
                 opt1.type = SpinOptionType.Standard;
                 opt1.title = "Standard Spins";
                 opt1.spinCount = 7;
@@ -60,47 +72,43 @@ namespace _Game.Scripts.Core.Managers
                 opt1.isAvailable = true;
                 opt1.description = $"Cost: {standardCost} Coin\nGet 7 Spins.\nReward: +1 Ticket.";
 
-                // Setup Option 2: Fewer Spins (4 Spins, +2 Ticket)
                 opt2.type = SpinOptionType.FewerSpins;
                 opt2.title = "Fewer Spins";
                 opt2.spinCount = 4;
-                opt2.coinCost = fewerCost; // Vẫn tốn tiền dựa trên số spin
-                opt2.ticketReward = 2; // Thưởng nhiều vé hơn
+                opt2.coinCost = fewerCost;
+                opt2.ticketReward = 2;
                 opt2.isAffordable = true;
                 opt2.isAvailable = true;
                 opt2.description = $"Cost: {fewerCost} Coin\nGet 4 Spins.\nReward: +2 Tickets!";
             }
-            // CASE 2: KHÔNG ĐỦ 7 SPIN NHƯNG CÒN TIỀN (Underspin)
+            // CASE 2: KHÔNG ĐỦ 7 SPIN NHƯNG CÒN TIỀN
             else if (coin > 0)
             {
-                // Tính số spin mua được (làm tròn xuống)
-                int affordableSpins = coin / baseCost;
+                // Note: finalBaseCost is higher now, so you get FEWER spins for the same money!
+                int affordableSpins = coin / finalBaseCost;
 
-                // Nếu tiền lẻ quá không mua nổi 1 spin -> Chuyển sang Case Phá sản (Free)
                 if (affordableSpins == 0)
                 {
                     GenerateBankruptcyOptions(ref opt1, ref opt2);
                 }
                 else
                 {
-                    // Setup Option 1: Underspin
                     opt1.type = SpinOptionType.Underspin;
                     opt1.title = "Underspin";
                     opt1.spinCount = affordableSpins;
-                    opt1.coinCost = affordableSpins * baseCost; // Trừ hết tiền chẵn
-                    opt1.ticketReward = 1; // Vẫn cho 1 vé (theo logic game gốc)
+                    opt1.coinCost = affordableSpins * finalBaseCost;
+                    opt1.ticketReward = 1;
                     opt1.isAffordable = true;
                     opt1.isAvailable = true;
                     opt1.description = $"Not enough for 7!\nSpend all to get {affordableSpins} Spins.\nReward: +1 Ticket.";
 
-                    // Setup Option 2: Disable
                     opt2.type = SpinOptionType.FewerSpins;
                     opt2.title = "Unavailable";
-                    opt2.isAvailable = false; // Khóa nút 2
-                    opt2.description = "Not enough coins to choose this option.";
+                    opt2.isAvailable = false;
+                    opt2.description = "Not enough coins.";
                 }
             }
-            // CASE 3: HẾT SẠCH TIỀN (Bankruptcy)
+            // CASE 3: HẾT SẠCH TIỀN
             else
             {
                 GenerateBankruptcyOptions(ref opt1, ref opt2);
@@ -111,7 +119,6 @@ namespace _Game.Scripts.Core.Managers
 
         private void GenerateBankruptcyOptions(ref SpinOption opt1, ref SpinOption opt2)
         {
-            // Setup Option 1: Free Spin
             opt1.type = SpinOptionType.Free;
             opt1.title = "Bankruptcy";
             opt1.spinCount = 1;
@@ -121,7 +128,6 @@ namespace _Game.Scripts.Core.Managers
             opt1.isAvailable = true;
             opt1.description = "You are broke!\nGet 1 Free Spin from the landlord.";
 
-            // Setup Option 2: Disable
             opt2.type = SpinOptionType.FewerSpins;
             opt2.title = "Unavailable";
             opt2.isAvailable = false;
