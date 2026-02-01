@@ -27,6 +27,7 @@ namespace _Game.Scripts.Core.Managers
 
         // Danh sách hiển thị trên UI
         private List<CharmData> _currentShopItems = new List<CharmData>();
+        private Dictionary<CharmTier, float> _tierWeightMultipliers = new Dictionary<CharmTier, float>();
         
         // Kho hàng khả dụng (những món người chơi CHƯA có)
         private Dictionary<CharmTier, List<CharmData>> _availablePool = new Dictionary<CharmTier, List<CharmData>>();
@@ -165,9 +166,9 @@ namespace _Game.Scripts.Core.Managers
             {
                 // 1. Pick Tier
                 TierWeight selectedTierInfo = WeightedRandomSelector.Select(
-                    currentProbabilityProfile.tierWeights, 
-                    t => t.weight
-                );
+                        currentProbabilityProfile.tierWeights, 
+                        t => Mathf.RoundToInt(GetEffectiveWeight(t)) 
+                    );
                 CharmTier targetTier = selectedTierInfo.tier;
                 
                 if (_availablePool.TryGetValue(targetTier, out var pool) && pool.Count > 0)
@@ -264,6 +265,29 @@ namespace _Game.Scripts.Core.Managers
             // 2. Otherwise, calculate normal price
             CharmData item = _currentShopItems[slotIndex];
             return GetFinalPrice(item);
+        }
+        
+        public void ModifyTierWeight(CharmTier tier, float multiplier)
+        {
+            if (!_tierWeightMultipliers.ContainsKey(tier))
+            {
+                _tierWeightMultipliers[tier] = 1.0f;
+            }
+    
+            // Add the multiplier (e.g., +0.3)
+            _tierWeightMultipliers[tier] += multiplier;
+    
+            Debug.Log($"[ShopManager] {tier} weight adjusted. Now: {_tierWeightMultipliers[tier]}x");
+        }
+        
+        private float GetEffectiveWeight(TierWeight tw)
+        {
+            float mult = 1.0f;
+            if (_tierWeightMultipliers.TryGetValue(tw.tier, out float m))
+            {
+                mult = m;
+            }
+            return tw.weight * mult;
         }
         
         public int GetRerollCost() => rerollCost;
