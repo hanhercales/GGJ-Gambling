@@ -4,7 +4,7 @@ using _Game.Scripts.Core.Inventory;
 using _Game.Scripts.Core.Managers;
 
 [CreateAssetMenu(menuName = "Charms/Masks/Mask of Greed")]
-public class GreedMask : CharmData
+public class GreedMask : MaskData // [THAY ĐỔI] Kế thừa MaskData
 {
     [Header("Settings")]
     public float moneyMultiplier = 2f; // Double Money

@@ -5,7 +5,7 @@ using _Game.Scripts.Core.Inventory;
 using _Game.Scripts.Core.Managers;
 
 [CreateAssetMenu(menuName = "Charms/Masks/Mask of Gluttony")]
-public class GluttonyMask : CharmData
+public class GluttonyMask : MaskData // [THAY ĐỔI] Kế thừa MaskData
 {
     [Header("Settings")]
     public int freeSlotsCount = 2; // "2 Free Items"
@@ -27,6 +27,8 @@ public class GluttonyMask : CharmData
         }
     }
     
+    // Lưu ý: Mask không mua được trong Shop nên hàm này sẽ chỉ kích hoạt 
+    // nếu logic game của bạn cho phép Mask tác động lên Shop khi Reroll
     public override void OnShopRolled(ShopManager shop)
     {
         if (shop == null) return;
@@ -46,7 +48,7 @@ public class GluttonyMask : CharmData
             int randomIndex = Random.Range(0, availableIndices.Count);
             int slotToDiscount = availableIndices[randomIndex];
             
-            shop.SetSlotFree(slotToDiscount);
+            shop.SetSlotFree(slotToDiscount); // Hàm này bạn cần đảm bảo có trong ShopManager
             
             availableIndices.RemoveAt(randomIndex);
             picks++;

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26048236eb48f2746b431ca929a42978, type: 3}
+  m_Name: Pride Mask
+  m_EditorClassIdentifier: Assembly-CSharp::MaskOfPrideCharm
+  idName: 
+  icon: {fileID: 21300000, guid: 227c53706359ef04db56f40f5fd2c048, type: 3}
+  baseSpawnWeight: 0
+  tier: 3
+  charmName: Pride Mask
+  price: 0
+  isEquipped: 0
+  oneTimePurchase: 0
+  description: Whenever you get a jackpot with Crown, double the value of all patterns
+    permanently but only Diamond, Star and Crown can score.
+  requiredCharmToUnlock: []
+  requiredIngredients:
+  - {fileID: 11400000, guid: 170dfc1645646084f9b654340936791c, type: 2}
+  - {fileID: 11400000, guid: 38b67bf8e12c437489efae8d4410c2b8, type: 2}
+  - {fileID: 11400000, guid: 6732d65f2518bf64a8f25607538817f5, type: 2}
+  crownSymbol: {fileID: 11400000, guid: 88c0899ff2813184a97a75f51ea04950, type: 2}
+  jackpotKeyword: JACKPOT
+  peasantSymbols:
+  - {fileID: 11400000, guid: 345c52dbb02010b48a7ea8e2a58780fa, type: 2}
+  - {fileID: 11400000, guid: a1186c9672f10e4479d888e58ce6d2bf, type: 2}
+  - {fileID: 11400000, guid: cee35f6c399c3f74eafab04910b921d6, type: 2}
+  - {fileID: 11400000, guid: e9020101daf34ef49a73cf74151aaa7f, type: 2}

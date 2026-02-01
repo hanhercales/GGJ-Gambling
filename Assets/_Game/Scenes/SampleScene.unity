@@ -3427,14 +3427,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
   m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Left: 8
+    m_Right: 8
+    m_Top: 8
+    m_Bottom: 8
   m_ChildAlignment: 0
   m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
@@ -3736,16 +3736,7 @@ MonoBehaviour:
   leverPullClip: {fileID: 8300000, guid: 9f39bae94b28d494e8bc987b46a49a76, type: 3}
   spinningLoopClip: {fileID: 8300000, guid: 7d4bda1df271cab4faebd4fa89209f1d, type: 3}
   patternMatchClip: {fileID: 8300000, guid: 3e963424541026b439641cca78c97387, type: 3}
-  winClip:
-  - {fileID: 8300000, guid: 4958a319ec4b9544391ba8024a5d4236, type: 3}
-  - {fileID: 8300000, guid: a053d36b6dffec14fb8579a129e0db7d, type: 3}
-  - {fileID: 8300000, guid: 71c1e635bac22cd41b03c5e76fe33d9c, type: 3}
-  - {fileID: 8300000, guid: 552cdc56f252f3b4a8a3e8e71b05e0d1, type: 3}
-  - {fileID: 8300000, guid: ebb11e7724633534aa70bdf915e4ecc1, type: 3}
-  - {fileID: 8300000, guid: c7cfca2a131f2d946927f2f8b0213e06, type: 3}
-  - {fileID: 8300000, guid: 7d99a1497a188ce448ba7ac032dea7cd, type: 3}
-  - {fileID: 8300000, guid: 5290599702fb8c948be99e0603d4eae8, type: 3}
-  - {fileID: 8300000, guid: 9334c32953e0f604f9065f6d11856b22, type: 3}
+  winClip: []
   maskUnlockClip: {fileID: 8300000, guid: bccad758b9c7208438658884281f30fb, type: 3}
 --- !u!224 &649105521 stripped
 RectTransform:
@@ -9592,7 +9583,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.MaskManager
   playerInventory: {fileID: 1661107992}
-  allGameMasks: []
+  allGameMasks:
+  - {fileID: 11400000, guid: 894cc3971c69e24408abd7eb43324507, type: 2}
+  - {fileID: 11400000, guid: 018b0cba89851744a848354cb13f6c74, type: 2}
+  - {fileID: 11400000, guid: a3eee53b3aadabf4786370fa0ea49181, type: 2}
+  - {fileID: 11400000, guid: cfbc7eed9c997db4b891b70798d2481b, type: 2}
+  - {fileID: 11400000, guid: 71819ea3da0635442822313cdc3f6d78, type: 2}
+  - {fileID: 11400000, guid: 9df3d061d4bc48041b20866b5b55a8ce, type: 2}
+  - {fileID: 11400000, guid: 360e920e6bc291b4fb47c9f8e31f10c6, type: 2}
 --- !u!1001 &1652684980
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12164,7 +12162,7 @@ MonoBehaviour:
   headerText: {fileID: 1210227197}
   contentText: {fileID: 444160829}
   layoutElement: {fileID: 606542410}
-  characterWrapLimit: 64
+  maxTooltipWidth: 400
   offset: {x: 15, y: -15}
 --- !u!1 &2142177862
 GameObject:

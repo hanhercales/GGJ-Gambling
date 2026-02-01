@@ -5,7 +5,7 @@ using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Logic;
 
 [CreateAssetMenu(menuName = "Charms/Masks/Mask of Pride")]
-public class MaskOfPrideCharm : CharmData
+public class MaskOfPrideCharm : MaskData // [THAY ĐỔI] Kế thừa MaskData
 {
     [Header("Buff Settings")]
     public SymbolData crownSymbol;
@@ -34,10 +34,10 @@ public class MaskOfPrideCharm : CharmData
             Debug.Log("[Mask of Pride] KNEEL! Crown Jackpot hit. Doubling ALL patterns permanently.");
             if (machine != null && machine.allPatterns != null)
             {
-                 foreach(var pat in machine.allPatterns) 
-                 {
-                     pat.AddPermanentValue(pat.baseMultiplier); 
-                 }
+                foreach(var pat in machine.allPatterns) 
+                {
+                    pat.AddPermanentValue(pat.baseMultiplier); 
+                }
             }
         }
     }
