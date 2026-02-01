@@ -10,17 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a58c9f817fbbf5f44ba633b0b50b4769, type: 3}
-  m_Name: R Symbol Charm 2
+  m_Name: RareClover
   m_EditorClassIdentifier: Assembly-CSharp::RSymbolCharm
   idName: 
   icon: {fileID: 0}
   baseSpawnWeight: 0
-  tier: 0
+  tier: 2
   charmName: 
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: All scoring Clover become silver, which increases the scored pattern
+    by its base value, permanently.
   requiredCharmToUnlock: []
-  targetSymbol: {fileID: 0}
+  targetSymbol: {fileID: 11400000, guid: 345c52dbb02010b48a7ea8e2a58780fa, type: 2}
   growthFactor: 1

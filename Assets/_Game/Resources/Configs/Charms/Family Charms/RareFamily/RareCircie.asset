@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a58c9f817fbbf5f44ba633b0b50b4769, type: 3}
-  m_Name: R Symbol Charm
+  m_Name: RareCircie
   m_EditorClassIdentifier: Assembly-CSharp::RSymbolCharm
   idName: 
   icon: {fileID: 0}
@@ -20,7 +20,8 @@ MonoBehaviour:
   price: 0
   isEquipped: 0
   oneTimePurchase: 0
-  description: 
+  description: All scoring [Symbols] become silver, which increases the scored pattern
+    by its base value, permanently.
   requiredCharmToUnlock: []
-  targetSymbol: {fileID: 0}
+  targetSymbol: {fileID: 11400000, guid: e9020101daf34ef49a73cf74151aaa7f, type: 2}
   growthFactor: 1
