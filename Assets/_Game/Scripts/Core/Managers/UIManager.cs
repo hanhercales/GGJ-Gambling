@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using _Game.Scripts.View.UI; // Để dùng MenuMode
+using UnityEngine;
 
 namespace _Game.Scripts.Core.Managers
 {
@@ -10,20 +11,29 @@ namespace _Game.Scripts.Core.Managers
         [SerializeField] private GameObject panelDialogContainer; // Panel nền đen
         [SerializeField] private GameObject panelShop;            // Panel Shop
         [SerializeField] private GameObject panelBook;            // Panel BookMask
-        [SerializeField] private GameObject panelInfo;
+        [SerializeField] private GameObject panelInfo;            // Panel Info
+        [SerializeField] private GameObject panelGameMenu;        // Panel chứa GameMenuUI
+        private GameMenuUI _gameMenuScript;
+        
+        // Getter kiểm tra menu có mở không để GameManager chặn Esc
+        public bool IsGameMenuOpen => panelGameMenu != null && panelGameMenu.activeSelf;
         
         private void Awake()
         {
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
+
+            // Lấy script UI từ panel
+            if (panelGameMenu != null)
+                _gameMenuScript = panelGameMenu.GetComponent<GameMenuUI>();
         }
 
         private void Start()
         {
             CloseAllDialogs();
+            // Không mở gì ở đây cả, để GameManager quyết định
         }
 
-        // --- SHOP LOGIC ---
         public void OpenShop()
         {
             panelDialogContainer.SetActive(true);
@@ -31,6 +41,7 @@ namespace _Game.Scripts.Core.Managers
             if (panelShop != null) panelShop.SetActive(true);
             if (panelInfo != null) panelInfo.SetActive(false);
             if (panelBook != null) panelBook.SetActive(false);
+            if (panelGameMenu != null) panelGameMenu.SetActive(false);
         }
 
         public void CloseShop()
@@ -39,7 +50,6 @@ namespace _Game.Scripts.Core.Managers
             CheckCloseContainer();
         }
 
-        // --- BOOK LOGIC ---
         public void OpenBook()
         {
             panelDialogContainer.SetActive(true);
@@ -47,6 +57,7 @@ namespace _Game.Scripts.Core.Managers
             if (panelBook != null) panelBook.SetActive(true);
             if (panelInfo != null) panelInfo.SetActive(false);
             if (panelShop != null) panelShop.SetActive(false);
+            if (panelGameMenu != null) panelGameMenu.SetActive(false);
         }
 
         public void CloseBook()
@@ -54,7 +65,7 @@ namespace _Game.Scripts.Core.Managers
             if (panelBook != null) panelBook.SetActive(false);
             CheckCloseContainer();
         }
-        
+
         public void OpenInfo()
         {
             panelDialogContainer.SetActive(true);
@@ -62,6 +73,7 @@ namespace _Game.Scripts.Core.Managers
             
             if (panelShop != null) panelShop.SetActive(false);
             if (panelBook != null) panelBook.SetActive(false);
+            if (panelGameMenu != null) panelGameMenu.SetActive(false);
         }
 
         public void CloseInfo()
@@ -70,23 +82,47 @@ namespace _Game.Scripts.Core.Managers
             CheckCloseContainer();
         }
         
-        // --- SHARED ---
+        public void OpenGameMenu(MenuMode mode)
+        {
+            panelDialogContainer.SetActive(true);
+            
+            if (panelGameMenu != null)
+            {
+                panelGameMenu.SetActive(true);
+                // Setup text và nút bấm tùy theo chế độ (MainMenu/Pause/GameOver)
+                if (_gameMenuScript != null) _gameMenuScript.Setup(mode);
+            }
+
+            // Tắt các UI khác để tập trung vào Menu
+            if (panelShop != null) panelShop.SetActive(false);
+            if (panelBook != null) panelBook.SetActive(false);
+            if (panelInfo != null) panelInfo.SetActive(false);
+        }
+
+        public void CloseGameMenu()
+        {
+            if (panelGameMenu != null) panelGameMenu.SetActive(false);
+            CheckCloseContainer();
+        }
+
         public void CloseAllDialogs()
         {
             if (panelShop != null) panelShop.SetActive(false);
             if (panelBook != null) panelBook.SetActive(false);
             if (panelInfo != null) panelInfo.SetActive(false);
+            if (panelGameMenu != null) panelGameMenu.SetActive(false);
+            
             if (panelDialogContainer != null) panelDialogContainer.SetActive(false);
         }
         
-        // Chỉ tắt nền đen nếu CẢ Shop và Book đều đã đóng
         private void CheckCloseContainer()
         {
             bool isShopActive = panelShop != null && panelShop.activeSelf;
             bool isBookActive = panelBook != null && panelBook.activeSelf;
             bool isInfoActive = panelInfo != null && panelInfo.activeSelf;
+            bool isMenuActive = panelGameMenu != null && panelGameMenu.activeSelf;
             
-            if (!isShopActive && !isBookActive)
+            if (!isShopActive && !isBookActive && !isInfoActive && !isMenuActive)
             {
                 if (panelDialogContainer != null) 
                     panelDialogContainer.SetActive(false);

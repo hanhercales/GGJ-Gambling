@@ -6,6 +6,7 @@ using _Game.Scripts.Core.Data;
 using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Inventory;
 using _Game.Scripts.Core.Logic;
+using _Game.Scripts.View.UI;
 
 namespace _Game.Scripts.Core.Managers
 {
@@ -35,9 +36,10 @@ namespace _Game.Scripts.Core.Managers
         // Option hiện tại (để tính thưởng vé khi quay xong)
         [SerializeField] private SpinOption currentSpinOption; 
         
+        private bool _isGameRunning = false;
+        
         public int SpinsRemaining => spinsRemaining;
         
-        // --- [MỚI] Public Getter để UI có thể truy cập ---
         public GameState CurrentState => currentState;
 
         // Events
@@ -72,7 +74,30 @@ namespace _Game.Scripts.Core.Managers
                 ResourceManager.Instance.OnResourceChanged += OnResourceChanged;
             }
 
-            StartNewGame();
+            OpenMainMenu();
+        }
+        
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                // Nếu chưa Start Game (đang ở MainMenu) hoặc đã Game Over -> Esc vô hiệu
+                if (!_isGameRunning || currentState == GameState.GameOver) return;
+
+                if (UIManager.Instance != null)
+                {
+                    // Nếu Menu đang mở -> Đóng (Resume)
+                    if (UIManager.Instance.IsGameMenuOpen)
+                    {
+                        UIManager.Instance.CloseGameMenu();
+                    }
+                    // Nếu Menu đang đóng -> Mở (Pause)
+                    else
+                    {
+                        UIManager.Instance.OpenGameMenu(MenuMode.Pause);
+                    }
+                }
+            }
         }
 
         private void OnDestroy()
@@ -88,10 +113,20 @@ namespace _Game.Scripts.Core.Managers
                 ResourceManager.Instance.OnResourceChanged -= OnResourceChanged;
             }
         }
+        
+        private void OpenMainMenu()
+        {
+            _isGameRunning = false;
+            if (UIManager.Instance != null)
+                UIManager.Instance.OpenGameMenu(MenuMode.MainMenu);
+        }
 
-        private void StartNewGame()
+        public void StartNewGame()
         {
             Debug.Log("--- Initializing New Game Data ---");
+            
+            _isGameRunning = true;
+            
             currentDebtRound = 1;
             currentStage = 1;
             globalSpinModifier = 0;
@@ -357,6 +392,12 @@ namespace _Game.Scripts.Core.Managers
         {
             Debug.Log("[Event Received] DebtManager says: GAME OVER (Bankrupt).");
             ChangeState(GameState.GameOver);
+            
+            _isGameRunning = false;
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.OpenGameMenu(MenuMode.GameOver);
+            }
         }
 
         // --- HELPER METHODS ---
