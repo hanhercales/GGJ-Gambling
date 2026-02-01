@@ -5,12 +5,12 @@ using _Game.Scripts.Core.Managers;
 
 namespace _Game.Scripts.View.UI
 {
-    // Enum để xác định trạng thái hiển thị của Menu
     public enum MenuMode
     {
-        MainMenu,   // Mới mở game (Chỉ có New Game, Quit)
-        Pause,      // Đang chơi bấm Esc (Có thêm Resume)
-        GameOver    // Thua cuộc (Chỉ có New Game, Quit)
+        MainMenu,   
+        Pause,      
+        GameOver,
+        WinGame     
     }
 
     public class GameMenuUI : MonoBehaviour
@@ -18,8 +18,11 @@ namespace _Game.Scripts.View.UI
         [Header("Components")]
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private Button btnNewGame;
-        [SerializeField] private Button btnResume; // Nút tắt bảng (dấu X hoặc chữ Resume)
-        [SerializeField] private Button btnQuit;   // (Optional)
+        [SerializeField] private Button btnResume;
+        [SerializeField] private TextMeshProUGUI resumeButtonText; 
+        [SerializeField] private Button btnQuit;   
+
+        private MenuMode _currentMode; 
 
         private void Awake()
         {
@@ -30,47 +33,59 @@ namespace _Game.Scripts.View.UI
 
         public void Setup(MenuMode mode)
         {
+            _currentMode = mode; 
+            
+            if (resumeButtonText != null) resumeButtonText.text = "RESUME";
+
             switch (mode)
             {
                 case MenuMode.MainMenu:
                     if (titleText != null) titleText.text = "WELCOME";
-                    if (btnResume != null) btnResume.gameObject.SetActive(false); // Bắt buộc chọn New Game
+                    if (btnResume != null) btnResume.gameObject.SetActive(false);
                     break;
 
                 case MenuMode.Pause:
                     if (titleText != null) titleText.text = "PAUSED";
-                    if (btnResume != null) btnResume.gameObject.SetActive(true); // Cho phép tắt để chơi tiếp
+                    if (btnResume != null) btnResume.gameObject.SetActive(true);
                     break;
 
                 case MenuMode.GameOver:
                     if (titleText != null) titleText.text = "GAME OVER";
-                    if (btnResume != null) btnResume.gameObject.SetActive(false); // Thua rồi, không thể Resume
+                    if (btnResume != null) btnResume.gameObject.SetActive(false);
+                    break;
+                
+                case MenuMode.WinGame:
+                    if (titleText != null) titleText.text = "YOU WIN!"; 
+                    if (btnResume != null) 
+                    {
+                        btnResume.gameObject.SetActive(true);
+                        // Đổi chữ thành Continue Endless
+                        if (resumeButtonText != null) resumeButtonText.text = "CONTINUE"; 
+                    }
                     break;
             }
         }
 
         private void OnNewGameClick()
         {
-            // Báo GameManager bắt đầu game mới
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.StartNewGame();
             }
-            
-            // Đóng menu sau khi bấm
-            if (UIManager.Instance != null)
-            {
-                UIManager.Instance.CloseGameMenu();
-            }
+            CloseMenu();
         }
 
         private void OnResumeClick()
         {
-            // Chỉ đóng menu, game sẽ tiếp tục
-            if (UIManager.Instance != null)
+            if (_currentMode == MenuMode.WinGame)
             {
-                UIManager.Instance.CloseGameMenu();
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.ContinueEndlessMode();
+                }
             }
+            
+            CloseMenu();
         }
 
         private void OnQuitClick()
@@ -79,6 +94,14 @@ namespace _Game.Scripts.View.UI
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #endif
+        }
+
+        private void CloseMenu()
+        {
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.CloseGameMenu();
+            }
         }
     }
 }

@@ -11,15 +11,20 @@ public class ReceiptPrinter : ChanceCharm
     [Header("Reward Settings")]
     public int ticketAmount = 1;
     
-    public override void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
+    public override bool OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
     {
+        bool triggered = false; // Cờ đánh dấu
+
         foreach (var match in results)
         {
             if (TryTrigger()) 
             {
                 ResourceManager.Instance.AddResource(ResourceType.Ticket, ticketAmount);
                 Debug.Log($"[TicketBonus] Match on {match.symbol.idName} triggered a Ticket!");
+                triggered = true; // Đã có hiệu ứng xảy ra
             }
         }
+
+        return triggered;
     }
 }

@@ -12,8 +12,10 @@ public class RSymbolCharm : CharmData
     [Tooltip("Growth Factor. 1.0 means add 100% of BASE value.")]
     public float growthFactor = 1.0f; 
 
-    public override void OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
+    public override bool OnSpinResultBuff(SlotMachineController machine, List<MatchResult> results)
     {
+        bool triggered = false;
+
         foreach (var match in results)
         {
             if (match.symbol == targetSymbol)
@@ -21,7 +23,9 @@ public class RSymbolCharm : CharmData
                 float growthAmount = match.pattern.baseMultiplier * growthFactor;
                 match.pattern.AddPermanentValue(growthAmount);
                 Debug.Log($"[Scaler] {match.symbol.idName} buffed {match.pattern.patternName}! (+{growthAmount})");
+                triggered = true;
             }
         }
+        return triggered;
     }
 }
