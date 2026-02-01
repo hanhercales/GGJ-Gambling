@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f32ff4fa50da41cd9a9c9722018bdd84, type: 3}
-  m_Name: Level1
+  m_Name: Level1 9
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.ShopProbabilitySO
   tierWeights:
   - tier: 0
-    weight: 100
+    weight: 1
   - tier: 1
     weight: 0
   - tier: 2

@@ -2137,8 +2137,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d496d4bd40cec5a4b9b72dd0f4af31c1, type: 2}
   - {fileID: 11400000, guid: 339e5009967628c458470711906ec7dc, type: 2}
   - {fileID: 11400000, guid: 2168f90c3b352314bba3bb8b1e6bb328, type: 2}
+  - {fileID: 11400000, guid: f36fc38515b53bb4c8e868f5759bf90c, type: 2}
+  - {fileID: 11400000, guid: 520ab9b06e1338b40a87ab8e95f1f744, type: 2}
+  - {fileID: 11400000, guid: cb96f17d4ec0a6f44b58090ff030dbef, type: 2}
+  - {fileID: 11400000, guid: 6732d65f2518bf64a8f25607538817f5, type: 2}
+  - {fileID: 11400000, guid: 05d3014f4a4319748a938f566d3653e4, type: 2}
+  - {fileID: 11400000, guid: 500bd94388f990a4a8eec84c099d87b6, type: 2}
+  - {fileID: 11400000, guid: acaf847b661d34d4e85aeb5abe41fb36, type: 2}
   shopSlots: 6
-  rerollCost: 0
+  rerollCost: 2
   _globalDiscount: 0
   currentProbabilityProfile: {fileID: 11400000, guid: ebc113ab7fb2b65479f873f92f3c7b04, type: 2}
 --- !u!4 &459823656
@@ -12057,7 +12064,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.GameManager
   slotMachine: {fileID: 1916981135}
   luckManager: {fileID: 2090457733}
-  startingCoin: 80
+  startingCoin: 14
   stagesPerDebtRound: 4
   shopProfiles:
   - {fileID: 11400000, guid: ebc113ab7fb2b65479f873f92f3c7b04, type: 2}

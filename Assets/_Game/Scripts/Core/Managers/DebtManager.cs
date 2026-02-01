@@ -136,6 +136,10 @@ namespace _Game.Scripts.Core.Managers
                 // Báo cho GameManager biết
                 OnDebtPaidSuccess?.Invoke();
             }
+            else
+            {
+                return;
+            }
         }
 
         private void OnResourceChanged(ResourceType type, string value)
@@ -153,8 +157,8 @@ namespace _Game.Scripts.Core.Managers
             BigInteger coin = ResourceManager.Instance.GetResourceBigInt(ResourceType.Coin);
             BigInteger debt = ResourceManager.Instance.GetResourceBigInt(ResourceType.Debt);
 
-            // Nút chỉ bấm được khi: Có Nợ (>0) VÀ Đủ Tiền (Coin >= Debt)
-            bool canPay = (debt > 0) && (coin >= debt);
+            // Nút chỉ bấm được khi: Có Nợ (>0)
+            bool canPay = (debt > 0);
 
             payDebtButton.interactable = canPay;
 
