@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f32ff4fa50da41cd9a9c9722018bdd84, type: 3}
-  m_Name: Level1 4
+  m_Name: Shop_Endless
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.ShopProbabilitySO
   tierWeights:
   - tier: 0
-    weight: 1
+    weight: 5
   - tier: 1
-    weight: 0
+    weight: 15
   - tier: 2
-    weight: 0
+    weight: 40
   - tier: 3
-    weight: 0
+    weight: 40

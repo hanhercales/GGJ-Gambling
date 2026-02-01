@@ -175,6 +175,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -56
       objectReference: {fileID: 0}
+    - target: {fileID: 5824721468842818350, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: targetImage
+      value: 
+      objectReference: {fileID: 1690634616}
     - target: {fileID: 7061246388571337607, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_Name
       value: Panel_CellShop (2)
@@ -1326,6 +1330,7 @@ MonoBehaviour:
   btnPurchase: {fileID: 757449805}
   btnReroll: {fileID: 185976305}
   btnBack: {fileID: 401398937}
+  rerollPriceText: {fileID: 0}
   purchaseBtnCanvasGroup: {fileID: 0}
 --- !u!224 &366086398 stripped
 RectTransform:
@@ -2027,7 +2032,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -2147,7 +2152,7 @@ MonoBehaviour:
   shopSlots: 6
   rerollCost: 2
   _globalDiscount: 0
-  currentProbabilityProfile: {fileID: 11400000, guid: ebc113ab7fb2b65479f873f92f3c7b04, type: 2}
+  currentProbabilityProfile: {fileID: 11400000, guid: 3111248dfc643fc478190e6ffdd073fa, type: 2}
 --- !u!4 &459823656
 Transform:
   m_ObjectHideFlags: 0
@@ -6088,7 +6093,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -6339,6 +6344,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -56
       objectReference: {fileID: 0}
+    - target: {fileID: 5824721468842818350, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: targetImage
+      value: 
+      objectReference: {fileID: 1358302794}
     - target: {fileID: 7061246388571337607, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_Name
       value: Panel_CellShop (4)
@@ -6520,6 +6529,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -56
       objectReference: {fileID: 0}
+    - target: {fileID: 5824721468842818350, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: targetImage
+      value: 
+      objectReference: {fileID: 1708562625}
     - target: {fileID: 7061246388571337607, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_Name
       value: Panel_CellShop (5)
@@ -6702,6 +6715,7 @@ MonoBehaviour:
   titleText: {fileID: 729743422}
   btnNewGame: {fileID: 443585293}
   btnResume: {fileID: 751415233}
+  resumeButtonText: {fileID: 1963493065}
   btnQuit: {fileID: 1066010109}
 --- !u!114 &1244329662
 MonoBehaviour:
@@ -7292,6 +7306,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1357616287}
   m_CullTransparentMesh: 1
+--- !u!114 &1358302794 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1315702616260244136, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+  m_PrefabInstance: {fileID: 1223458068}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1390232862
 GameObject:
   m_ObjectHideFlags: 0
@@ -8791,7 +8816,7 @@ MonoBehaviour:
   charmHolder: {fileID: 1661107992}
   luckManager: {fileID: 2090457733}
   slotMachine: {fileID: 1916981135}
-  holderDisplay: {fileID: 0}
+  holderDisplay: {fileID: 1661107987}
 --- !u!1 &1510775690
 GameObject:
   m_ObjectHideFlags: 0
@@ -9647,6 +9672,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -56
       objectReference: {fileID: 0}
+    - target: {fileID: 5824721468842818350, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: targetImage
+      value: 
+      objectReference: {fileID: 1652684985}
     - target: {fileID: 7061246388571337607, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_Name
       value: Panel_CellShop (1)
@@ -9772,6 +9801,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91ca546dcc64e2c84b0dafa68e63696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.View.UI.ShopUI.ShopSlotUI
+--- !u!114 &1652684985 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1315702616260244136, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+  m_PrefabInstance: {fileID: 1652684980}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1661107985
 GameObject:
   m_ObjectHideFlags: 0
@@ -10093,6 +10133,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -56
       objectReference: {fileID: 0}
+    - target: {fileID: 5824721468842818350, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: targetImage
+      value: 
+      objectReference: {fileID: 1682360921}
     - target: {fileID: 7061246388571337607, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_Name
       value: Panel_CellShop (3)
@@ -10218,6 +10262,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91ca546dcc64e2c84b0dafa68e63696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.View.UI.ShopUI.ShopSlotUI
+--- !u!114 &1682360921 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1315702616260244136, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+  m_PrefabInstance: {fileID: 1682360916}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!114 &1690634616 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1315702616260244136, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+  m_PrefabInstance: {fileID: 41017569}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1705119803
 GameObject:
   m_ObjectHideFlags: 0
@@ -10316,6 +10382,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1705119803}
   m_CullTransparentMesh: 1
+--- !u!114 &1708562625 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1315702616260244136, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+  m_PrefabInstance: {fileID: 1236155693}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!224 &1727092504 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8220085099281627705, guid: b5eeac17795c7c243a9900a1c2526d93, type: 3}
@@ -11184,7 +11261,6 @@ MonoBehaviour:
   boardView: {fileID: 1916981134}
   spinLever: {fileID: 1397883200}
   scoreText: {fileID: 1565976741}
-  gameplayButtons: {fileID: 0}
 --- !u!4 &1916981136
 Transform:
   m_ObjectHideFlags: 0
@@ -12062,10 +12138,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Managers.GameManager
   slotMachine: {fileID: 1916981135}
   luckManager: {fileID: 2090457733}
+  playerInventory: {fileID: 0}
   startingCoin: 14
+  startingTicket: 3
   stagesPerDebtRound: 4
+  maxRoundsToWin: 12
   shopProfiles:
-  - {fileID: 11400000, guid: ebc113ab7fb2b65479f873f92f3c7b04, type: 2}
+  - {fileID: 11400000, guid: 3111248dfc643fc478190e6ffdd073fa, type: 2}
+  - {fileID: 11400000, guid: 3ed2ac99669217241a986a7b58c4e090, type: 2}
+  - {fileID: 11400000, guid: 4f03c072c0ba7e146833493dc7bc7e18, type: 2}
+  - {fileID: 11400000, guid: aa142dbab64a0fd48a20cbc24f46627c, type: 2}
+  - {fileID: 11400000, guid: d2899dbde9faf004b9317ce063215221, type: 2}
   currentState: 0
   currentDebtRound: 1
   currentStage: 1
@@ -12162,7 +12245,7 @@ MonoBehaviour:
   headerText: {fileID: 1210227197}
   contentText: {fileID: 444160829}
   layoutElement: {fileID: 606542410}
-  maxTooltipWidth: 400
+  maxTooltipWidth: 300
   offset: {x: 15, y: -15}
 --- !u!1 &2142177862
 GameObject:
@@ -12518,6 +12601,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -56
       objectReference: {fileID: 0}
+    - target: {fileID: 5824721468842818350, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+      propertyPath: targetImage
+      value: 
+      objectReference: {fileID: 4381221160907126441}
     - target: {fileID: 7061246388571337607, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
       propertyPath: m_Name
       value: Panel_CellShop
@@ -12634,6 +12721,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91ca546dcc64e2c84b0dafa68e63696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.View.UI.ShopUI.ShopSlotUI
+--- !u!114 &4381221160907126441 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1315702616260244136, guid: 350536c9b13c5bd448f0f8a25c029fa2, type: 3}
+  m_PrefabInstance: {fileID: 4381221160907126437}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

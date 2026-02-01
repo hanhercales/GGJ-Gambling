@@ -17,22 +17,36 @@ namespace _Game.Scripts.Core.Managers
 
         [Header("Config")]
         [SerializeField] private int shopSlots = 6;
-        [SerializeField] private int rerollCost = 5; // COINS
+        [SerializeField] private int rerollCost = 5; // Giá Reroll bằng Coin
         
         [Header("Runtime State")]
-        [SerializeField] private int _globalDiscount = 0; // Reduces TICKET cost
+        [SerializeField] private int _globalDiscount = 0; // Giảm giá (nếu có charm giảm giá)
 
         [Header("Probability Settings")]
         [SerializeField] private ShopProbabilitySO currentProbabilityProfile;
 
         // Danh sách hiển thị trên UI
         private List<CharmData> _currentShopItems = new List<CharmData>();
+        
+        // Biến lưu tỉ lệ cộng thêm (Buff từ Lust Mask...)
         private Dictionary<CharmTier, float> _tierWeightMultipliers = new Dictionary<CharmTier, float>();
         
         // Kho hàng khả dụng (những món người chơi CHƯA có)
         private Dictionary<CharmTier, List<CharmData>> _availablePool = new Dictionary<CharmTier, List<CharmData>>();
-
+        
+        // Danh sách các slot được miễn phí (Buff từ Gluttony Mask...)
         private HashSet<int> _freeSlots = new HashSet<int>();
+
+        // [MỚI] Thứ tự ưu tiên để fallback (Từ cao xuống thấp)
+        // Nếu quay trúng Legendary mà hết hàng -> Nó sẽ tìm Rare -> Uncommon -> Common
+        private readonly List<CharmTier> _tierFallbackOrder = new List<CharmTier>() 
+        { 
+            CharmTier.Legendary, 
+            CharmTier.Rare, 
+            CharmTier.Uncommon, 
+            CharmTier.Common 
+        };
+
         public event System.Action<List<CharmData>> OnShopRefreshed;
 
         private void Awake()
@@ -45,16 +59,16 @@ namespace _Game.Scripts.Core.Managers
 
         private void Start()
         {
-            // Đăng ký sự kiện từ CharmHolder
             if (playerInventory != null)
             {
                 playerInventory.OnCharmAdded += OnPlayerObtainedCharm;
                 playerInventory.OnCharmRemoved += OnPlayerLostCharm;
                 
-                // Đồng bộ ngay lập tức (phòng trường hợp Load Game đã có đồ)
+                // Đồng bộ ngay lập tức phòng trường hợp Load Game
                 SyncPoolWithInventory();
             }
 
+            // Reroll lần đầu khi game chạy (Free)
             RerollShop(true);
         }
 
@@ -77,7 +91,6 @@ namespace _Game.Scripts.Core.Managers
                 _availablePool[tier] = new List<CharmData>();
             }
 
-            // Nạp tất cả vào kho
             foreach (var charm in allCharmsPool)
             {
                 if (_availablePool.ContainsKey(charm.tier))
@@ -89,7 +102,6 @@ namespace _Game.Scripts.Core.Managers
 
         private void SyncPoolWithInventory()
         {
-            // Loại bỏ những món đang nằm trong túi người chơi
             foreach (var charm in playerInventory.GetContent())
             {
                 RemoveFromPool(charm);
@@ -97,14 +109,11 @@ namespace _Game.Scripts.Core.Managers
         }
 
         private void OnPlayerObtainedCharm(CharmData charm) => RemoveFromPool(charm);
+        
         private void OnPlayerLostCharm(CharmData charm)
         {
-            // NEW: Check the flag before adding back
-            if (charm.oneTimePurchase)
-            {
-                Debug.Log($"[Shop] {charm.charmName} is a One-Time item. Removed from pool forever.");
-                return; // Stop here! Don't add to pool.
-            }
+            // Nếu là vật phẩm mua 1 lần duy nhất thì không trả lại pool
+            if (charm.oneTimePurchase) return;
 
             AddToPool(charm);
         }
@@ -125,12 +134,13 @@ namespace _Game.Scripts.Core.Managers
             }
         }
 
-        // --- LOGIC REROLL (KHÔNG TRÙNG LẶP) ---
+        // --- LOGIC REROLL THÔNG MINH (SMART REROLL) ---
 
         public void RerollShop(bool isFree = false)
         {
             if (!isFree)
             {
+                // Kiểm tra tiền trước khi Reroll
                 if (!ResourceManager.Instance.TrySpendResource(ResourceType.Coin, rerollCost))
                 {
                     Debug.Log("Không đủ Coin để Reroll!");
@@ -139,53 +149,90 @@ namespace _Game.Scripts.Core.Managers
             }
 
             _currentShopItems.Clear();
-            _freeSlots.Clear();
+            _freeSlots.Clear(); // Reset trạng thái miễn phí
             
-            // Danh sách tạm để kiểm tra trùng lặp TRONG MẺ QUAY NÀY
+            // Danh sách tạm để đảm bảo không trùng lặp trong cùng 1 lần reroll
             List<CharmData> sessionPicks = new List<CharmData>();
 
             for (int i = 0; i < shopSlots; i++)
             {
-                CharmData picked = RollUniqueCharm(sessionPicks);
-                if (picked != null) sessionPicks.Add(picked);
+                // [THAY ĐỔI] Dùng hàm RollSmartCharm thay vì RollUniqueCharm cũ
+                CharmData picked = RollSmartCharm(sessionPicks);
+                
+                if (picked != null) 
+                {
+                    sessionPicks.Add(picked);
+                }
                 _currentShopItems.Add(picked);
             }
+            
+            // Bắn sự kiện cho các Mask (ví dụ Gluttony muốn free slot)
             if (CharmManager.Instance != null)
                 CharmManager.Instance.NotifyShopRolled(this);
 
             OnShopRefreshed?.Invoke(_currentShopItems);
         }
 
-        // Hàm roll đảm bảo không trùng với những gì đã roll trước đó trong cùng mẻ
-        private CharmData RollUniqueCharm(List<CharmData> excludeList)
+        private CharmData RollSmartCharm(List<CharmData> excludeList)
         {
             if (currentProbabilityProfile == null) return null;
 
-            int maxAttempts = 10; 
-            for (int attempt = 0; attempt < maxAttempts; attempt++)
-            {
-                // 1. Pick Tier
-                TierWeight selectedTierInfo = WeightedRandomSelector.Select(
-                        currentProbabilityProfile.tierWeights, 
-                        t => Mathf.RoundToInt(GetEffectiveWeight(t)) 
-                    );
-                CharmTier targetTier = selectedTierInfo.tier;
-                
-                if (_availablePool.TryGetValue(targetTier, out var pool) && pool.Count > 0)
-                {
-                    var candidates = pool.Where(c => 
-                            !excludeList.Contains(c) &&       // 1. Not picked in this reroll yet
-                            c.IsUnlockable(playerInventory)   // 2. NEW: Requirements met?
-                    ).ToList();
+            // BƯỚC 1: Chọn Tier mục tiêu dựa trên tỉ lệ (Weighted Random)
+            // Ví dụ: 5% ra Legendary, 95% ra Common
+            TierWeight selectedTierInfo = WeightedRandomSelector.Select(
+                    currentProbabilityProfile.tierWeights, 
+                    t => Mathf.RoundToInt(GetEffectiveWeight(t)) 
+                );
+            CharmTier targetTier = selectedTierInfo.tier;
 
-                    if (candidates.Count > 0)
-                    {
-                        return WeightedRandomSelector.Select(candidates, c => c.baseSpawnWeight);
-                    }
+            // BƯỚC 2: Thử lấy đồ từ Tier mục tiêu
+            CharmData result = TryPickFromTier(targetTier, excludeList);
+            if (result != null) return result;
+
+            // BƯỚC 3: Nếu Tier mục tiêu hết hàng -> FALLBACK (Hạ cấp độ tìm kiếm)
+            // Logic: Nếu quay trúng Legendary nhưng hết Legendary -> Tìm Rare -> Uncommon -> Common
+            
+            int startIndex = _tierFallbackOrder.IndexOf(targetTier);
+            
+            // Quét xuống các tier thấp hơn trước
+            for (int i = startIndex + 1; i < _tierFallbackOrder.Count; i++)
+            {
+                result = TryPickFromTier(_tierFallbackOrder[i], excludeList);
+                if (result != null) return result;
+            }
+
+            // Nếu vẫn không có, quét ngược lên các tier cao hơn (trường hợp rất hiếm: chỉ còn đồ xịn)
+            for (int i = startIndex - 1; i >= 0; i--)
+            {
+                result = TryPickFromTier(_tierFallbackOrder[i], excludeList);
+                if (result != null) return result;
+            }
+
+            return null; // Thực sự hết sạch đồ trong game
+        }
+
+        private CharmData TryPickFromTier(CharmTier tier, List<CharmData> excludeList)
+        {
+            if (_availablePool.TryGetValue(tier, out var pool) && pool.Count > 0)
+            {
+                // Lọc danh sách ứng viên:
+                // 1. Chưa được chọn trong lượt reroll này (excludeList)
+                // 2. Thỏa mãn điều kiện mở khóa (IsUnlockable - check charm cha)
+                var candidates = pool.Where(c => 
+                        !excludeList.Contains(c) &&       
+                        c.IsUnlockable(playerInventory)   
+                ).ToList();
+
+                if (candidates.Count > 0)
+                {
+                    // Chọn ngẫu nhiên theo trọng số spawn của từng charm
+                    return WeightedRandomSelector.Select(candidates, c => c.baseSpawnWeight);
                 }
             }
             return null;
         }
+
+        // --- CÁC HÀM TIỆN ÍCH & API ---
 
         public void SetProbabilityProfile(ShopProbabilitySO newProfile)
         {
@@ -195,14 +242,12 @@ namespace _Game.Scripts.Core.Managers
         public int GetFinalPrice(CharmData item)
         {
             if (item == null) return 0;
-            // Price cannot be lower than 0
             return Mathf.Max(0, item.price - _globalDiscount);
         }
         
         public void ModifyDiscount(int amount)
         {
             _globalDiscount += amount;
-            // Force UI refresh so prices update instantly in the shop view
             OnShopRefreshed?.Invoke(_currentShopItems); 
         }
         
@@ -213,33 +258,34 @@ namespace _Game.Scripts.Core.Managers
             CharmData item = _currentShopItems[slotIndex];
             if (item == null) return false;
             
-            // 1. Calculate Ticket Price (with Coupon)
+            // 1. Tính giá Ticket (có áp dụng giảm giá hoặc miễn phí slot)
             int finalPrice = GetSlotPrice(slotIndex);
             
-            // 2. Check TICKETS
+            // 2. Kiểm tra đủ Ticket không
             var currentTicket = ResourceManager.Instance.GetResourceBigInt(ResourceType.Ticket);
+            
             if (currentTicket < finalPrice) 
             {
-                Debug.Log($"[Shop] Not enough TICKETS! (Have: {currentTicket}, Need: {finalPrice})");
+                Debug.Log($"[Shop] Không đủ Ticket! (Có: {currentTicket}, Cần: {finalPrice})");
                 return false;
             }
             
-            // 3. Check Capacity
+            // 3. Kiểm tra túi đầy
             if (playerInventory.GetContent().Count >= playerInventory.GetSize()) 
             {
-                Debug.Log("[Shop] Inventory Full!");
+                Debug.Log("[Shop] Túi đồ đã đầy!");
                 return false;
             }
 
-            // 4. Pay in TICKETS
+            // 4. Trừ Ticket và thêm đồ
             if (ResourceManager.Instance.TrySpendResource(ResourceType.Ticket, finalPrice))
             {
                 playerInventory.AddCharm(item);
 
-                _currentShopItems[slotIndex] = null;
+                _currentShopItems[slotIndex] = null; // Xóa khỏi slot sau khi mua
                 OnShopRefreshed?.Invoke(_currentShopItems);
                 
-                Debug.Log($"[Shop] Bought '{item.charmName}' for {finalPrice} Tickets.");
+                Debug.Log($"[Shop] Mua thành công '{item.charmName}' giá {finalPrice} Ticket.");
                 return true;
             }
 
@@ -251,7 +297,6 @@ namespace _Game.Scripts.Core.Managers
             if (!_freeSlots.Contains(index))
             {
                 _freeSlots.Add(index);
-                // Debug.Log($"[Shop] Slot {index} is now FREE!");
             }
         }
         
@@ -259,10 +304,9 @@ namespace _Game.Scripts.Core.Managers
         {
             if (slotIndex < 0 || slotIndex >= _currentShopItems.Count) return 0;
     
-            // 1. If this slot is marked free, cost is 0
+            // Nếu slot này được đánh dấu miễn phí (Gluttony Mask)
             if (_freeSlots.Contains(slotIndex)) return 0;
 
-            // 2. Otherwise, calculate normal price
             CharmData item = _currentShopItems[slotIndex];
             return GetFinalPrice(item);
         }
@@ -274,7 +318,7 @@ namespace _Game.Scripts.Core.Managers
                 _tierWeightMultipliers[tier] = 1.0f;
             }
     
-            // Add the multiplier (e.g., +0.3)
+            // Cộng dồn multiplier (ví dụ: +0.3)
             _tierWeightMultipliers[tier] += multiplier;
     
             Debug.Log($"[ShopManager] {tier} weight adjusted. Now: {_tierWeightMultipliers[tier]}x");

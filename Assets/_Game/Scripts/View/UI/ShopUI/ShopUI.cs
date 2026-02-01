@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using _Game.Scripts.Core.Data;
 using _Game.Scripts.Core.Managers;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,8 @@ namespace _Game.Scripts.View.UI.ShopUI
         [SerializeField] private Button btnPurchase; 
         [SerializeField] private Button btnReroll;
         [SerializeField] private Button btnBack;
+        
+        [SerializeField] private TextMeshProUGUI rerollPriceText;
         
         // (Optional) Nếu bạn muốn làm mờ nút bằng CanvasGroup thay vì Button Transition
         [SerializeField] private CanvasGroup purchaseBtnCanvasGroup; 
@@ -42,6 +45,8 @@ namespace _Game.Scripts.View.UI.ShopUI
             {
                 ShopManager.Instance.OnShopRefreshed += UpdateUI;
                 UpdateUI(ShopManager.Instance.GetCurrentItems());
+                
+                UpdateRerollButton();
             }
         }
 
@@ -52,10 +57,20 @@ namespace _Game.Scripts.View.UI.ShopUI
                 ShopManager.Instance.OnShopRefreshed -= UpdateUI;
             }
         }
+        
+        private void UpdateRerollButton()
+        {
+            if (rerollPriceText != null && ShopManager.Instance != null)
+            {
+                int cost = ShopManager.Instance.GetRerollCost();
+                rerollPriceText.text = $"Reroll ({cost} Coin)";
+            }
+        }
 
         private void UpdateUI(List<CharmData> items)
         {
             ResetSelectionLogic(); 
+            UpdateRerollButton();
 
             for (int i = 0; i < shopSlots.Count; i++)
             {
@@ -68,7 +83,6 @@ namespace _Game.Scripts.View.UI.ShopUI
             }
         }
 
-        // --- HÀM CLICK SLOT ---
         private void OnSlotSelected(int index)
         {
             Debug.Log($"[UI] Selected Slot: {index}");

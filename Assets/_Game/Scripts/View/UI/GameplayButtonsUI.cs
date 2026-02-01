@@ -1,63 +1,80 @@
 ﻿using UnityEngine;
-using _Game.Scripts.Core.Data;     // Để dùng GameState
+using _Game.Scripts.Core.Data;     
 using _Game.Scripts.Core.Managers;
-using UnityEngine.UI; // Để gọi GameManager
+using UnityEngine.UI;
 
 namespace _Game.Scripts.View.UI
 {
     [RequireComponent(typeof(CanvasGroup))]
     public class GameplayButtonsUI : MonoBehaviour
     {
+        [Header("Display Settings")]
         [SerializeField] private Image shopButtonImage;
         [SerializeField] private Sprite normalSprite;
         [SerializeField] private Sprite lockedSprite;
         
         private CanvasGroup _canvasGroup;
+        private Button _shopButton; 
 
         private void Awake()
         {
             _canvasGroup = GetComponent<CanvasGroup>();
+            // Tìm component Button
+            if (shopButtonImage != null) _shopButton = shopButtonImage.GetComponent<Button>();
+            if (_shopButton == null) _shopButton = GetComponentInChildren<Button>();
         }
 
-        private void Start()
+        private void Update()
         {
-            // Lắng nghe sự kiện thay đổi trạng thái game
+            // [STRICT MODE] Kiểm tra liên tục mỗi khung hình
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.OnStateChanged += OnGameStateChanged;
+                GameState state = GameManager.Instance.CurrentState;
                 
-                // Cập nhật ngay trạng thái ban đầu (để tránh UI bị sai khi mới vào game)
-                OnGameStateChanged(GameManager.Instance.CurrentState);
+                // Chỉ mở khi đang ở Preparation
+                bool shouldBeInteractable = (state == GameState.Preparation);
+                
+                // Cập nhật trạng thái
+                ForceUpdateState(shouldBeInteractable);
             }
         }
 
-        private void OnDestroy()
-        {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.OnStateChanged -= OnGameStateChanged;
-            }
-        }
-
-        // --- LOGIC TỰ ĐỘNG KHÓA/MỞ ---
-        private void OnGameStateChanged(GameState newState)
-        {
-            // Chỉ cho phép tương tác (bấm nút Shop, Book, Mua gói...) khi đang ở giai đoạn Chuẩn Bị
-            bool canInteract = (newState == GameState.Preparation);
-            
-            SetInteractable(canInteract);
-        }
-
-        public void SetInteractable(bool isInteractable)
+        private void ForceUpdateState(bool isInteractable)
         {
             if (_canvasGroup != null)
             {
-                _canvasGroup.interactable = isInteractable;
-                _canvasGroup.blocksRaycasts = isInteractable; // Chặn chuột hoàn toàn
-                shopButtonImage.sprite = isInteractable ? normalSprite : lockedSprite;
+                // 1. Chặn Raycast (Chuột không bấm được)
+                if (_canvasGroup.blocksRaycasts != isInteractable)
+                    _canvasGroup.blocksRaycasts = isInteractable;
+
+                // 2. Chặn Interactable (Logic hệ thống)
+                if (_canvasGroup.interactable != isInteractable)
+                    _canvasGroup.interactable = isInteractable;
+
+                // [THAY ĐỔI] Luôn giữ độ sáng 100% (Alpha = 1), không làm mờ nữa
+                if (_canvasGroup.alpha != 1f)
+                    _canvasGroup.alpha = 1f;
+            }
+
+            // 3. Đổi Sprite (Khóa/Mở)
+            if (shopButtonImage != null)
+            {
+                Sprite targetSprite = isInteractable ? normalSprite : lockedSprite;
                 
-                // Làm mờ để người chơi biết là đang bị khóa
-                _canvasGroup.alpha = isInteractable ? 1f : 0.6f; 
+                // Chỉ gán lại nếu sprite thay đổi (để tối ưu)
+                if (shopButtonImage.sprite != targetSprite)
+                    shopButtonImage.sprite = targetSprite;
+                
+                // [THAY ĐỔI] Luôn giữ màu trắng (gốc) để LockedSprite hiển thị đúng màu thiết kế
+                // Không phủ màu xám (Color.gray) đè lên nữa
+                if (shopButtonImage.color != Color.white)
+                    shopButtonImage.color = Color.white;
+            }
+            
+            // 4. Khóa cứng component Button (Lớp bảo vệ cuối cùng)
+            if (_shopButton != null && _shopButton.interactable != isInteractable)
+            {
+                _shopButton.interactable = isInteractable;
             }
         }
     }

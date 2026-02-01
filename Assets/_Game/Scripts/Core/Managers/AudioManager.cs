@@ -70,7 +70,10 @@ namespace _Game.Scripts.Core.Managers
     
         public void PlayWin()
         {
-           PlaySFX(winClip[Random.Range(0, winClip.Count())]);
+            if (winClip != null && winClip.Count > 0)
+            {
+                PlaySFX(winClip[Random.Range(0, winClip.Count)]);
+            }
         }
     
         public void PlayUnlockMask()

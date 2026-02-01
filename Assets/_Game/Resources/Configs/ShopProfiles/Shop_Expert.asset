@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f32ff4fa50da41cd9a9c9722018bdd84, type: 3}
-  m_Name: Level7
+  m_Name: Shop_Expert
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Core.Data.ShopProbabilitySO
   tierWeights:
   - tier: 0
-    weight: 18
+    weight: 15
   - tier: 1
-    weight: 52
+    weight: 25
   - tier: 2
-    weight: 27
+    weight: 40
   - tier: 3
-    weight: 3
+    weight: 20

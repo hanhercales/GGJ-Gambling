@@ -63,11 +63,12 @@ namespace _Game.Scripts.Core.Managers
                     break;
                     
                 case ResourceType.Ticket:
-                    if (_ticketsBlocked)
+                    if (_ticketsBlocked && amount > 0)
                     {
                         Debug.Log("[ResourceManager] Blocked Ticket gain due to active Curse.");
-                        return; // Reject the deposit
+                        return; 
                     }
+                    
                     ticket += (int)amount;
                     if (ticket < 0) ticket = 0;
                     OnResourceChanged?.Invoke(type, ticket.ToString());
@@ -127,11 +128,12 @@ namespace _Game.Scripts.Core.Managers
             return false;
         }
         
-        // Reset game (Cho debug hoặc chơi lại)
-        public void ResetAllData(int startCoin)
+        public void ResetAllData(int startCoin, int startTicket)
         {
             coin = startCoin;
-            ticket = 0;
+            
+            ticket = startTicket; 
+            
             currentDebt = 0;
             
             OnResourceChanged?.Invoke(ResourceType.Coin, FormatBigInt(coin));
