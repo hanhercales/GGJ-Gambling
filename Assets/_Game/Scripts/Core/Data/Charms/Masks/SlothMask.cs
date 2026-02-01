@@ -4,7 +4,7 @@ using _Game.Scripts.Core.Inventory;
 using _Game.Scripts.Core.Managers;
 
 [CreateAssetMenu(menuName = "Charms/Masks/Mask of Sloth")]
-public class MaskOfSlothCharm : CharmData
+public class MaskOfSlothCharm : MaskData // [THAY ĐỔI] Kế thừa MaskData
 {
     [Header("Settings")]
     public int spinsReduction = 2; 

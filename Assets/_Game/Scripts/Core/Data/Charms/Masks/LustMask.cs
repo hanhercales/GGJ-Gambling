@@ -4,7 +4,7 @@ using _Game.Scripts.Core.Inventory;
 using _Game.Scripts.Core.Managers;
 
 [CreateAssetMenu(menuName = "Charms/Masks/Mask of Lust")]
-public class LustMask : CharmData
+public class LustMask : MaskData // [THAY ĐỔI] Kế thừa MaskData
 {
     [Header("Buff Settings")]
     public float rarityBoost = 0.3f; // +30% weight for high tiers
@@ -17,7 +17,6 @@ public class LustMask : CharmData
         // 1. BUFF: Increase Rare & Legendary weights
         if (ShopManager.Instance != null)
         {
-            // Adding 0.3 means 1.3x multiplier (30% increase)
             ShopManager.Instance.ModifyTierWeight(CharmTier.Rare, rarityBoost);
             ShopManager.Instance.ModifyTierWeight(CharmTier.Legendary, rarityBoost);
         }

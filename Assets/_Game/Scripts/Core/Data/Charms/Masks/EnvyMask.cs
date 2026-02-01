@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
-using _Game.Scripts.Core.Data;
+using _Game.Scripts.Core.Data; // MaskData nằm trong namespace này
 using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Managers;
 using _Game.Scripts.Core.Logic;
-using System.Linq; // Needed for Sorting
+using System.Linq;
 
 [CreateAssetMenu(menuName = "Charms/Masks/Mask of Envy")]
-public class MaskOfEnvyCharm : CharmData
+public class MaskOfEnvyCharm : MaskData // [THAY ĐỔI] Kế thừa MaskData
 {
     [Header("Settings")]
     [Range(0f, 1f)] public float triggerChance = 0.3f; // 30%
@@ -36,7 +36,6 @@ public class MaskOfEnvyCharm : CharmData
     private void ApplyEnvyBonus(List<MatchResult> results)
     {
         // A. FIND THE "IDOL" (Symbol with highest value)
-        // We use currentValue to decide who is "Best"
         var bestMatch = results
             .OrderByDescending(r => r.symbol.currentValue) 
             .FirstOrDefault();
@@ -46,7 +45,6 @@ public class MaskOfEnvyCharm : CharmData
 
         Debug.Log($"[Mask of Envy] JEALOUSY! Transforming all wins into {bestSymbol.idName}...");
         
-        
         float gSymMult = ScoreManager.Instance.GetSymbolMult();
         float gPatMult = ScoreManager.Instance.GetPatternMult();
         float extraMoneyToAdd = 0;
@@ -54,14 +52,12 @@ public class MaskOfEnvyCharm : CharmData
         foreach (var match in results)
         {
             // 1. Swap the symbol!
-            // The previous 'Lemon' match now thinks it is a 'Diamond' match.
             match.symbol = bestSymbol;
 
             // 2. Calculate the NEW score
             float newScore = match.GetScore(gSymMult, gPatMult);
 
             // 3. We want 1.5x total. 
-            // The Machine handles 1.0x. We handle the 0.5x.
             extraMoneyToAdd += newScore * (bonusMultiplier - 1.0f);
         }
 

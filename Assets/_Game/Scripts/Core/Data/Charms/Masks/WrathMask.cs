@@ -5,10 +5,10 @@ using _Game.Scripts.Core.Data;
 using _Game.Scripts.Controllers.Machines;
 using _Game.Scripts.Core.Managers;
 using _Game.Scripts.Core.Logic;
-using System.Numerics; // For BigInteger
+using System.Numerics;
 
 [CreateAssetMenu(menuName = "Charms/Masks/Mask of Wrath")]
-public class WrathMask : CharmData
+public class WrathMask : MaskData // [THAY ĐỔI] Kế thừa MaskData
 {
     [Header("Buff Settings")]
     public int luckBonus = 5;
