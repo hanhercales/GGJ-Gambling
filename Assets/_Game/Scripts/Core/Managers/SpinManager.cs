@@ -65,7 +65,7 @@ namespace _Game.Scripts.Core.Managers
             {
                 opt1.type = SpinOptionType.Standard;
                 opt1.title = "Standard Spins";
-                opt1.spinCount = 7;
+                opt1.spinCount += 7;
                 opt1.coinCost = standardCost;
                 opt1.ticketReward = 1;
                 opt1.isAffordable = true;
@@ -74,7 +74,7 @@ namespace _Game.Scripts.Core.Managers
 
                 opt2.type = SpinOptionType.FewerSpins;
                 opt2.title = "Fewer Spins";
-                opt2.spinCount = 4;
+                opt2.spinCount += 4;
                 opt2.coinCost = fewerCost;
                 opt2.ticketReward = 2;
                 opt2.isAffordable = true;

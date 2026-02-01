@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace _Game.Scripts.Core.Managers
@@ -17,7 +18,7 @@ namespace _Game.Scripts.Core.Managers
         public AudioClip spinningLoopClip;
         public AudioClip patternMatchClip;
         
-        public List<AudioClip> winClip = new List<AudioClip>();
+        public List<AudioClip> winClip;
         public AudioClip maskUnlockClip;
         
         private void Awake()
@@ -69,7 +70,7 @@ namespace _Game.Scripts.Core.Managers
     
         public void PlayWin()
         {
-           PlaySFX(winClip[Random.Range(0, winClip.Count)]);
+           PlaySFX(winClip[Random.Range(0, winClip.Count())]);
         }
     
         public void PlayUnlockMask()
